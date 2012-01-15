@@ -1,0 +1,4 @@
+Jinja2==2.6
+MarkupSafe==0.15
+PyYAML==3.10
+wsgiref==0.1.2
