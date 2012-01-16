@@ -59,12 +59,11 @@ def build_node_tree(content_path, target_path, config, parent_node):
         target = os.path.join(target_path, target_name + ext)
 
         if os.path.isdir(path):
-            folder_node = FolderNode(parent_node, name, leaf_config, target)
+            folder_node = FolderNode(target_name, leaf_config, target)
+            parent_node.add_child(folder_node)
 
             build_node_tree(path, target, node_config, folder_node)
         else:
-            print target
-
             # an entire folder can be marked 'dont_process' using 'dont_process': true
             # or it can contain a list of glob patterns
             should_process = True
@@ -76,9 +75,9 @@ def build_node_tree(content_path, target_path, config, parent_node):
             if should_process:
                 # no need to assign this anywhere,
                 # parent_node will add this node as a child.
-                TemplatePageNode(parent_node, name, leaf_config, target, path)
+                parent_node.add_child(TemplatePageNode(target_name, leaf_config, target, path))
             else:
-                AssetPageNode(parent_node, name, leaf_config, target, path)
+                parent_node.add_child(AssetPageNode(target_name, leaf_config, target, path))
 
 # actual work is done here:
 with open(CONFIG_PATH, 'r') as config_file:
@@ -92,7 +91,7 @@ with open(CONFIG_PATH, 'r') as config_file:
     if not os.path.isdir(CONTENT_PATH):
         raise "Could not find CONTENT_PATH folder \"%s\"" % CONTENT_PATH
 
-    root_node = FolderNode(None, '', config, folder=DEPLOY_PATH)
+    root_node = FolderNode('', config, folder=DEPLOY_PATH)
 
     build_node_tree(CONTENT_PATH, DEPLOY_PATH, config, root_node)
 

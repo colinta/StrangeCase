@@ -1,0 +1,21 @@
+# robots.txt for Google
+User-Agent: Googlebot
+Allow: /
+Allow: /image/
+Allow: /pdf/
+Noindex: /js/
+Noindex: /css/
+
+# robots.txt for Google Image Search
+User-Agent: Googlebot-Image
+Allow: /image/
+
+# robots.txt for all remaining bots
+User-Agent: *
+Allow: /
+Allow: /image/
+Allow: /pdf/
+Disallow: /js/
+Disallow: /css/
+
+sitemap: http://{{ host }}/sitemap.xml
