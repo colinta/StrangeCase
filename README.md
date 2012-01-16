@@ -21,8 +21,8 @@ OK, SO
   * see? only `site/` is special.  everything else is up to you.
 
 
-DEFAULT CONFIG
---------------
+DEFAULT/SPECIAL CONFIG
+----------------------
 
 ``` yaml
   host: "http://localhost:8000"  # hostname
@@ -37,14 +37,16 @@ EXECUTING
 
 `$ python strange_case.py`
 
-Goes through all the files and directories in site/
+Goes through all the files and directories in `site/`
 
-* Folders become "FolderNode" objects (site/ is such a node).  folders have children
-* Templates (jinja2 templates - or any text file) become TemplatePageNode(PageNode) objects
-* Assets (css, js, images - anything that isn't a template) become AssetPageNode(PageNode) objects
+* Folders become `FolderNode` objects (`site/` is such a node).  Folders have children.
+* Templates (jinja2 templates - or any text file) become `TemplatePageNode(PageNode)` objects
+* Assets (css, js, images - anything that isn't a template) become `AssetPageNode(PageNode)` objects
 
 
-Files can have metadata either as front matter, or in that folder's config.yaml in the parent folder, in a "files" entry (this is so that static assets can have metadata).  because of this, "files:" in the yaml files are not copied as context variables.
+Files can have metadata either as front matter, or in that folder's `config.yaml` in the parent folder, in a `files` entry.
+The `files` is so that static assets can have metadata.  Because of this, `files:` in the `config.yaml` files are not
+copied or merged with child or parent settings.  That's the only special config other than those above.
 
 
 These nodes are placed in a tree:
