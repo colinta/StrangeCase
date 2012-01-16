@@ -37,8 +37,9 @@ def build_node_tree(content_path, target_path, config, parent_node):
     folder_config = {}
     if os.path.isfile(config_path):
         with open(config_path, 'r') as config_file:
-            folder_config = yaml.load(config_file)
-            if folder_config:
+            yaml_config = yaml.load(config_file)
+            if yaml_config:
+                folder_config.update(yaml_config)
                 node_config.update(folder_config)
 
                 # the 'files' setting is not merged.  it is super special. :-(
@@ -73,7 +74,8 @@ def build_node_tree(content_path, target_path, config, parent_node):
             build_node_tree(path, target, node_config, folder_node)
         else:
             try:
-                leaf_config.update(folder_config['files'][target_name])
+                if folder_config['files'] and folder_config['files'][target_name]:
+                    leaf_config.update(folder_config['files'][target_name])
             except KeyError:
                 pass
 
