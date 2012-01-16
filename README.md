@@ -69,32 +69,33 @@ These nodes are placed in a tree:
 TEMPLATES
 ---------
 
-### In your templates, you have access anything in the top-level config and in per-page metadata:
+### In your templates, you have access to anything in the top-level config and in per-page metadata:
 
 `/config.yaml`:
 
 ``` yaml
 meta:
   author:
-    name: Colin
+    name: "Colin"
 ```
 
 `/site/index.html`:
 
 ``` jinja
 ---
-# front matter
+# YAML front matter
 title: test
 ---
 
-{{ meta.author.name }}
-{{ title }}
+<h1>{{ meta.author.name }}</h1>
+<h2>{{ title }}</h2>
 ```
 
 =>
-
-    Colin
-    test
+``` html
+<h1>Colin</h1>
+<h2>test</h2>
+```
 
 
 ### You can iterate over folders:
@@ -111,7 +112,7 @@ title: test
 {{ site.blogs.test1.url }}
 ```
 
-### Iterate over static assets:
+### Even iterate over static assets — everything is a node!
 
 ``` jinja
 {% for image in site.static.image %}
@@ -122,7 +123,7 @@ title: test
 AND THAT'S IT
 -------------
 
-jinja2 makes it easy to put logic in these templates, which is really the only place for them...
+jinja2 makes it easy to put complicated logic in templates, which is really the only place for them in this static generator context...
 
 ...or is it !?  I’m wondering what kind of spaghetti nonsense these templates could end up with (it's like PHP all over again!), and how that could be fixed.
 
@@ -131,4 +132,4 @@ TODO
 ----
 
 * Add page processors, so that you could build a categories index page based on pages' category metadata.
-* Placing entries in .../config.yaml override parent configs, but i'd like to add a merging syntax similar to what we have in fbmvc (`key ?:`, `key !:`, `key -:` ...)
+* Placing entries in `**/config.yaml` override parent configs, but i'd like to add a merging syntax to the YAML, as a little DSL.
