@@ -5,8 +5,8 @@ It's yet another static site generator.  Have you seen jekyll?  hyde?  Yup.  Lik
 
 But this one is:
 
-1) Written in python, unlike `jekyll`
-2) **NOT** complicated, unlike `hyde`.  and I mean *really* **NOT** complicated.
+1. Written in python, unlike `jekyll`
+2. **NOT** complicated, unlike `hyde`.  and I mean *really* **NOT** complicated.
 
 
 OK, SO
