@@ -51,7 +51,7 @@ def yamlload(config_path, protected=True):
     if protected:
         for key in PROTECTED:
             try:
-                del yaml_config['files']
+                del yaml_config[key]
             except KeyError:
                 pass
     return yaml_config
