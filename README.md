@@ -16,7 +16,7 @@ OK, SO
 * `site/` stores site content - templates and assets.  These are processed or copied or ignored, as the case may be.
 * `config.yaml` files in a folder within `site/` override settings in the parent folder.  config is merged with the default config (see below - it's simple, too!).
 * `./` is the "root" afa template includes go:
-  * layouts can go in `layouts/` and are included using `{% include 'layouts/file.j2' %}`
+  * layouts can go in `layouts/` and are extended using `{% extends 'layouts/file.j2' %}`
   * includes can go in `anywhere/` and are included using `{% include 'anywhere/file.j2' %}`
   * see? only `site/` is special.  everything else is up to you.
 
