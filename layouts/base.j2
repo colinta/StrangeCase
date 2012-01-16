@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 
 {% block seometadata %}
-    <title>{% block title %}{{ meta.title }} | {{ meta.title }}{% endblock %}</title>
+    <title>{% block title %}{% if title %}{{ title }} | {% endif %}{{ meta.title }}{% endblock %}</title>
     <meta name="description" content="{{ meta.description }}">
     <meta name="author" content="{{ meta.author }}">
 {% endblock seometadata %}
@@ -53,9 +53,9 @@
 {%- endblock %}
           <ul class="nav">
 {% block nav -%}
-            <li><a href="">Blogs</a></li>
-            <li><a href="">Projects</a></li>
-            <li><a href="">Tags</a></li>
+            <li><a href="{{ site.blogs.url }}">Blogs</a></li>
+            <li><a href="{{ site.projects.url }}">Projects</a></li>
+            <li><a href="{{ site.tags.url }}">Tags</a></li>
 {%- endblock %}
           </ul>
         </div>

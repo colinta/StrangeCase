@@ -16,15 +16,53 @@ class Node(object):
     def __init__(self, name, config):
         self.name = name
         self.config = config
+        self.parent = None
 
     def build(self, **context):
         pass
+
     ##|
     ##|  "special" keys
     ##|
     @property
+    def type(self):
+        return 'abstract'
+
+    @property
+    def is_folder(self):
+        return False
+
+    @property
+    def is_page(self):
+        return False
+
+    @property
+    def is_asset(self):
+        return False
+
+    @property
     def title(self):
         return self.name.replace('_', ' ')
+
+    @property
+    def next(self):
+        if not self.parent:
+            return None
+
+        iterables = [page for page in self.parent]
+        index = iterables.index(self)
+        if len(iterables) > index + 1:
+            return iterables[index + 1]
+
+    @property
+    def prev(self):
+        if not self.parent:
+            return None
+
+        iterables = [page for page in self.parent]
+        index = iterables.index(self)
+        if index - 1 >= 0:
+            return iterables[index - 1]
 
     def __nonzero__(self):
         return True
@@ -58,12 +96,13 @@ class FolderNode(Node):
             child.parent.remove_child(child)
 
         child.parent = self
-        if not self.children.get(child.name):
-            self.children[child.name] = child
-            self.children_list.append(child)
+        if self.children.get(child.name):
+            raise NameError("Duplicate name %s in %s" % (child.name, self.name or '<root>'))
+        self.children[child.name] = child
+        self.children_list.append(child)
 
     def remove_child(self, child):
-        if self.children.get(child.name):
+        if child.name in self.children:
             del self.children[child.name]
 
         if child in self.children_list:
@@ -76,40 +115,50 @@ class FolderNode(Node):
         for child in self.children_list:
             child.build(**context)
 
-    ##|
-    ##|  "special" keys
-    ##|
-    @property
-    def next(self):
-        if not self.parent:
-            return None
-        index = self.parent.children_list.index(self)
-        if len(self.parent.children_list) > index + 1:
-            return self.parent.children_list[index + 1]
-
-    @property
-    def prev(self):
-        if not self.parent:
-            return None
-        index = self.parent.children_list.index(self)
-        if index - 1 >= 0:
-            return self.parent.children_list[index - 1]
-
     def __getattr__(self, key):
         ret = super(FolderNode, self).__getattr__(key)
         if ret is not None:
             return ret
 
-        page = self.children.get(key)
-        if page:
-            return page
+        if key in self.children:
+            return self.children[key]
         return None
 
     def __len__(self):
-        return len(self.children_list)
+        return len([child for child in self.children_list if child.iterable])
 
     def __iter__(self):
-        return iter(self.children_list)
+        return iter([child for child in self.children_list if child.iterable])
+
+    ##|
+    ##|  "special" keys
+    ##|
+    @property
+    def type(self):
+        return 'folder'
+
+    @property
+    def is_folder(self):
+        return True
+
+    def all(self, folders=False, pages=True, assets=False, recursive=False):
+        """ Returns ancestors, regardless of iterability. Ignores folders by default. """
+        ret = []
+
+        for child in self.children_list:
+            if isinstance(child, FolderNode):
+                if folders:
+                    ret.append(child)
+
+                if recursive:
+                    ret.extend(child.all(folders, pages))
+            elif isinstance(child, TemplatePageNode):
+                if pages:
+                    ret.append(child)
+            elif isinstance(child, AssetPageNode):
+                if assets:
+                    ret.append(child)
+        return ret
 
 
 class PageNode(Node):
@@ -119,6 +168,22 @@ class PageNode(Node):
     def __init__(self, name, config, target):
         super(PageNode, self).__init__(name, config)
         self.target = target
+
+    ##|
+    ##|  "special" keys
+    ##|
+    @property
+    def type(self):
+        return 'page' if self.is_page else 'asset'
+
+    @property
+    def is_page(self):
+        _, ext = os.path.splitext(self.target)
+        return True if ext == self.html_extension else False
+
+    @property
+    def is_asset(self):
+        return not self.is_page
 
 
 class AssetPageNode(PageNode):
@@ -148,4 +213,3 @@ class TemplatePageNode(PageNode):
         content = self.template.render(self.config, my=self, **context)
         with open(self.target, 'w') as dest:
             dest.write(content)
-        super(TemplatePageNode, self).build(**context)

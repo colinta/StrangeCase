@@ -26,9 +26,11 @@ DEFAULT/SPECIAL CONFIG
 
 ``` yaml
   host: "http://localhost:8000"  # hostname
+  index: index.html  # any file whose target_name matches this name will not be iterable (by default)
   ignore: ['config.yaml', '.*']  # which files to ignore altogether
   dont_process: ['*.js', '*.css', *images]  # do not run these files through jinja
   rename_extensions: { '.j2': '.html', '.jinja2': '.html' }  # which extensions to rename
+  html_extension: '.html'  # files with this extension are html files (`page.is_page` => `True`)
 ```
 
 
@@ -42,7 +44,6 @@ Goes through all the files and directories in `site/`
 * Folders become `FolderNode` objects (`site/` is such a node).  Folders have children.
 * Templates (jinja2 templates - or any text file) become `TemplatePageNode(PageNode)` objects
 * Assets (css, js, images - anything that isn't a template) become `AssetPageNode(PageNode)` objects
-
 
 Files can have metadata either as front matter, or in that folder's `config.yaml` in the parent folder, in a `files` entry.
 The `files` is so that static assets can have metadata.  Because of this, `files:` in the `config.yaml` files are not
@@ -103,23 +104,43 @@ title: test
 
 ``` jinja
 {% for blog in site.blogs %}
-{{ loop.index }}. {{ blog.title }}
+<p>{{ loop.index }}. {{ blog.title }}</p>
 {% endfor %}
 ```
 
-### Or access a page by name (filename w/o ext):
+=>
+
+``` html
+<p>1. Blog Title</p>
+<p>2. Blog Title</p>
+```
+
+** * Note: * ** Files named `index.html` will not be iterable by default.  This is a
+*good thing* when making index.html files.  If you don't like it, set `iterable: true`
+in your front matter.
+
+
+### Access any page by name:
 
 ``` jinja
 {{ site.blogs.test1.url }}
 ```
 
-### Even iterate over static assets — everything is a node!
+** * Note: * ** The .html extension is removed, but in order to have unique names, all other
+file types have their extension added.
+
+Also, in order to access pages this way, non-word characters are replaced by "_".  e.g. `-my.goofy-$-filename.txt` => `my_goofy___filename_txt`.
+
+### Even iterate over static assets, everything is a node!
 
 ``` jinja
 {% for image in site.static.image %}
 <img src="{{ image.url }}" />
 {% endfor %}
 ```
+
+You can check what kind of node you're working with using the `type` property ("page", "folder", "asset") or the `is_page`, `is_folder`, `is_asset` methods.
+
 
 AND THAT'S IT
 -------------

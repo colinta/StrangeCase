@@ -1,0 +1,15 @@
+---
+page: index
+---
+{% extends "layouts/base.j2" %}
+
+{% block main %}
+  <h1>Blogs ({{ site.blogs | count }})</h1>
+  <ol>
+  {% for blog in site.blogs %}
+    <li><a href="{{ blog.url }}">{{ blog.title }}</a></li>
+  {% else %}
+    <li>None</li>
+  {% endfor %}
+  </ol>
+{% endblock %}

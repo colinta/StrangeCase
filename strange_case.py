@@ -1,5 +1,6 @@
 import yaml
 import os
+import re
 from fnmatch import fnmatch
 from copy import deepcopy
 
@@ -8,15 +9,18 @@ from node import *  # imports Node, Page, TemplatePage, and Folder
 # these will eventually be command-line configurable:
 CONFIG_FILE = u'config.yaml'
 CONFIG_PATH = u'./' + CONFIG_FILE
-CONTENT_PATH = u'site/'
+SITE_PATH = u'site/'
 DEPLOY_PATH = u'public/'
 PORT = 8000
+HTML_EXT = '.html'
 
 DEFAULT_CONFIG = {
     'host': 'http://localhost:' + str(PORT),
+    'html_extension': HTML_EXT,
+    'index': 'index' + HTML_EXT,
     'rename_extensions': {
-        '.j2': '.html',
-        '.jinja2': '.html',
+        '.j2': HTML_EXT,
+        '.jinja2': HTML_EXT,
     },
     'ignore': [
         '.*',
@@ -28,12 +32,12 @@ DEFAULT_CONFIG = {
 }
 
 
-def build_node_tree(content_path, target_path, config, parent_node):
+def build_node_tree(source_path, target_path, config, parent_node):
     # don't modify node_config
     node_config = deepcopy(config)
 
     # merge folder config
-    config_path = os.path.join(content_path, CONFIG_FILE)
+    config_path = os.path.join(source_path, CONFIG_FILE)
     folder_config = {}
     if os.path.isfile(config_path):
         with open(config_path, 'r') as config_file:
@@ -52,23 +56,48 @@ def build_node_tree(content_path, target_path, config, parent_node):
     if node_config['ignore'] is True:
         return
 
-    for name in os.listdir(content_path):
-        if any(pattern for pattern in node_config['ignore'] if fnmatch(name, pattern)):
+    for file_name in os.listdir(source_path):
+        if any(pattern for pattern in node_config['ignore'] if fnmatch(file_name, pattern)):
             continue
 
         leaf_config = deepcopy(node_config)
 
-        path = os.path.join(content_path, name)
-        target_name, ext = os.path.splitext(name)
-        if leaf_config.get('name'):
-            target_name = leaf_config.get('name')
-        # .jinja2 should be served as .html
-        if leaf_config.get('rename_extensions', {}).get(ext):
-            ext = leaf_config['rename_extensions'].get(ext)
-        target = os.path.join(target_path, target_name + ext)
+        # figure out source and destination paths, and target_name
+        path = os.path.join(source_path, file_name)
+        name, ext = os.path.splitext(file_name)
 
+        # .jinja2 should be served as .html
+        if 'rename_extensions' in leaf_config and ext in leaf_config['rename_extensions']:
+            ext = leaf_config['rename_extensions'][ext]
+
+        # allow name override
+        if 'name' in leaf_config:
+            name = leaf_config['name']
+
+        # allow target_name override, otherwise it is
+        # `name + ext`
+        if 'target_name' in leaf_config:
+            target_name = leaf_config['target_name']
+        else:
+            target_name = name + ext
+
+        # modify the name: add the extension if it exists
+        # and isn't ".html", and replace non-word characters with _
+        if ext and ext != HTML_EXT:
+            name += '_' + ext[1:]
+        name = name.replace('-', '_')
+        name = re.sub(r'/\W/', '_', name)
+
+        target = os.path.join(target_path, target_name)
+
+        public_path = source_path[len(SITE_PATH):]
+        url = os.path.join('/' + public_path, target_name)
+
+        leaf_config['url'] = url
+
+        # create node(s)
         if os.path.isdir(path):
-            folder_node = FolderNode(target_name, leaf_config, target)
+            folder_node = FolderNode(name, leaf_config, target)
             parent_node.add_child(folder_node)
 
             build_node_tree(path, target, node_config, folder_node)
@@ -84,15 +113,19 @@ def build_node_tree(content_path, target_path, config, parent_node):
             should_process = True
             if isinstance(node_config['dont_process'], bool):
                 should_process = not node_config['dont_process']
-            elif any(pattern for pattern in node_config['dont_process'] if fnmatch(name, pattern)):
+            elif any(pattern for pattern in node_config['dont_process'] if fnmatch(file_name, pattern)):
                 should_process = False
 
+            # if this file is an index file, it will not be included in the pages iterator.
+            # all other pages are iterable
+            if 'iterable' not in leaf_config:
+                if target_name != leaf_config['index']:
+                    leaf_config['iterable'] = True
+
             if should_process:
-                # no need to assign this anywhere,
-                # parent_node will add this node as a child.
-                parent_node.add_child(TemplatePageNode(target_name, leaf_config, target, path))
+                parent_node.add_child(TemplatePageNode(name, leaf_config, target, path))
             else:
-                parent_node.add_child(AssetPageNode(target_name, leaf_config, target, path))
+                parent_node.add_child(AssetPageNode(name, leaf_config, target, path))
 
 # actual work is done here:
 with open(CONFIG_PATH, 'r') as config_file:
@@ -103,11 +136,11 @@ with open(CONFIG_PATH, 'r') as config_file:
         config.update(yaml_config)
 
     # look for files in content/
-    if not os.path.isdir(CONTENT_PATH):
-        raise "Could not find CONTENT_PATH folder \"%s\"" % CONTENT_PATH
+    if not os.path.isdir(SITE_PATH):
+        raise "Could not find SITE_PATH folder \"%s\"" % SITE_PATH
 
     root_node = FolderNode('', config, folder=DEPLOY_PATH)
 
-    build_node_tree(CONTENT_PATH, DEPLOY_PATH, config, root_node)
+    build_node_tree(SITE_PATH, DEPLOY_PATH, config, root_node)
 
     root_node.build(site=root_node)

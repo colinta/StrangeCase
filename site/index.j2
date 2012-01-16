@@ -5,13 +5,17 @@ test: nifty
 
 {% block main -%}
   <h1>Blogs ({{ site.blogs | count }})</h1>
-  <ul>
+  <ol>
   {% for blog in site.blogs %}
-    <li>{{ loop.index }}. {{ blog.title }}</li>
+    {% if blog.is_folder %}
+      <li>{{ blog.title }}</li>
+    {% else %}
+      <li><a href="{{ blog.url }}">{{ blog.title }}</a></li>
+    {% endif %}
   {% else %}
     <li>None</li>
   {% endfor %}
-  </ul>
+  </ol>
 
   <h1>Projects ({{ site.projects | count }})</h1>
 
