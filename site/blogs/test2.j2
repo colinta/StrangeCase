@@ -1,11 +1,12 @@
 ----
 title: 'Test blog'
 ----
-{% extends 'layouts/layout_test.j2' %}
+{% extends 'layouts/base.j2' %}
 
 {% block main %}
 {{ super() }}
-<h1>{{ page.title }}</h1>
+<h1>prev: {{ my.prev }}</h1>
+<h1>next: {{ my.next }}</h1>
 
 <p>Isn't this nice a nice blog, TOO?</p>
 

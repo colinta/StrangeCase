@@ -5,26 +5,26 @@
     <meta charset="utf-8">
 
 {% block seometadata %}
-    <title>{% block title %}{{ page.meta.title }} | {{ meta.title }}{% endblock %}</title>
-    <meta name="description" content="{{ page.meta.description }}">
-    <meta name="author" content="{{ page.meta.author }}">
+    <title>{% block title %}{{ meta.title }} | {{ meta.title }}{% endblock %}</title>
+    <meta name="description" content="{{ meta.description }}">
+    <meta name="author" content="{{ meta.author }}">
 {% endblock seometadata %}
 
-    <link rel="shortcut icon" href="{{ media_url('/favicon.ico') }}">
-    <link rel="apple-touch-icon" href="{{ media_url('/apple-touch-icon.png') }}">
-    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+    <link rel="shortcut icon" href="/static/image/favicon.ico">
+    <link rel="apple-touch-icon" href="/static/image/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/static/image/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/static/image/apple-touch-icon-114x114.png">
 
 {% block googlefonts %}
     <link href='http://fonts.googleapis.com/css?family=Wire+One|Anonymous+Pro' rel='stylesheet' type='text/css'>
 {% endblock googlefonts %}
 
 {% block headcss %}
-    <link href="{{ media_url('css/bootstrap.css') }}" rel="stylesheet">
-    <link href="{{ media_url('css/style.css') }}" rel="stylesheet" type="text/css" media="all">
-    <link href="{{ media_url('css/colinta.css') }}" rel="stylesheet" type="text/css" media="all">
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css" media="all">
+    <link href="/static/css/colinta.css" rel="stylesheet" type="text/css" media="all">
 
-    <link href="{{ media_url('google-code-prettify/prettify.css') }}" rel="stylesheet" type="text/css" media="all">
+    <link href="/static/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
 {% endblock headcss %}
 
 {% block headjs %}
@@ -33,9 +33,11 @@
     <![endif]-->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
-    <script src="{{ media_url('js/libs/modernizr.js') }}"></script>
-    <script src="{{ media_url('google-code-prettify/prettify.js') }}"></script>
+    <script src="/static/js/libs/modernizr.js"></script>
+    <script src="/static/google-code-prettify/prettify.js"></script>
 {% endblock headjs %}
+
+{% block analytics %}{% include 'includes/analytics.j2' %}{% endblock analytics %}
 
 {% block endhead %}{% endblock endhead %}
   </head>
@@ -51,8 +53,9 @@
 {%- endblock %}
           <ul class="nav">
 {% block nav -%}
-            {% from "macros.j2" import render_nav with context %}
-            {{ render_nav(menu, 'main_nav') }}
+            <li>Blogs</li>
+            <li>Projects</li>
+            <li>Tags</li>
 {%- endblock %}
           </ul>
         </div>
@@ -79,10 +82,6 @@
 $(document).ready(prettyPrint);
 </script>
 {% endblock prettyprint %}
-
-{% block analytics -%}
-  {% include "analytics.j2" %}
-{%- endblock analytics %}
 
 {% endblock js %}
   </body>

@@ -8,7 +8,7 @@ from node import *  # imports Node, Page, TemplatePage, and Folder
 # these will eventually be command-line configurable:
 CONFIG_FILE = u'config.yaml'
 CONFIG_PATH = u'./' + CONFIG_FILE
-CONTENT_PATH = u'content/'
+CONTENT_PATH = u'site/'
 DEPLOY_PATH = u'public/'
 PORT = 8000
 
@@ -19,6 +19,7 @@ DEFAULT_CONFIG = {
         '.jinja2': '.html',
     },
     'ignore': [
+        '.*',
         CONFIG_FILE
     ],
     'dont_process': [
@@ -33,14 +34,21 @@ def build_node_tree(content_path, target_path, config, parent_node):
 
     # merge folder config
     config_path = os.path.join(content_path, CONFIG_FILE)
+    folder_config = {}
     if os.path.isfile(config_path):
         with open(config_path, 'r') as config_file:
-            yaml_config = yaml.load(config_file)
-            if yaml_config:
-                node_config.update(yaml_config)
+            folder_config = yaml.load(config_file)
+            if folder_config:
+                node_config.update(folder_config)
+
+                # the 'files' setting is not merged.  it is super special. :-(
+                try:
+                    del node_config['files']
+                except KeyError:
+                    pass
 
     # if { ignore: true }, the entire directory is ignored
-    if isinstance(node_config['ignore'], bool) and node_config['ignore']:
+    if node_config['ignore'] is True:
         return
 
     for name in os.listdir(content_path):
@@ -64,11 +72,16 @@ def build_node_tree(content_path, target_path, config, parent_node):
 
             build_node_tree(path, target, node_config, folder_node)
         else:
+            try:
+                leaf_config.update(folder_config['files'][target_name])
+            except KeyError:
+                pass
+
             # an entire folder can be marked 'dont_process' using 'dont_process': true
             # or it can contain a list of glob patterns
             should_process = True
-            if isinstance(node_config['dont_process'], bool) and not node_config['dont_process']:
-                should_process = False
+            if isinstance(node_config['dont_process'], bool):
+                should_process = not node_config['dont_process']
             elif any(pattern for pattern in node_config['dont_process'] if fnmatch(name, pattern)):
                 should_process = False
 
