@@ -119,6 +119,13 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
         else:
             target_name = base_name + ext
 
+            ### if ''fix_target_name'' ?
+            ### this code makes target names "look purty", like their name counterpart
+
+            # target_name = target_name.replace('-', '_')
+            # target_name = target_name.replace(' ', '_')
+            # target_name = re.sub(r'/\W/', '_', target_name)
+
         ##|  FIX NAME
         # modify the name: add the extension if it exists
         # and isn't ".html", and replace non-word characters with _
