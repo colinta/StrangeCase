@@ -4,6 +4,16 @@ test: nifty
 {% extends "layouts/layout_test.j2" %}
 
 {% block main -%}
-Index! by {{ meta.author.name }}
-{%- endblock %}
+  <h1>Blogs ({{ site.blogs | count }})</h1>
+  <ul>
+  {% for blog in site.blogs %}
+    <li>{{ loop.index }}. {{ blog }}</li>
+  {% else %}
+    <li>None</li>
+  {% endfor %}
+  </ul>
 
+  <h1>Projects ({{ site.projects | count }})</h1>
+
+  Index! by {{ meta.author.name }}
+{%- endblock %}

@@ -1,5 +1,5 @@
+host: http://colinta.com
 meta:
-  host: http://colinta.com
   title: stuff by colinta
   # time: `Date()`
   author:
