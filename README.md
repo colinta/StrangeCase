@@ -24,10 +24,12 @@ OK, SO
 DEFAULT CONFIG
 --------------
 
-'host': hostname (http://localhost:8000)
-'ignore': which files to ignore altogether (['config.yaml', '.*'])
-'dont_process': do not run these files through jinja (['*.js', '*.css', *images])
-'rename_extensions': which extensions to rename ({'j2': 'html'})
+``` yaml
+  host: "http://localhost:8000"  # hostname
+  ignore: ['config.yaml', '.*']  # which files to ignore altogether
+  dont_process: ['*.js', '*.css', *images]  # do not run these files through jinja
+  rename_extensions: { '.j2': '.html', '.jinja2': '.html' }  # which extensions to rename
+```
 
 
 EXECUTING
