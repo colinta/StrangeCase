@@ -7,16 +7,17 @@ from copy import deepcopy
 
 from node import *  # imports Node, Page, TemplatePage, and Folder
 
-# these will eventually be command-line configurable:
+# this will eventually be command-line configurable:
+CONFIG_PATH = u'./config.yaml'
+
+# these can all be gleaned from the config file
 CONFIG_FILE = u'config.yaml'
-CONFIG_PATH = u'./' + CONFIG_FILE
 SITE_PATH = u'site/'
 DEPLOY_PATH = u'public/'
-PORT = 8000
 HTML_EXT = '.html'
 
 DEFAULT_CONFIG = {
-    'host': 'http://localhost:' + str(PORT),
+    'host': 'http://localhost:8000',
     'html_extension': HTML_EXT,
     'index': 'index' + HTML_EXT,
     'rename_extensions': {
@@ -30,8 +31,30 @@ DEFAULT_CONFIG = {
     ],
     'dont_process': [
         '*.js', '*.css',
-    ]
+    ],
+    ##|  PATHS
+    'config_file': CONFIG_FILE,
+    # PROTECTED
+    'site_path':   SITE_PATH,
+    'deploy_path': DEPLOY_PATH
 }
+
+
+# these settings cannot be overidden on a per-folder basis
+PROTECTED = ['site_path', 'deploy_path']
+
+
+def yamlload(config_path, protected=True):
+    with open(config_path, 'r') as config_file:
+        yaml_config = yaml.load(config_file)
+
+    if protected:
+        for key in PROTECTED:
+            try:
+                del yaml_config['files']
+            except KeyError:
+                pass
+    return yaml_config
 
 
 def build_node_tree(source_path, target_path, config, parent_node):
@@ -39,20 +62,20 @@ def build_node_tree(source_path, target_path, config, parent_node):
     node_config = deepcopy(config)
 
     # merge folder/config.yaml
-    config_path = os.path.join(source_path, CONFIG_FILE)
+    config_path = os.path.join(source_path, config['config_file'])
     folder_config = {}
     if os.path.isfile(config_path):
-        with open(config_path, 'r') as config_file:
-            yaml_config = yaml.load(config_file)
-            if yaml_config:
-                folder_config.update(yaml_config)
-                node_config.update(folder_config)
+        yaml_config = yamlload(config_path)
 
-                # the 'files' setting is not merged.  it is super special. :-(
-                try:
-                    del node_config['files']
-                except KeyError:
-                    pass
+        if yaml_config:
+            folder_config.update(yaml_config)
+            node_config.update(folder_config)
+
+            # the 'files' setting is not merged.  it is super special. :-(
+            try:
+                del node_config['files']
+            except KeyError:
+                pass
 
     # if { ignore: true }, the entire directory is ignored
     if node_config['ignore'] is True:
@@ -99,7 +122,7 @@ def build_node_tree(source_path, target_path, config, parent_node):
         ##|  FIX NAME
         # modify the name: add the extension if it exists
         # and isn't ".html", and replace non-word characters with _
-        if ext and ext != HTML_EXT:
+        if ext and ext != leaf_config['html_extension']:
             name += '_' + ext[1:]
         name = name.replace('-', '_')
         name = name.replace(' ', '_')
@@ -107,7 +130,7 @@ def build_node_tree(source_path, target_path, config, parent_node):
 
         target = os.path.join(target_path, target_name)
 
-        public_path = source_path[len(SITE_PATH):]
+        public_path = source_path[len(config['site_path']):]
         url = os.path.join('/' + public_path, target_name)
 
         ##|  ASSIGN URL
@@ -150,19 +173,19 @@ def build_node_tree(source_path, target_path, config, parent_node):
                 parent_node.add_child(StaticPageNode(name, leaf_config, target, path))
 
 # actual work is done here:
-with open(CONFIG_PATH, 'r') as config_file:
-    config = {}
-    config.update(DEFAULT_CONFIG)
-    yaml_config = yaml.load(config_file)
-    if yaml_config:
-        config.update(yaml_config)
+config = {}
+config.update(DEFAULT_CONFIG)
 
-    # look for files in content/
-    if not os.path.isdir(SITE_PATH):
-        raise "Could not find SITE_PATH folder \"%s\"" % SITE_PATH
+yaml_config = yamlload(CONFIG_PATH, protected=False)
+if yaml_config:
+    config.update(yaml_config)
 
-    root_node = FolderNode('', config, folder=DEPLOY_PATH)
+# look for files in content/
+if not os.path.isdir(config['site_path']):
+    raise "Could not find SITE_PATH folder \"%s\"" % config['site_path']
 
-    build_node_tree(SITE_PATH, DEPLOY_PATH, config, root_node)
+root_node = FolderNode('', config, folder=config['deploy_path'])
 
-    root_node.build(site=root_node)
+build_node_tree(config['site_path'], config['deploy_path'], config, root_node)
+
+root_node.build(site=root_node)
