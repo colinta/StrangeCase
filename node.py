@@ -146,16 +146,16 @@ class FolderNode(Node):
         ret = []
 
         for child in self.children_list:
-            if isinstance(child, FolderNode):
+            if child.is_folder:
                 if folders:
                     ret.append(child)
 
                 if recursive:
                     ret.extend(child.all(folders, pages))
-            elif isinstance(child, TemplatePageNode):
+            elif child.is_page:
                 if pages:
                     ret.append(child)
-            elif isinstance(child, AssetPageNode):
+            elif child.is_asset:
                 if assets:
                     ret.append(child)
         return ret
@@ -186,17 +186,17 @@ class PageNode(Node):
         return not self.is_page
 
 
-class AssetPageNode(PageNode):
+class StaticPageNode(PageNode):
     """
     Copies a file to a destination
     """
     def __init__(self, name, config, target, path):
-        super(AssetPageNode, self).__init__(name, config, target)
+        super(StaticPageNode, self).__init__(name, config, target)
         self.path = path
 
     def build(self, **context):
         copy2(self.path, self.target)
-        super(AssetPageNode, self).build(**context)
+        super(StaticPageNode, self).build(**context)
 
 
 class TemplatePageNode(PageNode):

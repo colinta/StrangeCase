@@ -9,6 +9,14 @@ But this one is:
 2. **NOT** complicated, unlike `hyde`.  and I mean *really* **NOT** complicated.
 
 
+First, the complicated stuff:
+
+* Index pages are not iterable, except by using `page.all()`
+
+
+Now for the easy stuff!
+
+
 OK, SO
 -------
 
@@ -43,7 +51,7 @@ Goes through all the files and directories in `site/`
 
 * Folders become `FolderNode` objects (`site/` is such a node).  Folders have children.
 * Templates (jinja2 templates - or any text file) become `TemplatePageNode(PageNode)` objects
-* Assets (css, js, images - anything that isn't a template) become `AssetPageNode(PageNode)` objects
+* Assets (css, js, images - anything that isn't a template) become `StaticPageNode(PageNode)` objects
 
 Files can have metadata either as front matter, or in that folder's `config.yaml` in the parent folder, in a `files` entry.
 The `files` is so that static assets can have metadata.  Because of this, `files:` in the `config.yaml` files are not

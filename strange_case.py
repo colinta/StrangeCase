@@ -125,7 +125,7 @@ def build_node_tree(source_path, target_path, config, parent_node):
             if should_process:
                 parent_node.add_child(TemplatePageNode(name, leaf_config, target, path))
             else:
-                parent_node.add_child(AssetPageNode(name, leaf_config, target, path))
+                parent_node.add_child(StaticPageNode(name, leaf_config, target, path))
 
 # actual work is done here:
 with open(CONFIG_PATH, 'r') as config_file:
