@@ -1,0 +1,19 @@
+---
+title: this is one nifty demo blog
+date: 2012-01-16
+---
+{% extends 'layouts/post.j2' %}
+
+{% block content %}
+{% markdown2 %}
+This is being written as markdown.  I've included the `markdown2_extension.py` file in the `extensions/` folder.
+
+<pre><code>{% raw -%}
+{% markdown2 %}
+This is being written as markdown.  I've included the `markdown2_extension.py` file in the `extensions/` folder.
+{% endmarkdown2 %}
+{%- endraw %}</code></pre>
+
+{% endmarkdown2 %}
+
+{% endblock %}

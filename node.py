@@ -2,10 +2,28 @@ from jinja2 import Environment
 from strange_case_jinja import YamlFrontMatterLoader, YamlFrontMatterTemplate
 import os
 from shutil import copy2
+from extensions.markdown2_extension import Markdown2Extension
+from extensions.date_extension import date
 
 
-env = Environment(loader=YamlFrontMatterLoader(os.getcwd()))
-env.template_class = YamlFrontMatterTemplate
+environment = Environment(extensions=[Markdown2Extension],
+                          loader=YamlFrontMatterLoader(os.getcwd()),
+                          )
+environment.filters['date'] = date
+
+environment.template_class = YamlFrontMatterTemplate
+
+
+def check_config_first(fn):
+    """
+    @property methods like title() get called instead of __getattr__().  This method helps
+    to make sure that self.config is checked before returning the default.
+    """
+    def ret(self):
+        if fn.__name__ in self.config:
+            return self.config[fn.__name__]
+        return fn(self)
+    return ret
 
 
 class Node(object):
@@ -25,22 +43,27 @@ class Node(object):
     ##|  "special" keys
     ##|
     @property
+    @check_config_first
     def type(self):
         return 'abstract'
 
     @property
+    @check_config_first
     def is_folder(self):
         return False
 
     @property
+    @check_config_first
     def is_page(self):
         return False
 
     @property
+    @check_config_first
     def is_asset(self):
         return False
 
     @property
+    @check_config_first
     def title(self):
         return self.name.replace('_', ' ')
 
@@ -134,10 +157,12 @@ class FolderNode(Node):
     ##|  "special" keys
     ##|
     @property
+    @check_config_first
     def type(self):
         return 'folder'
 
     @property
+    @check_config_first
     def is_folder(self):
         return True
 
@@ -173,15 +198,18 @@ class PageNode(Node):
     ##|  "special" keys
     ##|
     @property
+    @check_config_first
     def type(self):
         return 'page' if self.is_page else 'asset'
 
     @property
+    @check_config_first
     def is_page(self):
         _, ext = os.path.splitext(self.target)
         return True if ext == self.html_extension else False
 
     @property
+    @check_config_first
     def is_asset(self):
         return not self.is_page
 
@@ -206,10 +234,10 @@ class TemplatePageNode(PageNode):
     def __init__(self, name, config, target, path):
         super(TemplatePageNode, self).__init__(name, config, target)
         self.path = path
-        self.template = env.get_template(path)
+        self.template = environment.get_template(path)
         self.config.update(self.template.context)
 
     def build(self, **context):
         content = self.template.render(self.config, my=self, **context)
         with open(self.target, 'w') as dest:
-            dest.write(content)
+            dest.write(content.encode('utf-8'))

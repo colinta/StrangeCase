@@ -1,23 +1,17 @@
 ---
-test: nifty
+title: home
+header: this is my home page
 ---
-{% extends "layouts/base.j2" %}
+{% extends 'layouts/header.j2' %}
 
-{% block main -%}
-  <h1>Blogs ({{ site.blogs | count }})</h1>
-  <ol>
-  {% for blog in site.blogs %}
-    {% if blog.is_folder %}
-      <li>{{ blog.title }}</li>
-    {% else %}
-      <li><a href="{{ blog.url }}">{{ blog.title }}</a></li>
-    {% endif %}
-  {% else %}
-    <li>None</li>
-  {% endfor %}
-  </ol>
+{% block content %}
+{{ super() }}
+<h2>Blog</h2>
 
-  <h1>Projects ({{ site.projects | count }})</h1>
+<ul class="posts">
+{% for blog in site.blogs %}
+  <li><span>{{ blog.date | date }}</span> &rsaquo; <a href="{{ blog.url }}">{{ blog.title }}</a></li>
+{% endfor %}
+</ul>
 
-  Index! by {{ meta.author.name }}
-{%- endblock %}
+{% endblock %}

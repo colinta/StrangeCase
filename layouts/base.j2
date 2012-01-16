@@ -22,7 +22,6 @@
 {% block headcss %}
     <link href="/static/css/bootstrap.css" rel="stylesheet">
     <link href="/static/css/style.css" rel="stylesheet" type="text/css" media="all">
-    <link href="/static/css/colinta.css" rel="stylesheet" type="text/css" media="all">
 
     <link href="/static/google-code-prettify/prettify.css" rel="stylesheet" type="text/css" media="all">
 {% endblock headcss %}
@@ -33,7 +32,7 @@
     <![endif]-->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
-    <script src="/static/js/libs/modernizr.js"></script>
+    <script src="/static/js/modernizr.js"></script>
     <script src="/static/google-code-prettify/prettify.js"></script>
 {% endblock headjs %}
 
@@ -47,14 +46,12 @@
     <div class="topbar">
       <div class="fill">
         <div class="container">
-{% block header -%}
-          <img class="minime" src="/static/image/minime.png" />
+{% block logo -%}
           <a class="brand" href="/">{{ meta.title }}</a>
 {%- endblock %}
           <ul class="nav">
 {% block nav -%}
             <li><a href="{{ site.blogs.url }}">Blogs</a></li>
-            <li><a href="{{ site.projects.url }}">Projects</a></li>
             <li><a href="{{ site.tags.url }}">Tags</a></li>
 {%- endblock %}
           </ul>
@@ -71,7 +68,7 @@
 
       <footer>
         <p>&copy; {{ meta.author.name }} {{ meta.time }}</p>
-        <p>Powered by <a href="http://ringce.com/hyde">hyde</a>.</p>
+        <p>Powered by <a href="http://colinta.com/projects/StrangeCase">StrangeCase</a>.</p>
       </footer>
 
     </div> <!-- /container -->

@@ -1,0 +1,19 @@
+{%  macro nextprev(page, site) -%}
+    <div class="pagination">
+      <ul>
+      {% if page.prev %}
+        <li class="prev"><a href="{{ page.prev.url }}" title="{{ page.prev.title }}">&larr;</a></li>
+      {% else %}
+        <li class="prev disabled"><a>&larr;</a></li>
+      {% endif %}
+{% if site.archive %}
+        <li><a href="{{ site.archive.url }}">{{ site.archive.title }}</a></li>
+{% endif %}
+      {% if page.next %}
+        <li class="next"><a href="{{ page.next.url }}" title="{{ page.next.title }}">&rarr;</a></li>
+      {% else %}
+        <li class="next disabled"><a>&rarr;</a>
+      {% endif %}
+      </ul>
+    </div>
+{%- endmacro %}

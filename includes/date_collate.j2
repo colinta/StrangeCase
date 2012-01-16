@@ -1,0 +1,33 @@
+{% macro date_collate(posts_collate) %}
+
+{% for post in posts_collate  %}
+  {% set this_year = post.date | date: "%Y" %}
+  {% set this_month = post.date | date: "%B" %}
+  {% set next_year = post.prev.date | date: "%Y" %}
+  {% set next_month = post.prev.date | date: "%B" %}
+
+  {% if loop.first %}
+    <h2>{{this_year}}</h2>
+    <h3>{{this_month}}</h3>
+    <ul>
+  {% endif %}
+
+  <li><span>{{ post.date | date: "%B %e, %Y" }}</span> &rsaquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+
+  {% if loop.last %}
+    </ul>
+  {% else %}
+    {% if this_year != next_year %}
+      </ul>
+      <h2>{{next_year}}</h2>
+      <h3>{{next_month}}</h3>
+      <ul>
+    {% else %}
+      {% if this_month != next_month %}
+        </ul>
+        <h3>{{next_month}}</h3>
+        <ul>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}

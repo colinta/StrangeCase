@@ -1,0 +1,12 @@
+{% extends 'layouts/header.j2' %}
+
+{% block main %}
+{{ super() }}
+
+<div class="row">
+  <div class="span14">
+{% block content %}{% endblock %}
+  </div>
+</div>
+
+{% endblock %}

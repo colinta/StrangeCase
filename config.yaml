@@ -1,10 +1,11 @@
-host: http://colinta.com
+# host: http://yourhost.com
 meta:
-  analytics: 'UA-15076738-1'
-  title: stuff by colinta
-  # time: {{ Date() }}
+  analytics: 'UA-12345678-1'
+  title: your title
+  header: your header
   author:
-    name: Colin Thomas-Arnold
-    email: colinta@gmail.com
-    github: colinta
-    twitter: colinta
+    name: your name
+    short_name: you
+    email: youremail@yourhost.com
+    github: you
+    twitter: you

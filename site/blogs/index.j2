@@ -1,13 +1,13 @@
 ---
-page: index
+title: blogs
+header: stuff i've written
 ---
-{% extends "layouts/base.j2" %}
+{% extends 'layouts/header.j2' %}
 
-{% block main %}
-  <h1>Blogs ({{ site.blogs | count }})</h1>
+{% block content %}
   <ol>
   {% for blog in site.blogs %}
-    <li><a href="{{ blog.url }}">{{ blog.title }}</a></li>
+    <li><span>{{ blog.date | date }}</span> &rsaquo; <a href="{{ blog.url }}">{{ blog.title }}</a></li>
   {% else %}
     <li>None</li>
   {% endfor %}

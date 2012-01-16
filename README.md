@@ -12,6 +12,10 @@ But this one is:
 First, the complicated stuff:
 
 * Index pages are not iterable, except by using `page.all()`
+* Index pages' URLs do not include the filename.  This means they have the same name
+  as the folder they index.  That's good, right?
+* For fun, you can prefix variables on a page with `my.`
+  I think it looks better, and `self` was taken.
 
 
 Now for the easy stuff!
