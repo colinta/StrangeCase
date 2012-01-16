@@ -57,7 +57,7 @@ def yamlload(config_path, protected=True):
     return yaml_config
 
 
-def build_node_tree(source_path, target_path, config, parent_node):
+def build_node_tree(source_path, target_path, public_path, config, parent_node):
     # don't modify parent's node_config
     node_config = deepcopy(config)
 
@@ -88,7 +88,7 @@ def build_node_tree(source_path, target_path, config, parent_node):
         leaf_config = deepcopy(node_config)
 
         # figure out source path and base_name, ext to help get us started on the name mangling
-        path = os.path.join(source_path, file_name)
+        file_path = os.path.join(source_path, file_name)
         base_name, ext = os.path.splitext(file_name)
 
         ##|  MERGE FILES CONFIG
@@ -130,8 +130,7 @@ def build_node_tree(source_path, target_path, config, parent_node):
 
         target = os.path.join(target_path, target_name)
 
-        public_path = source_path[len(config['site_path']):]
-        url = os.path.join('/' + public_path, target_name)
+        url = os.path.join(public_path, target_name)
 
         ##|  ASSIGN URL
         leaf_config['url'] = url
@@ -141,17 +140,17 @@ def build_node_tree(source_path, target_path, config, parent_node):
         leaf_config['url'] = urllib.quote(url)
 
         ### DEBUG
-        ### print '%s >> %s @ %s' % (name, target, leaf_config['url'])
+        ### print '%s >> %s || %s @ %s' % (name, target, target_name, leaf_config['url'])
 
         # create node(s)
-        if os.path.isdir(path):
+        if os.path.isdir(file_path):
             # add a trailing slash.  this gives folders the same
             # url as their index page (assuming they have one)
             leaf_config['url'] += '/'
             folder_node = FolderNode(name, leaf_config, target)
             parent_node.add_child(folder_node)
 
-            build_node_tree(path, target, node_config, folder_node)
+            build_node_tree(file_path, target, os.path.join(public_path, target_name), node_config, folder_node)
         else:
             # an entire folder can be marked 'dont_process' using 'dont_process': true
             # or it can contain a list of glob patterns
@@ -168,9 +167,9 @@ def build_node_tree(source_path, target_path, config, parent_node):
                     leaf_config['iterable'] = True
 
             if should_process:
-                parent_node.add_child(TemplatePageNode(name, leaf_config, target, path))
+                parent_node.add_child(TemplatePageNode(name, leaf_config, target, file_path))
             else:
-                parent_node.add_child(StaticPageNode(name, leaf_config, target, path))
+                parent_node.add_child(StaticPageNode(name, leaf_config, target, file_path))
 
 # actual work is done here:
 config = {}
@@ -186,6 +185,6 @@ if not os.path.isdir(config['site_path']):
 
 root_node = FolderNode('', config, folder=config['deploy_path'])
 
-build_node_tree(config['site_path'], config['deploy_path'], config, root_node)
+build_node_tree(config['site_path'], config['deploy_path'], '/', config, root_node)
 
 root_node.build(site=root_node)
