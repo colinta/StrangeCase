@@ -7,7 +7,7 @@ test: nifty
   <h1>Blogs ({{ site.blogs | count }})</h1>
   <ul>
   {% for blog in site.blogs %}
-    <li>{{ loop.index }}. {{ blog }}</li>
+    <li>{{ loop.index }}. {{ blog.title }}</li>
   {% else %}
     <li>None</li>
   {% endfor %}

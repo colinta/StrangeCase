@@ -19,6 +19,12 @@ class Node(object):
 
     def build(self, **context):
         pass
+    ##|
+    ##|  "special" keys
+    ##|
+    @property
+    def title(self):
+        return self.name.replace('_', ' ')
 
     def __nonzero__(self):
         return True
