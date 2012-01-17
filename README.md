@@ -6,43 +6,71 @@ It's yet another static site generator.  Have you seen jekyll?  hyde?  Yup.  Lik
 But this one is:
 
 1. Written in python, unlike `jekyll`
-2. **NOT** complicated, unlike `hyde`.  and I mean *really* **NOT** complicated.
+2. **NOT** complicated, unlike `hyde`.  And I mean *really* **NOT** complicated.
 
+----------------------------------------------------------------------------------------------------------------
 
-First, the complicated stuff:
+First, the complicated stuff.  This will hopefully make sense at the end.  I mention them
+first so that you get an idea for the *most* complicated parts (which aren't really that
+complicated)
 
-* Index pages are not iterable, except by using `page.all()`
+* `config.yaml` files can contain a `files:` dictionary where the keys refer to a file in that folder, and
+  the values are treated as yaml front matter.  This makes it possible to configure binary files.
+
+* Index pages are not included when iterating over a folder.
+
 * Index pages' URLs do not include the filename.  This means they have the same name
   as the folder they index.  That's good, right?
-* For fun, you can prefix variables on a page with `my.`
-  I think it looks better, and `self` was taken.
 
 
 Now for the easy stuff!
 
+----------------------------------------------------------------------------------------------------------------
 
 OK, SO
 -------
 
-* `config.yaml` stores context variables.
+
+* `config.yaml` stores context variables.  It is merged with the default config (see below - it's simple, too!).
+
+* Everything in your `config.yaml` files is available as a context variable.  `config.yaml` files in a folder
+  are merged with the parent folder.
+
 * `site/` stores site content - templates and assets.  These are processed or copied or ignored, as the case may be.
-* `config.yaml` files in a folder within `site/` override settings in the parent folder.  config is merged with the default config (see below - it's simple, too!).
-* `./` is the "root" afa template includes go:
-  * layouts can go in `layouts/` and are extended using `{% extends 'layouts/file.j2' %}`
-  * includes can go in `anywhere/` and are included using `{% include 'anywhere/file.j2' %}`
-  * see? only `site/` is special.  everything else is up to you.
+
+* `config.yaml` files in a folder within `site/` override settings in the parent folder.
+
+* Template files (.html, .txt, .md) can contain YAML front matter.  If the first line is `^[-]{3,}$`, everything up
+  to the matching dashes will be treated as YAML and added to that files context variables.
+
+* Templates are processed using (jinja2)[http://jinja.pocoo.org/]
+
+* Jinja is told only about your project folder, so you can use any directories you want
+  to store layouts, macros, and partials.
+  * layouts that are in `layouts/` are extended using `{% extends 'layouts/file.j2' %}`
+  * includes can go in `anywhere/`, and then they are included using `{% include 'anywhere/file.j2' %}`
+  * SO: only `site/` is special.
+
+* For fun, you can prefix variables on a page with `my.` (e.g. `my.title` or `my.parent`). I think it looks
+  better in some places because it makes it clear where the content comes from (e.g. `{{ my.title }}` as
+  opposed to just `{{ title }}`).
 
 
 DEFAULT/SPECIAL CONFIG
 ----------------------
 
 ``` yaml
-  host: "http://localhost:8000"  # hostname
-  index: index.html  # any file whose target_name matches this name will not be iterable (by default)
+  config_file: 'config.yaml'  # name of file that contains config
+  host: "http://localhost:8000"  # hostname.  I'm not using this for anything, but I imagine it will be importand for pligin authors
+  index: index.html  # any file whose target_name matches this name will not be iterable
   ignore: ['config.yaml', '.*']  # which files to ignore altogether
   dont_process: ['*.js', '*.css', *images]  # do not run these files through jinja
   rename_extensions: { '.j2': '.html', '.jinja2': '.html' }  # which extensions to rename
   html_extension: '.html'  # files with this extension are html files (`page.is_page` => `True`)
+  # PROTECTED
+  # these can only be assigned in the root config file
+  site_path: 'site/'  # where to find site content
+  deploy_path: 'public/'  # where to put the generated site
 ```
 
 
@@ -53,13 +81,14 @@ EXECUTING
 
 Goes through all the files and directories in `site/`
 
+* Files/Folders that match `ignore` are skipped.
 * Folders become `FolderNode` objects (`site/` is such a node).  Folders have children.
-* Templates (jinja2 templates - or any text file) become `TemplatePageNode(PageNode)` objects
-* Assets (css, js, images - anything that isn't a template) become `StaticPageNode(PageNode)` objects
+* Templates (any file that doesn't match `dont_process`) become `TemplatePageNode(PageNode)` objects
+* Assets (anything that isn't a template) become `StaticPageNode(PageNode)` objects
 
-Files can have metadata either as front matter, or in that folder's `config.yaml` in the parent folder, in a `files` entry.
-The `files` is so that static assets can have metadata.  Because of this, `files:` in the `config.yaml` files are not
-copied or merged with child or parent settings.  That's the only special config other than those above.
+Files can have metadata either as front matter, or in that folder's `config.yaml` in a `files:` entry.
+The `files:` entry is so that static assets can have metadata.  Because of this, `files:` in the `config.yaml` files are not
+copied or merged with child or parent settings.
 
 
 These nodes are placed in a tree:
@@ -102,12 +131,14 @@ title: test
 
 <h1>{{ meta.author.name }}</h1>
 <h2>{{ title }}</h2>
+<h2>{{ my.title }}</h2>
 ```
 
 =>
 
 ``` html
 <h1>Colin</h1>
+<h2>test</h2>
 <h2>test</h2>
 ```
 
@@ -127,9 +158,10 @@ title: test
 <p>2. Blog Title</p>
 ```
 
-** * Note: * ** Files named `index.html` will not be iterable by default.  This is a
-*good thing* when making index.html files.  If you don't like it, set `iterable: true`
-in your front matter.
+** * Note: * ** Files named `index.html` will not be included in this list.  This is a
+very reasonable design decision, and I see no reason why it should even be a configuration
+option.  But hey, make a case for it.  I'm a reasonable person, and I'll be oh so flattered
+that you're using `StrangeCase`!
 
 
 ### Access any page by name:
@@ -138,12 +170,13 @@ in your front matter.
 {{ site.blogs.test1.url }}
 ```
 
-** * Note: * ** The .html extension is removed, but in order to have unique names, all other
-file types have their extension added.
+In order to access pages this way, non-word characters are replaced by "_".  e.g. `-my.goofy-$-filename.txt` => `my_goofy___filename_txt`.
 
-Also, in order to access pages this way, non-word characters are replaced by "_".  e.g. `-my.goofy-$-filename.txt` => `my_goofy___filename_txt`.
+** * Note: * ** The .html extension is removed from html files, all other extensions are preserved (but `file.txt` => `file_txt`, as
+explained above)
 
-### Even iterate over static assets, everything is a node!
+
+### Even iterate over static assets, since everything is a node!
 
 ``` jinja
 {% for image in site.static.image %}
@@ -152,6 +185,14 @@ Also, in order to access pages this way, non-word characters are replaced by "_"
 ```
 
 You can check what kind of node you're working with using the `type` property ("page", "folder", "asset") or the `is_page`, `is_folder`, `is_asset` methods.
+
+Lastly, the `.all()` method on folders is useful.  The method definition says it all I think:
+
+``` python
+def all(self, folders=False, pages=True, assets=False, recursive=False):
+    """ Returns descendants, ignoring iterability. Folders, assets, and
+    pages can all be included or excluded as the case demands."""
+```
 
 
 AND THAT'S IT
