@@ -160,7 +160,8 @@ class FolderNode(Node):
         return True
 
     def all(self, folders=False, pages=True, assets=False, recursive=False):
-        """ Returns descendants, ignoring iterability. Ignores folders and assets by default."""
+        """ Returns descendants, ignoring iterability. Folders, assets, and
+            pages can all be included or excluded as the case demands."""
         ret = []
 
         for child in self.children:
@@ -169,7 +170,7 @@ class FolderNode(Node):
                     ret.append(child)
 
                 if recursive:
-                    ret.extend(child.all(folders, pages))
+                    ret.extend(child.all(folders, pages, assets, recursive))
             elif child.is_page:
                 if pages:
                     ret.append(child)
