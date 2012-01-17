@@ -173,9 +173,10 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
                 should_process = False
 
             # if this file is an index file, it will not be included in the pages iterator.
-            # all other pages are iterable
-            if target_name != leaf_config['index']:
-                leaf_config['iterable'] = True
+            # all other pages are iterable.
+            if 'iterable' not in leaf_config:
+                if target_name != leaf_config['index']:
+                    leaf_config['iterable'] = True
 
             if should_process:
                 parent_node.add_child(TemplatePageNode(leaf_config, target, file_path))

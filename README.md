@@ -159,9 +159,9 @@ title: test
 ```
 
 ** * Note: * ** Files named `index.html` will not be included in this list.  This is a
-very reasonable design decision, and I see no reason why it should even be a configuration
-option.  But hey, make a case for it.  I'm a reasonable person, and I'll be oh so flattered
-that you're using `StrangeCase`!
+very reasonable design decision, but I can imagin a situation where you have a file (think
+`robots.txt`) that *also* doesn't belong in the iterable pages list.  So `iterable: false` is
+available as a config setting.
 
 
 ### Access any page by name:
