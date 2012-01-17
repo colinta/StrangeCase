@@ -1,7 +1,8 @@
-The Strange Case...
-===================
+The Strange Case of...
+======================
 
-It's yet another static site generator.  Have you seen jekyll?  hyde?  Yup.  Like those.
+It's yet another static site generator.  Have you seen (jekyll)[https://github.com/mojombo/jekyll]?
+(hyde)[http://ringce.com/hyde]?  Yup.  Like those.
 
 But this one is:
 
