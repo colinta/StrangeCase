@@ -107,9 +107,21 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
         ##|  ASSIGN NAME
         # name override
         if 'name' in leaf_config:
+            # no error checking is done if you specify the name yourself.
             name = leaf_config['name']
         else:
             name = base_name
+
+            ##|  FIX NAME
+            # modify the name: add the extension if it exists
+            # and isn't ".html", and replace non-word characters with _
+            if ext and ext != leaf_config['html_extension']:
+                name += '_' + ext[1:]  # pluck off the "." in front
+
+            # remove offending characters:
+            # non-word, hyphens, and spaces
+            name = re.sub(r'[\W -]', '_', name, re.UNICODE)
+            leaf_config['name'] = name.encode('ascii')
 
         ##|  ASSIGN TARGET_NAME
         # allow target_name override, otherwise it is
@@ -126,22 +138,15 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
             # target_name = target_name.replace(' ', '_')
             # target_name = re.sub(r'/\W/', '_', target_name)
 
-        ##|  FIX NAME
-        # modify the name: add the extension if it exists
-        # and isn't ".html", and replace non-word characters with _
-        if ext and ext != leaf_config['html_extension']:
-            name += '_' + ext[1:]
-        name = name.replace('-', '_')
-        name = name.replace(' ', '_')
-        name = re.sub(r'/\W/', '_', name)
-
         target = os.path.join(target_path, target_name)
 
         url = os.path.join(public_path, target_name)
 
         ##|  ASSIGN URL
+        if 'url' in leaf_config:
+            raise KeyError('You cannot specify "url" in config.  It is determined by its location in the tree, and the target_names of itself and all its parents')
         leaf_config['url'] = url
-        # remove 'index.html from the end of the url'
+        # remove 'index.html' from the end of the url
         if leaf_config['url'].endswith(leaf_config['index']):
             leaf_config['url'] = leaf_config['url'][0:-len(leaf_config['index'])]
         leaf_config['url'] = urllib.quote(url)
@@ -154,7 +159,7 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
             # add a trailing slash.  this gives folders the same
             # url as their index page (assuming they have one)
             leaf_config['url'] += '/'
-            folder_node = FolderNode(name, leaf_config, target)
+            folder_node = FolderNode(leaf_config, target)
             parent_node.add_child(folder_node)
 
             build_node_tree(file_path, target, os.path.join(public_path, target_name), node_config, folder_node)
@@ -174,9 +179,9 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
                     leaf_config['iterable'] = True
 
             if should_process:
-                parent_node.add_child(TemplatePageNode(name, leaf_config, target, file_path))
+                parent_node.add_child(TemplatePageNode(leaf_config, target, file_path))
             else:
-                parent_node.add_child(StaticPageNode(name, leaf_config, target, file_path))
+                parent_node.add_child(StaticPageNode(leaf_config, target, file_path))
 
 # actual work is done here:
 config = {}
@@ -190,7 +195,8 @@ if yaml_config:
 if not os.path.isdir(config['site_path']):
     raise "Could not find SITE_PATH folder \"%s\"" % config['site_path']
 
-root_node = FolderNode('', config, folder=config['deploy_path'])
+root_node = FolderNode(config, folder=config['deploy_path'])
+root_node.name = ''
 
 build_node_tree(config['site_path'], config['deploy_path'], '/', config, root_node)
 

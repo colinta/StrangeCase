@@ -31,8 +31,7 @@ class Node(object):
     Parent class for all nodes (pages and folders)
     """
 
-    def __init__(self, name, config):
-        self.name = name
+    def __init__(self, config):
         self.config = config
         self.parent = None
 
@@ -95,12 +94,8 @@ class Node(object):
         return True
 
     def __getattr__(self, key):
-        if key == "name":
-            return self.name
-
-        conf = self.config.get(key)
-        if conf:
-            return conf
+        if key in self.config:
+            return self.config.get(key)
         return None
 
     def __repr__(self, indent=''):
@@ -111,27 +106,20 @@ class FolderNode(Node):
     """
     A FolderNode object creates itself.
     """
-    def __init__(self, name, config, folder):
-        super(FolderNode, self).__init__(name, config)
+    def __init__(self, config, folder):
+        super(FolderNode, self).__init__(config)
         self.folder = folder
 
         self.children = []
-        self.child_by_name = {}
 
     def add_child(self, child):
         if child.parent:
             child.parent.remove_child(child)
 
         child.parent = self
-        if self.child_by_name.get(child.name):
-            raise NameError("Duplicate name %s in %s" % (child.name, self.name or '<root>'))
-        self.child_by_name[child.name] = child
         self.children.append(child)
 
     def remove_child(self, child):
-        if child.name in self.child_by_name:
-            del self.child_by_name[child.name]
-
         if child in self.children:
             self.children.remove(child)
 
@@ -147,8 +135,9 @@ class FolderNode(Node):
         if ret is not None:
             return ret
 
-        if key in self.child_by_name:
-            return self.child_by_name[key]
+        for child in self.children:
+            if child.name == key:
+                return child
         return None
 
     def __len__(self):
@@ -194,8 +183,8 @@ class PageNode(Node):
     """
     A PageNode object is an abstract parent class for a "leaf".
     """
-    def __init__(self, name, config, target):
-        super(PageNode, self).__init__(name, config)
+    def __init__(self, config, target):
+        super(PageNode, self).__init__(config)
         self.target = target
 
     ##|
@@ -222,8 +211,8 @@ class StaticPageNode(PageNode):
     """
     Copies a file to a destination
     """
-    def __init__(self, name, config, target, path):
-        super(StaticPageNode, self).__init__(name, config, target)
+    def __init__(self, config, target, path):
+        super(StaticPageNode, self).__init__(config, target)
         self.path = path
 
     def build(self, **context):
@@ -235,10 +224,12 @@ class TemplatePageNode(PageNode):
     """
     A TemplatePageNode object is rendered before copied to its destination
     """
-    def __init__(self, name, config, target, path):
-        super(TemplatePageNode, self).__init__(name, config, target)
+    def __init__(self, config, target, path):
+        super(TemplatePageNode, self).__init__(config, target)
         self.path = path
         self.template = environment.get_template(path)
+        if 'url' in self.template.context:
+            raise KeyError('You cannot specify "url" in yaml front matter.  It is determined by its location in the tree, and the target_names of itself and all its parents')
         self.config.update(self.template.context)
 
     def build(self, **context):
