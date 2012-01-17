@@ -48,7 +48,7 @@ def yamlload(config_path, protected=True):
     with open(config_path, 'r') as config_file:
         yaml_config = yaml.load(config_file)
 
-    if protected:
+    if yaml_config and protected:
         for key in PROTECTED:
             try:
                 del yaml_config[key]

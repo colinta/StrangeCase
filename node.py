@@ -67,6 +67,10 @@ class Node(object):
     def title(self):
         return self.name.replace('_', ' ')
 
+    ##|
+    ##|  TRAVERSAL
+    ##|   see FolderNode for the children property
+    ##|
     @property
     def next(self):
         if not self.parent:
@@ -111,31 +115,31 @@ class FolderNode(Node):
         super(FolderNode, self).__init__(name, config)
         self.folder = folder
 
-        self.children_list = []
-        self.children = {}
+        self.children = []
+        self.child_by_name = {}
 
     def add_child(self, child):
         if child.parent:
             child.parent.remove_child(child)
 
         child.parent = self
-        if self.children.get(child.name):
+        if self.child_by_name.get(child.name):
             raise NameError("Duplicate name %s in %s" % (child.name, self.name or '<root>'))
-        self.children[child.name] = child
-        self.children_list.append(child)
+        self.child_by_name[child.name] = child
+        self.children.append(child)
 
     def remove_child(self, child):
-        if child.name in self.children:
-            del self.children[child.name]
+        if child.name in self.child_by_name:
+            del self.child_by_name[child.name]
 
-        if child in self.children_list:
-            self.children_list.remove(child)
+        if child in self.children:
+            self.children.remove(child)
 
     def build(self, **context):
         if not os.path.isdir(self.folder):
             os.mkdir(self.folder, 0755)
 
-        for child in self.children_list:
+        for child in self.children:
             child.build(**context)
 
     def __getattr__(self, key):
@@ -143,15 +147,15 @@ class FolderNode(Node):
         if ret is not None:
             return ret
 
-        if key in self.children:
-            return self.children[key]
+        if key in self.child_by_name:
+            return self.child_by_name[key]
         return None
 
     def __len__(self):
-        return len([child for child in self.children_list if child.iterable])
+        return len([child for child in self.children if child.iterable])
 
     def __iter__(self):
-        return iter([child for child in self.children_list if child.iterable])
+        return iter([child for child in self.children if child.iterable])
 
     ##|
     ##|  "special" keys
@@ -167,10 +171,10 @@ class FolderNode(Node):
         return True
 
     def all(self, folders=False, pages=True, assets=False, recursive=False):
-        """ Returns ancestors, regardless of iterability. Ignores folders by default. """
+        """ Returns descendants, ignoring iterability. Ignores folders and assets by default."""
         ret = []
 
-        for child in self.children_list:
+        for child in self.children:
             if child.is_folder:
                 if folders:
                     ret.append(child)
