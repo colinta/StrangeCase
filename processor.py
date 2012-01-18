@@ -1,25 +1,29 @@
+"""
+The long and short of it:
+* write a function that looks like this:
+      def your_processor(config, source_file, target_path):
+          return (nodes, ...)
+* Processor.register('your_name', your_processor)
+
+If you return multiple nodes, they will all be added as children to the parent node.
+If instead you need to create some kind of tree structure, build the tree first and
+then return the top-level node (still in a tuple).  `build_node_tree` might be your
+friend.
+
+All files will be parsed for front matter unless it matches an entry in
+'dont_process' (using `fnmatch`).
+"""
+
 import yaml
 import os
 import re
-import urllib
 from fnmatch import fnmatch
 from copy import deepcopy
-from node import FolderNode, AssetNode, JinjaNode
+from node import FolderNode, RootFolderNode, AssetNode, JinjaNode
 
 
-##|
-##|  The long and short of it:
-##|  * extend Processor
-##|  * implement process()
-##|  * return (nodes, ...).
-##|
-##|  optionally:
-##|  * implement
-##|
-
-
-def process_front_matter(source_path):
-    with open(source_path, 'r') as f:
+def process_front_matter(source_file):
+    with open(source_file, 'r') as f:
         contents = f.read()
         front_matter_match = re.match(r"\A([-]{3,})$", contents, re.MULTILINE)
         if front_matter_match:
@@ -39,32 +43,15 @@ def process_front_matter(source_path):
     return {}
 
 
-def folder_processor(config, source_path, target_path, public_path):
-    node = FolderNode(config, public_path, source_path, target_path)
-    build_node_tree(node, config, source_path, target_path, public_path)
-    return (node, )
-
-
-def build_node_tree(parent_node, config, source_path, target_path, public_path):
+def build_node_tree(parent_node, config, source_path, target_path):
     # don't modify parent's node_config
     node_config = deepcopy(config)
 
-    # merge folder/config.yaml
-    config_path = os.path.join(source_path, config['config_file'])
-    folder_config = {}
-    if os.path.isfile(config_path):
-        with open(config_path, 'r') as config_file:
-            yaml_config = yaml.load(config_file)
-
-        if yaml_config:
-            folder_config.update(yaml_config)
-            node_config.update(folder_config)
-
-            # the 'files' setting is not merged.  it is super special. :-(
-            try:
-                del node_config['files']
-            except KeyError:
-                pass
+    # not merged
+    if 'name' in node_config:
+        del node_config['name']
+    if 'target_name' in node_config:
+        del node_config['target_name']
 
     # if { ignore: true }, the entire directory is ignored
     if node_config['ignore'] is True:
@@ -82,11 +69,11 @@ def build_node_tree(parent_node, config, source_path, target_path, public_path):
 
         ##|  MERGE FILES CONFIG
         # these use the "real" file_name
-        try:
-            if folder_config['files'] and folder_config['files'][file_name]:
-                leaf_config.update(folder_config['files'][file_name])
-        except KeyError:
-            pass
+        if 'files' in leaf_config:
+            if file_name in leaf_config['files']:
+                leaf_config.update(leaf_config['files'][file_name])
+            # the 'files' setting is not passed on to child pages
+            del leaf_config['files']
 
         ##|  FIX EXTENSION
         # .jinja2 should be served as .html
@@ -125,32 +112,19 @@ def build_node_tree(parent_node, config, source_path, target_path, public_path):
             # target_name = target_name.replace('-', '_')
             # target_name = target_name.replace(' ', '_')
             # target_name = re.sub(r'/\W/', '_', target_name)
-
-        target = os.path.join(target_path, target_name)
-
-        url = os.path.join(public_path, target_name)
-
-        ##|  ASSIGN URL
-        # remove 'index.html' from the end of the url
-        if url.endswith(leaf_config['index']):
-            url = url[0:-len(leaf_config['index'])]
-        url = urllib.quote(url)
+            leaf_config['target_name'] = target_name
 
         ### DEBUG
-        ### print 'name:%s >> target:%s || target_name:%s @ url:%s' % (name, target, target_name, url)
+        ### print 'name:%s >> target_file:%s || target_name:%s @ url:%s' % (name, target_file, target_name)
 
         # create node(s). if you specify a 'processor' it will override the default.
         if os.path.isdir(source_file):
-            # add a trailing slash.  this gives folders the same
-            # url as their index page (assuming they have one)
-            url += '/'
-
             if 'processor' in leaf_config:
                 processor = leaf_config['processor']
             else:
                 processor = 'folder'
 
-            nodes = Processor.get(processor, leaf_config, source_file, target, url)
+            nodes = Processor.get(processor, leaf_config, source_file, target_path)
         else:
             if 'processor' in leaf_config:
                 processor = leaf_config['processor']
@@ -175,23 +149,50 @@ def build_node_tree(parent_node, config, source_path, target_path, public_path):
                 else:
                     processor = 'asset'
 
-            # if this file is an index file, it will not be included in the pages iterator.
-            # all other pages are iterable.
-            if 'iterable' not in leaf_config:
-                if target_name != leaf_config['index']:
-                    leaf_config['iterable'] = True
-
-            nodes = Processor.get(processor, leaf_config, source_file, target, url)
+            nodes = Processor.get(processor, leaf_config, source_file, target_path)
         parent_node.extend(nodes)
 
 
-def asset_processor(config, source_path, target_path, public_path):
-    node = AssetNode(config, public_path, source_path, target_path)
+def root_processor(config, deploy_path, target_path):
+    # merge folder/config.yaml
+    config_path = os.path.join(deploy_path, config['config_file'])
+    if os.path.isfile(config_path):
+        with open(config_path, 'r') as config_file:
+            yaml_config = yaml.load(config_file)
+
+        if yaml_config:
+            config.update(yaml_config)
+
+    node = RootFolderNode(config, deploy_path, target_path)
+
+    build_node_tree(node, config, deploy_path, target_path)
     return (node, )
 
 
-def page_processor(config, source_path, target_path, public_path):
-    node = JinjaNode(config, public_path, source_path, target_path)
+def folder_processor(config, source_path, target_path):
+    # merge folder/config.yaml
+    config_path = os.path.join(source_path, config['config_file'])
+    if os.path.isfile(config_path):
+        with open(config_path, 'r') as config_file:
+            yaml_config = yaml.load(config_file)
+
+        if yaml_config:
+            config.update(yaml_config)
+
+    node = FolderNode(config, source_path, target_path)
+
+    target_path = os.path.join(target_path, node.target_name)
+    build_node_tree(node, config, source_path, target_path)
+    return (node, )
+
+
+def asset_processor(config, source_path, target_path):
+    node = AssetNode(config, source_path, target_path)
+    return (node, )
+
+
+def page_processor(config, source_path, target_path):
+    node = JinjaNode(config, source_path, target_path)
     return (node, )
 
 
@@ -216,7 +217,7 @@ class Processor(object):
             raise NotImplementedError('Unknown processor "%s"' % name)
 
 
-Processor.registerDefault('root', folder_processor)
+Processor.registerDefault('root', root_processor)
 Processor.registerDefault('folder', folder_processor)
 Processor.registerDefault('asset', asset_processor)
 Processor.registerDefault('page', page_processor)

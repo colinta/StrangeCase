@@ -15,7 +15,6 @@ if __name__ == '__main__':
     if not os.path.isdir(SITE_PATH):
         raise "Could not find SITE_PATH folder \"%s\"" % SITE_PATH
 
-    root_node = Processor.get('root', CONFIG, SITE_PATH, DEPLOY_PATH, '/')[0]
-    # build_node_tree(root_node, CONFIG, SITE_PATH, DEPLOY_PATH, '/')
+    root_node = Processor.get('root', CONFIG, SITE_PATH, DEPLOY_PATH)[0]
 
     root_node.generate(site=root_node)
