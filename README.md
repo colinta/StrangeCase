@@ -48,7 +48,7 @@ OK, SO
 * Template files (.html, .txt, .md) can contain YAML front matter.  If the first line is `^[-]{3,}$`, everything up
   to the matching dashes will be treated as YAML and added to that files context variables.
 
-* Templates are processed using (jinja2)[http://jinja.pocoo.org/]
+* Templates are processed using [jinja2](http://jinja.pocoo.org/)
 
 * Jinja is told only about your project folder, so you can use any directories you want
   to store layouts, macros, and partials.
