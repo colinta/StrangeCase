@@ -45,7 +45,6 @@ class Node(object):
             return True
         return False
 
-
     @property
     @check_config_first
     def type(self):

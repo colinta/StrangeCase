@@ -22,6 +22,17 @@ from copy import deepcopy
 from node import FolderNode, RootFolderNode, AssetNode, JinjaNode
 
 
+def process_config_yaml(config_path):
+    # merge folder/config.yaml
+    if os.path.isfile(config_path):
+        with open(config_path, 'r') as config_file:
+            yaml_config = yaml.load(config_file)
+
+        if yaml_config:
+            return yaml_config
+    return {}
+
+
 def process_front_matter(source_file):
     with open(source_file, 'r') as f:
         contents = f.read()
@@ -119,6 +130,15 @@ def build_node_tree(parent_node, config, source_path, target_path):
 
         # create node(s). if you specify a 'processor' it will override the default.
         if os.path.isdir(source_file):
+            # this also happens in the root_processor.  I would prefer these be DRYer, but I
+            # don't have a clear idea how to remove one or the other.  RootNode is created
+            # imperatively, and so must explicitly look for it.  Folders are detected
+            # after that point, but in order to be consistent with files' front matter parsing timing,
+            # the config is read *before* its processor is invoked (so no matter what processor you
+            # use, it is guaranteed that YAML info)
+            config_path = os.path.join(source_file, leaf_config['config_file'])
+            leaf_config.update(process_config_yaml(config_path))
+
             if 'processor' in leaf_config:
                 processor = leaf_config['processor']
             else:
@@ -154,14 +174,9 @@ def build_node_tree(parent_node, config, source_path, target_path):
 
 
 def root_processor(config, deploy_path, target_path):
-    # merge folder/config.yaml
+    # see note above about why root_processor has this code but folder_processor doesn't
     config_path = os.path.join(deploy_path, config['config_file'])
-    if os.path.isfile(config_path):
-        with open(config_path, 'r') as config_file:
-            yaml_config = yaml.load(config_file)
-
-        if yaml_config:
-            config.update(yaml_config)
+    config.update(process_config_yaml(config_path))
 
     node = RootFolderNode(config, deploy_path, target_path)
 
@@ -170,15 +185,6 @@ def root_processor(config, deploy_path, target_path):
 
 
 def folder_processor(config, source_path, target_path):
-    # merge folder/config.yaml
-    config_path = os.path.join(source_path, config['config_file'])
-    if os.path.isfile(config_path):
-        with open(config_path, 'r') as config_file:
-            yaml_config = yaml.load(config_file)
-
-        if yaml_config:
-            config.update(yaml_config)
-
     node = FolderNode(config, source_path, target_path)
 
     target_path = os.path.join(target_path, node.target_name)
