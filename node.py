@@ -27,9 +27,12 @@ class Node(object):
     def generate(self, **context):
         pass
 
-    ##|
-    ##|  "special" keys
-    ##|
+    def populate(self, **context):
+        return ()
+
+    ##|                        |##
+    ##|  "special" properties  |##
+    ##|                        |##
     @property
     def url(self):
         url = self.target_name
@@ -156,9 +159,9 @@ class FolderNode(Node):
     def __iter__(self):
         return iter([child for child in self.children if child.iterable])
 
-    ##|
-    ##|  "special" keys
-    ##|
+    ##|                        |##
+    ##|  "special" properties  |##
+    ##|                        |##
     @property
     def url(self):
         url = super(FolderNode, self).url
@@ -224,9 +227,9 @@ class FileNode(Node):
         self.source = source
         self.target = target
 
-    ##|
-    ##|  "special" keys
-    ##|
+    ##|                        |##
+    ##|  "special" properties  |##
+    ##|                        |##
     @property
     def url(self):
         if self.target_name == self.config['index']:
