@@ -223,7 +223,7 @@ You can:
 * define `ENVIRONMENT`, an instance of `strange_case_jinja.StrangeCaseEnvironment`. You can set extensions and register
   filters easily that way.
 
-* define `CONFIIG` and place context variables that need the **POWER OF PYTHON** to be determined.
+* define `CONFIG` and place context variables that need the **POWER OF PYTHON** to be determined.
 
 * define a `project_path` that is *not* `os.getcwd()`.  I see no benefit to this, but it was easier to call it a feature than
   to fix it as a bug.
