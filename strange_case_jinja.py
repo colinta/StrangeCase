@@ -1,6 +1,15 @@
 import yaml
 import re
-from jinja2 import Template, FileSystemLoader
+import os
+from jinja2 import Template, FileSystemLoader, Environment
+
+
+class StrangeCaseEnvironment(Environment):
+    def __init__(self, *args, **kwargs):
+        kwargs['loader'] = YamlFrontMatterLoader(os.getcwd())
+        super(StrangeCaseEnvironment, self).__init__(*args, **kwargs)
+
+        self.template_class = YamlFrontMatterTemplate
 
 
 class YamlFrontMatterLoader(FileSystemLoader):

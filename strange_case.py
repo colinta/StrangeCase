@@ -4,57 +4,16 @@ import re
 import urllib
 from fnmatch import fnmatch
 from copy import deepcopy
-
 from node import *  # imports Node, Page, TemplatePage, and Folder
+from processor import Processor
 
-# this will eventually be command-line configurable:
-CONFIG_PATH = u'./config.yaml'
+from strange_case_config import CONFIG
 
-# these can all be gleaned from the config file
-CONFIG_FILE = u'config.yaml'
-SITE_PATH = u'site/'
-DEPLOY_PATH = u'public/'
-HTML_EXT = '.html'
-
-DEFAULT_CONFIG = {
-    'host': 'http://localhost:8000',
-    'html_extension': HTML_EXT,
-    'index': 'index' + HTML_EXT,
-    'rename_extensions': {
-        '.md': HTML_EXT,
-        '.j2': HTML_EXT,
-        '.jinja2': HTML_EXT,
-    },
-    'ignore': [
-        '.*',
-        CONFIG_FILE
-    ],
-    'dont_process': [
-        '*.js', '*.css',
-    ],
-    ##|  PATHS
-    'config_file': CONFIG_FILE,
-    # PROTECTED
-    'site_path':   SITE_PATH,
-    'deploy_path': DEPLOY_PATH
-}
-
-
-# these settings cannot be overidden on a per-folder basis
-PROTECTED = ['site_path', 'deploy_path']
-
-
-def yamlload(config_path, protected=True):
-    with open(config_path, 'r') as config_file:
-        yaml_config = yaml.load(config_file)
-
-    if yaml_config and protected:
-        for key in PROTECTED:
-            try:
-                del yaml_config[key]
-            except KeyError:
-                pass
-    return yaml_config
+# pull out important values.
+# these are never allowed to change after this point
+PROJECT_PATH = CONFIG['project_path']
+SITE_PATH = CONFIG['site_path']
+DEPLOY_PATH = CONFIG['deploy_path']
 
 
 def build_node_tree(source_path, target_path, public_path, config, parent_node):
@@ -65,7 +24,8 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
     config_path = os.path.join(source_path, config['config_file'])
     folder_config = {}
     if os.path.isfile(config_path):
-        yaml_config = yamlload(config_path)
+        with open(config_path, 'r') as config_file:
+            yaml_config = yaml.load(config_file)
 
         if yaml_config:
             folder_config.update(yaml_config)
@@ -88,7 +48,7 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
         leaf_config = deepcopy(node_config)
 
         # figure out source path and base_name, ext to help get us started on the name mangling
-        file_path = os.path.join(source_path, file_name)
+        source_file = os.path.join(source_path, file_name)
         base_name, ext = os.path.splitext(file_name)
 
         ##|  MERGE FILES CONFIG
@@ -133,7 +93,6 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
 
             ### if ''fix_target_name'' ?
             ### this code makes target names "look purty", like their name counterpart
-
             # target_name = target_name.replace('-', '_')
             # target_name = target_name.replace(' ', '_')
             # target_name = re.sub(r'/\W/', '_', target_name)
@@ -155,22 +114,43 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
         ### print '%s >> %s || %s @ %s' % (name, target, target_name, leaf_config['url'])
 
         # create node(s)
-        if os.path.isdir(file_path):
+        # folders and files are handled differently - folders
+        # look for a 'folder_processor' setting, while files
+        # look for just 'processor'.  it is not common to use
+        # a different processor for a folder, but for files it
+        # is encouraged.
+        if os.path.isdir(source_file):
             # add a trailing slash.  this gives folders the same
             # url as their index page (assuming they have one)
             leaf_config['url'] += '/'
-            folder_node = FolderNode(leaf_config, target)
-            parent_node.add_child(folder_node)
 
-            build_node_tree(file_path, target, os.path.join(public_path, target_name), node_config, folder_node)
+            if 'folder_processor' in leaf_config:
+                processor = leaf_config['folder_processor']
+            else:
+                processor = 'folder'
+
+            nodes = Processor.get(processor, leaf_config, source_file, target)
+            build_node_tree(source_file, target, os.path.join(public_path, target_name), node_config, node)
         else:
-            # an entire folder can be marked 'dont_process' using 'dont_process': true
-            # or it can contain a list of glob patterns
-            should_process = True
-            if isinstance(node_config['dont_process'], bool):
-                should_process = not node_config['dont_process']
-            elif any(pattern for pattern in node_config['dont_process'] if fnmatch(file_name, pattern)):
-                should_process = False
+            if 'processor' in leaf_config:
+                processor = leaf_config['processor']
+            else:
+                # an entire folder can be marked 'dont_process' using 'dont_process': true
+                # or it can contain a list of glob patterns
+                # note, this doesn't apply to *folders*, they are ignored using 'ignore: true'
+                # or 'ignore: [glob patterns]'
+                should_process = True
+                if isinstance(node_config['dont_process'], bool):
+                    should_process = not node_config['dont_process']
+                elif any(pattern for pattern in node_config['dont_process'] if fnmatch(file_name, pattern)):
+                    should_process = False
+
+                if 'processor' in leaf_config:
+                    processor = leaf_config['processor']
+                elif should_process:
+                    processor = 'page'
+                else:
+                    processor = 'asset'
 
             # if this file is an index file, it will not be included in the pages iterator.
             # all other pages are iterable.
@@ -178,26 +158,18 @@ def build_node_tree(source_path, target_path, public_path, config, parent_node):
                 if target_name != leaf_config['index']:
                     leaf_config['iterable'] = True
 
-            if should_process:
-                parent_node.add_child(TemplatePageNode(leaf_config, target, file_path))
-            else:
-                parent_node.add_child(StaticPageNode(leaf_config, target, file_path))
+            nodes = Processor.get(processor, leaf_config, source_file, target)
 
-# actual work is done here:
-config = {}
-config.update(DEFAULT_CONFIG)
+        parent_node.extend(nodes)
 
-yaml_config = yamlload(CONFIG_PATH, protected=False)
-if yaml_config:
-    config.update(yaml_config)
+if __name__ == '__main__':
+    # look for files in content/
+    if not os.path.isdir(SITE_PATH):
+        raise "Could not find SITE_PATH folder \"%s\"" % SITE_PATH
 
-# look for files in content/
-if not os.path.isdir(config['site_path']):
-    raise "Could not find SITE_PATH folder \"%s\"" % config['site_path']
+    root_node = FolderNode(CONFIG, SITE_PATH, folder=DEPLOY_PATH)
+    root_node.name = ''
 
-root_node = FolderNode(config, folder=config['deploy_path'])
-root_node.name = ''
+    build_node_tree(SITE_PATH, DEPLOY_PATH, '/', CONFIG, root_node)
 
-build_node_tree(config['site_path'], config['deploy_path'], '/', config, root_node)
-
-root_node.build(site=root_node)
+    root_node.build(site=root_node)

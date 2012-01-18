@@ -1,3 +1,6 @@
+----
+processor: hidden_file
+----
 # robots.txt for Google
 User-Agent: Googlebot
 Allow: /

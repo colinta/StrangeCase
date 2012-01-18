@@ -3,13 +3,22 @@ import jinja2.ext
 import markdown2
 
 
+markdowner = markdown2.Markdown()
+
+
+# filter
+def markdown2(markdown):
+    return markdowner.convert(markdown).strip()
+
+
+#block
 class Markdown2Extension(jinja2.ext.Extension):
     tags = set(['markdown2'])
 
     def __init__(self, environment):
         super(Markdown2Extension, self).__init__(environment)
         environment.extend(
-            markdowner=markdown2.Markdown()
+            markdowner=markdowner
         )
 
     def parse(self, parser):

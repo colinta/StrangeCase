@@ -23,6 +23,10 @@ complicated)
 * Index pages' URLs do not include the filename.  This means they have the same name
   as the folder they index.  That's good, right?
 
+* To tap into jinja (add filters, add extensions) you can provide a `config.py` file that defines `ENVIRONMENT`.
+  You can also define `CONFIG`, and you can register node processors.  This part is complicated enough to deem
+  it's own section down below.
+
 
 Now for the easy stuff!
 
@@ -84,8 +88,8 @@ Goes through all the files and directories in `site/`
 
 * Files/Folders that match `ignore` are skipped.
 * Folders become `FolderNode` objects (`site/` is such a node).  Folders have children.
-* Templates (any file that doesn't match `dont_process`) become `TemplatePageNode(PageNode)` objects
-* Assets (anything that isn't a template) become `StaticPageNode(PageNode)` objects
+* Templates (any file that doesn't match `dont_process`) become `JinjaNode(FileNode)` objects
+* Assets (anything that isn't a template) become `StaticNode(FileNode)` objects
 
 Files can have metadata either as front matter, or in that folder's `config.yaml` in a `files:` entry.
 The `files:` entry is so that static assets can have metadata.  Because of this, `files:` in the `config.yaml` files are not
@@ -196,12 +200,42 @@ def all(self, folders=False, pages=True, assets=False, recursive=False):
 ```
 
 
-AND THAT'S IT
--------------
+AND THAT'S (pretty much) IT
+---------------------------
 
 jinja2 makes it easy to put complicated logic in templates, which is really the only place for them in this static generator context...
 
 ...or is it !?  I’m wondering what kind of spaghetti nonsense these templates could end up with (it's like PHP all over again!), and how that could be fixed.
+
+Which leads right into...
+
+
+*REALLY COMPLICATED STUFF*
+--------------------------
+
+This relates to the `config.py` file mentioned above.
+
+You should glance at the file in this repository, it does everything that can be done (and look in
+`extensions/` for the markdown extension, I copied it from somewhere).
+
+You can:
+
+* define `ENVIRONMENT`, an instance of `strange_case_jinja.StrangeCaseEnvironment`. You can set extensions and register
+  filters easily that way.
+
+* define `CONFIIG` and place context variables that need the **POWER OF PYTHON** to be determined.
+
+* define a `project_path` that is *not* `os.getcwd()`.  I see no benefit to this, but it was easier to call it a feature than
+  to fix it as a bug.
+
+* create a custom node `Processor` class.  These classes have a single method, `process(config, source, target)` which returns
+  a tuple (usually of a single item, but you can easily see, I hope, a case when you would want one processor to return multiple
+  nodes).  A lot of the code that is in `strange_case.py` will be moved into `Processor` class and made available as a tiny
+  little API, so don't go too crazy here for now, unless you want to help me with said project!  I'm struggling right now with
+  how the naming mechanism should (automatically?) deal with multiple nodes...
+
+  In the example I register it as "hidden_page", and assign that processor to the `robots.txt` file in its front matter.  It's
+  a contrived example - it makes a ".robots.txt.hidden" file.  But you can see what the naming dilemna is, I think.
 
 
 TODO

@@ -1,23 +1,11 @@
-from jinja2 import Environment
-from strange_case_jinja import YamlFrontMatterLoader, YamlFrontMatterTemplate
 import os
 from shutil import copy2
-from extensions.markdown2_extension import Markdown2Extension
-from extensions.date_extension import date
-
-
-environment = Environment(extensions=[Markdown2Extension],
-                          loader=YamlFrontMatterLoader(os.getcwd()),
-                          )
-environment.filters['date'] = date
-
-environment.template_class = YamlFrontMatterTemplate
 
 
 def check_config_first(fn):
     """
-    @property methods like title() get called instead of __getattr__().  This method helps
-    to make sure that self.config is checked before returning the default.
+    @property methods like title() get called instead of __getattr__().  This method
+    makes sure that self.config is checked before returning the default.
     """
     def ret(self):
         if fn.__name__ in self.config:
@@ -104,22 +92,27 @@ class Node(object):
 
 class FolderNode(Node):
     """
-    A FolderNode object creates itself.
+    A FolderNode object creates itself in the target folder (mkdir).
     """
-    def __init__(self, config, folder):
+    def __init__(self, config, source, folder):
         super(FolderNode, self).__init__(config)
+        self.source = source
         self.folder = folder
 
         self.children = []
 
-    def add_child(self, child):
+    def append(self, child):
         if child.parent:
-            child.parent.remove_child(child)
+            child.parent.remove(child)
 
         child.parent = self
         self.children.append(child)
 
-    def remove_child(self, child):
+    def extend(self, children):
+        for child in children:
+            self.append(child)
+
+    def remove(self, child):
         if child in self.children:
             self.children.remove(child)
 
@@ -180,12 +173,13 @@ class FolderNode(Node):
         return ret
 
 
-class PageNode(Node):
+class FileNode(Node):
     """
-    A PageNode object is an abstract parent class for a "leaf".
+    A FileNode object is an abstract parent class for a "leaf".
     """
-    def __init__(self, config, target):
-        super(PageNode, self).__init__(config)
+    def __init__(self, config, source, target):
+        super(FileNode, self).__init__(config)
+        self.source = source
         self.target = target
 
     ##|
@@ -208,27 +202,41 @@ class PageNode(Node):
         return not self.is_page
 
 
-class StaticPageNode(PageNode):
+class StaticNode(FileNode):
     """
     Copies a file to a destination
     """
-    def __init__(self, config, target, path):
-        super(StaticPageNode, self).__init__(config, target)
-        self.path = path
+    def __init__(self, config, source, target):
+        super(StaticNode, self).__init__(config, source, target)
 
     def build(self, **context):
-        copy2(self.path, self.target)
-        super(StaticPageNode, self).build(**context)
+        copy2(self.source, self.target)
+        super(StaticNode, self).build(**context)
 
 
-class TemplatePageNode(PageNode):
+class JinjaNode(FileNode):
     """
-    A TemplatePageNode object is rendered before copied to its destination
+    A JinjaNode object is rendered before copied to its destination
     """
-    def __init__(self, config, target, path):
-        super(TemplatePageNode, self).__init__(config, target)
-        self.path = path
-        self.template = environment.get_template(path)
+    ENVIRONMENT = None
+
+    @classmethod
+    def get_environment(cls):
+        if not cls.ENVIRONMENT:
+            ENVIRONMENT = None
+            try:
+                from config import ENVIRONMENT
+            except ImportError:
+                if not ENVIRONMENT:
+                    from strange_case_jinja import StrangeCaseEnvironment
+                    ENVIRONMENT = StrangeCaseEnvironment()
+            cls.ENVIRONMENT = ENVIRONMENT
+        return cls.ENVIRONMENT
+
+    def __init__(self, config, source, target):
+
+        super(JinjaNode, self).__init__(config, source, target)
+        self.template = self.get_environment().get_template(source)
         if 'url' in self.template.context:
             raise KeyError('You cannot specify "url" in yaml front matter.  It is determined by its location in the tree, and the target_names of itself and all its parents')
         self.config.update(self.template.context)
