@@ -72,7 +72,7 @@ class Node(object):
     @property
     @check_config_first
     def title(self):
-        return self.name.replace('_', ' ')
+        return self.name.titlecase()
 
     ##|
     ##|  TRAVERSAL
