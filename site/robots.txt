@@ -1,5 +1,5 @@
 ----
-processor: hidden_file
+processor: hidden_page
 ----
 # robots.txt for Google
 User-Agent: Googlebot

@@ -19,11 +19,12 @@ class Node(object):
     Parent class for all nodes (pages and folders)
     """
 
-    def __init__(self, config):
+    def __init__(self, config, url):
         self.config = config
+        self.url = url
         self.parent = None
 
-    def build(self, **context):
+    def generate(self, **context):
         pass
 
     ##|
@@ -87,19 +88,29 @@ class Node(object):
         return None
 
     def __repr__(self, indent=''):
-        return "%s (%s)" % (self.name, str(type(self)))
+        return "(url: %s type:%s)" % (self.url, str(type(self)))
 
 
 class FolderNode(Node):
     """
     A FolderNode object creates itself in the target folder (mkdir).
     """
-    def __init__(self, config, source, folder):
-        super(FolderNode, self).__init__(config)
+    def __init__(self, config, url, source, folder):
+        super(FolderNode, self).__init__(config, url)
         self.source = source
         self.folder = folder
 
         self.children = []
+
+    def build(self, public_path):
+        pass
+
+    def generate(self, **context):
+        if not os.path.isdir(self.folder):
+            os.mkdir(self.folder, 0755)
+
+        for child in self.children:
+            child.generate(**context)
 
     def append(self, child):
         if child.parent:
@@ -115,13 +126,6 @@ class FolderNode(Node):
     def remove(self, child):
         if child in self.children:
             self.children.remove(child)
-
-    def build(self, **context):
-        if not os.path.isdir(self.folder):
-            os.mkdir(self.folder, 0755)
-
-        for child in self.children:
-            child.build(**context)
 
     def __getattr__(self, key):
         ret = super(FolderNode, self).__getattr__(key)
@@ -177,8 +181,8 @@ class FileNode(Node):
     """
     A FileNode object is an abstract parent class for a "leaf".
     """
-    def __init__(self, config, source, target):
-        super(FileNode, self).__init__(config)
+    def __init__(self, config, url, source, target):
+        super(FileNode, self).__init__(config, url)
         self.source = source
         self.target = target
 
@@ -202,16 +206,16 @@ class FileNode(Node):
         return not self.is_page
 
 
-class StaticNode(FileNode):
+class AssetNode(FileNode):
     """
     Copies a file to a destination
     """
-    def __init__(self, config, source, target):
-        super(StaticNode, self).__init__(config, source, target)
+    def __init__(self, config, url, source, target):
+        super(AssetNode, self).__init__(config, url, source, target)
 
-    def build(self, **context):
+    def generate(self, **context):
         copy2(self.source, self.target)
-        super(StaticNode, self).build(**context)
+        super(AssetNode, self).generate(**context)
 
 
 class JinjaNode(FileNode):
@@ -233,15 +237,11 @@ class JinjaNode(FileNode):
             cls.ENVIRONMENT = ENVIRONMENT
         return cls.ENVIRONMENT
 
-    def __init__(self, config, source, target):
-
-        super(JinjaNode, self).__init__(config, source, target)
+    def __init__(self, config, url, source, target):
+        super(JinjaNode, self).__init__(config, url, source, target)
         self.template = self.get_environment().get_template(source)
-        if 'url' in self.template.context:
-            raise KeyError('You cannot specify "url" in yaml front matter.  It is determined by its location in the tree, and the target_names of itself and all its parents')
-        self.config.update(self.template.context)
 
-    def build(self, **context):
+    def generate(self, **context):
         content = self.template.render(self.config, my=self, **context)
         with open(self.target, 'w') as dest:
             dest.write(content.encode('utf-8'))

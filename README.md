@@ -89,7 +89,7 @@ Goes through all the files and directories in `site/`
 * Files/Folders that match `ignore` are skipped.
 * Folders become `FolderNode` objects (`site/` is such a node).  Folders have children.
 * Templates (any file that doesn't match `dont_process`) become `JinjaNode(FileNode)` objects
-* Assets (anything that isn't a template) become `StaticNode(FileNode)` objects
+* Assets (anything that isn't a template) become `AssetNode(FileNode)` objects
 
 Files can have metadata either as front matter, or in that folder's `config.yaml` in a `files:` entry.
 The `files:` entry is so that static assets can have metadata.  Because of this, `files:` in the `config.yaml` files are not
