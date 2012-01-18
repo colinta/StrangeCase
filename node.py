@@ -41,6 +41,7 @@ class Node(object):
         return urllib.quote(url)
 
     @property
+    @check_config_first
     def iterable(self):
         # if this file is an index file, it will not be included in the pages iterator.
         # all other pages and assets are iterable.
