@@ -160,7 +160,10 @@ def build_node_tree(parent_node, config, source_path, target_path):
                     should_process = False
 
                 if should_process:
-                    leaf_config.update(process_front_matter(source_file))
+                    yaml_config = process_front_matter(source_file)
+                    if 'dont_process' in yaml_config:
+                        raise KeyError('"dont_process" is not allowed in yaml front matter.')
+                    leaf_config.update(yaml_config)
 
                 if 'processor' in leaf_config:
                     processor = leaf_config['processor']
@@ -188,7 +191,8 @@ def folder_processor(config, source_path, target_path):
     node = FolderNode(config, source_path, target_path)
 
     target_path = os.path.join(target_path, node.target_name)
-    build_node_tree(node, config, source_path, target_path)
+    if os.path.isdir(source_path):
+        build_node_tree(node, config, source_path, target_path)
     return (node, )
 
 
