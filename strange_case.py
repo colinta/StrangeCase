@@ -1,5 +1,5 @@
 import os
-from processor import Processor
+from processor import Registry
 
 from strange_case_config import CONFIG
 
@@ -15,6 +15,7 @@ if __name__ == '__main__':
     if not os.path.isdir(SITE_PATH):
         raise IOError("Could not find SITE_PATH folder \"%s\"" % SITE_PATH)
 
-    root_node = Processor.get('root', CONFIG, SITE_PATH, DEPLOY_PATH)[0]
+    root_node = Registry.get('root', CONFIG, SITE_PATH, DEPLOY_PATH)[0]
 
-    root_node.generate(site=root_node)
+    Registry.startup(root_node)
+    root_node.generate()

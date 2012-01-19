@@ -3,7 +3,7 @@ The long and short of it:
 * write a function that looks like this:
       def your_processor(config, source_file, target_path):
           return (nodes, ...)
-* Processor.register('your_name', your_processor)
+* Registry.register('your_name', your_processor)
 
 If you return multiple nodes, they will all be added as children to the parent node.
 If instead you need to create some kind of tree structure, build the tree first and
@@ -17,6 +17,7 @@ All files will be parsed for front matter unless it matches an entry in
 import yaml
 import os
 import re
+from types import FunctionType
 from fnmatch import fnmatch
 from copy import deepcopy
 from node import FolderNode, RootFolderNode, AssetNode, JinjaNode
@@ -56,13 +57,7 @@ def process_front_matter(source_file):
 
 def build_node_tree(parent_node, config, source_path, target_path):
     # don't modify parent's node_config
-    node_config = deepcopy(config)
-
-    # not merged
-    if 'name' in node_config:
-        del node_config['name']
-    if 'target_name' in node_config:
-        del node_config['target_name']
+    node_config = parent_node.config_copy()
 
     # if { ignore: true }, the entire directory is ignored
     if node_config['ignore'] is True:
@@ -144,7 +139,7 @@ def build_node_tree(parent_node, config, source_path, target_path):
             else:
                 processor = 'folder'
 
-            nodes = Processor.get(processor, leaf_config, source_file, target_path)
+            nodes = Registry.get(processor, leaf_config, source_file, target_path)
         else:
             if 'processor' in leaf_config:
                 processor = leaf_config['processor']
@@ -172,7 +167,7 @@ def build_node_tree(parent_node, config, source_path, target_path):
                 else:
                     processor = 'asset'
 
-            nodes = Processor.get(processor, leaf_config, source_file, target_path)
+            nodes = Registry.get(processor, leaf_config, source_file, target_path)
         parent_node.extend(nodes)
 
 
@@ -207,27 +202,75 @@ def page_processor(config, source_path, target_path):
 
 
 class Processor(object):
+    """
+    If you *really* want to extend something, you can extend Processor.  You
+    don't need to, extending object is just as well.  It's here for reference.
+    """
+    def populate(self, site):
+        """
+        Classes that implement this method have a chance to populate the 'site' node (and any children thereof,
+        obviously) with more nodes.  This is where your Processor class has a chance to add nodes that were
+        not discovered as part of the 'build' stage.
+        """
+        pass
+
+    def process(self, config, source_path, target_path):
+        """
+        Called when a node registers itself with this processor.
+
+        source_path can be None, if it doesn't refer to a source file.
+        target_path is a definite, though.  This is a site generator.  What are you generating if it's not a file!?
+        """
+        return ()  # implementations should return a tuple of nodes.
+
+
+class ConcreteMetaclass(type):
+    """
+    Disables the ability to extend a class.
+    """
+    def __new__(cls, name, bases, dict):
+        for base in bases:
+            if isinstance(base, ConcreteMetaclass):
+                base_class_name = base.__name__
+                raise TypeError("{0} cannot be extended".format(base_class_name))
+        return super(ConcreteMetaclass, cls).__new__(cls, name, bases, dict)
+
+
+class Registry(object):
+    __metaclass__ = ConcreteMetaclass
     processors = {}
+
+    def __new__(cls):
+        raise TypeError("Don't instantiate Registry.")
 
     @classmethod
     def register(cls, name, processor):
-        cls.processors[name] = processor
+        if isinstance(processor, type):  # You can pass a class object,
+            cls.processors[name] = processor()  # and it gets instantiated
+        else:
+            cls.processors[name] = processor
 
     @classmethod
-    def registerDefault(cls, name, processor):
-        if not name in cls.processors:
-            cls.processors[name] = processor
+    def startup(cls, site):
+        for processor in cls.processors.itervalues():
+            # processor = cls.processors[name]
+            if hasattr(processor, 'populate'):
+                processor.populate(site)
 
     @classmethod
     def get(cls, name, *args, **kwargs):
         try:
             processor = cls.processors[name]
-            return processor(*args, **kwargs)
+
+            if type(processor) is FunctionType:
+                return processor(*args, **kwargs)
+            else:
+                return processor.process(*args, **kwargs)
         except KeyError:
             raise NotImplementedError('Unknown processor "%s"' % name)
 
 
-Processor.registerDefault('root', root_processor)
-Processor.registerDefault('folder', folder_processor)
-Processor.registerDefault('asset', asset_processor)
-Processor.registerDefault('page', page_processor)
+Registry.register('root', root_processor)
+Registry.register('folder', folder_processor)
+Registry.register('asset', asset_processor)
+Registry.register('page', page_processor)

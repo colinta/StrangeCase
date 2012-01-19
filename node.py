@@ -1,6 +1,7 @@
 import os
 from shutil import copy2
 import urllib
+from copy import deepcopy
 
 
 def check_config_first(fn):
@@ -24,11 +25,19 @@ class Node(object):
         self.config = config
         self.parent = None
 
-    def generate(self, **context):
-        pass
+    def generate(self, site):
+        raise NotImplementedError("Your node should implement generate(), and don't call super() unless you're extending a \"leaf\" class like FolderNode, AssetNode, or JinjaNode")
 
-    def populate(self, **context):
-        return ()
+    def config_copy(self):
+        node_config = deepcopy(self.config)
+
+        # not merged
+        if 'name' in node_config:
+            del node_config['name']
+        if 'target_name' in node_config:
+            del node_config['target_name']
+
+        return node_config
 
     ##|                        |##
     ##|  "special" properties  |##
@@ -121,13 +130,13 @@ class FolderNode(Node):
 
         self.children = []
 
-    def generate(self, **context):
+    def generate(self, site):
         folder = os.path.join(self.folder, self.target_name)
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
 
         for child in self.children:
-            child.generate(**context)
+            child.generate(site)
 
     def append(self, child):
         if child.parent:
@@ -178,23 +187,26 @@ class FolderNode(Node):
     def is_folder(self):
         return True
 
-    def all(self, folders=False, pages=True, assets=False, recursive=False):
-        """ Returns descendants, ignoring iterability. Folders, assets, and
-            pages can all be included or excluded as the case demands."""
+    def all(self, everything=False, folders=False, pages=True, assets=False, recursive=False):
+        """
+        Returns descendants, ignoring iterability. Folders, assets, and
+        pages can all be included or excluded as the case demands.  An easy
+        trick is to call all(True), which will return everything, recursively.
+        """
         ret = []
 
         for child in self.children:
             if child.is_folder:
-                if folders:
+                if everything or folders:
                     ret.append(child)
 
-                if recursive:
-                    ret.extend(child.all(folders, pages, assets, recursive))
+                if everything or recursive:
+                    ret.extend(child.all(everything, folders, pages, assets, recursive))
             elif child.is_page:
-                if pages:
+                if everything or pages:
                     ret.append(child)
             elif child.is_asset:
-                if assets:
+                if everything or assets:
                     ret.append(child)
         return ret
 
@@ -210,13 +222,16 @@ class RootFolderNode(FolderNode):
     def url(self):
         return '/'
 
-    def generate(self, **context):
+    def generate(self):
+        """
+        This is the only Node.generate method that doesn't require the 'site' argument.  'self' *is* the site arqument!
+        """
         folder = self.folder
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
 
         for child in self.children:
-            child.generate(**context)
+            child.generate(self)
 
 
 class FileNode(Node):
@@ -264,10 +279,9 @@ class AssetNode(FileNode):
     """
     Copies a file to a destination
     """
-    def generate(self, **context):
+    def generate(self, site):
         target = os.path.join(self.target, self.target_name)
         copy2(self.source, target)
-        super(AssetNode, self).generate(**context)
 
 
 class JinjaNode(FileNode):
@@ -289,9 +303,9 @@ class JinjaNode(FileNode):
             cls.ENVIRONMENT = ENVIRONMENT
         return cls.ENVIRONMENT
 
-    def generate(self, **context):
+    def generate(self, site):
         template = self.get_environment().get_template(self.source)
-        content = template.render(self.config, my=self, **context)
+        content = template.render(self.config, my=self, site=site)
 
         target = os.path.join(self.target, self.target_name)
         with open(target, 'w') as dest:

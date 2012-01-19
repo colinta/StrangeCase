@@ -228,7 +228,7 @@ You can:
 * define a `project_path` that is *not* `os.getcwd()`.  I see no benefit to this, but it was easier to call it a feature than
   to fix it as a bug.
 
-* create a custom node `Processor` class.  These classes have a single method, `process(config, source, target)` which returns
+* create a custom `Processor` class or method.  These classes have a single method, `process(config, source, target)` which returns
   a tuple (usually of a single item, but you can easily see, I hope, a case when you would want one processor to return multiple
   nodes).  A lot of the code that is in `strange_case.py` will be moved into `Processor` class and made available as a tiny
   little API, so don't go too crazy here for now, unless you want to help me with said project!  I'm struggling right now with
