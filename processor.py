@@ -124,6 +124,7 @@ def build_node_tree(parent_node, config, source_path, target_path):
         ### print 'name:%s >> target_file:%s || target_name:%s @ url:%s' % (name, target_file, target_name)
 
         # create node(s). if you specify a 'processor' it will override the default.
+        nodes = ()  # if processor is None, nodes won't get assigned
         if os.path.isdir(source_file):
             # this also happens in the root_processor.  I would prefer these be DRYer, but I
             # don't have a clear idea how to remove one or the other.  RootNode is created
@@ -139,7 +140,8 @@ def build_node_tree(parent_node, config, source_path, target_path):
             else:
                 processor = 'folder'
 
-            nodes = Registry.get(processor, leaf_config, source_file, target_path)
+            if processor:
+                nodes = Registry.get(processor, leaf_config, source_file, target_path)
         else:
             if 'processor' in leaf_config:
                 processor = leaf_config['processor']
@@ -167,8 +169,11 @@ def build_node_tree(parent_node, config, source_path, target_path):
                 else:
                     processor = 'asset'
 
-            nodes = Registry.get(processor, leaf_config, source_file, target_path)
-        parent_node.extend(nodes)
+            if processor:
+                nodes = Registry.get(processor, leaf_config, source_file, target_path)
+
+        if nodes:
+            parent_node.extend(nodes)
 
 
 def root_processor(config, deploy_path, target_path):
