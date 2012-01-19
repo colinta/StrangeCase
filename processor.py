@@ -186,7 +186,7 @@ def folder_processor(config, source_path, target_path):
     node = FolderNode(config, source_path, target_path)
 
     target_path = os.path.join(target_path, node.target_name)
-    if os.path.isdir(source_path):
+    if source_path and os.path.isdir(source_path):
         build_node_tree(node, config, source_path, target_path)
     return (node, )
 

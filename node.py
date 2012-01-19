@@ -21,20 +21,26 @@ class Node(object):
     Parent class for all nodes (pages and folders)
     """
 
-    def __init__(self, config):
+    def __init__(self, config, target):
         self.config = config
         self.parent = None
+        self.target = target
 
     def generate(self, site):
         raise NotImplementedError("Your node should implement generate(), and don't call super() unless you're extending a \"leaf\" class like FolderNode, AssetNode, or JinjaNode")
 
-    def config_copy(self):
+    def config_copy(self, name=None, target_name=None):
         node_config = deepcopy(self.config)
 
         # not merged
-        if 'name' in node_config:
+        if name:
+            node_config['name'] = name
+        elif 'name' in node_config:
             del node_config['name']
-        if 'target_name' in node_config:
+
+        if target_name:
+            node_config['target_name'] = target_name
+        elif 'target_name' in node_config:
             del node_config['target_name']
 
         return node_config
@@ -116,22 +122,21 @@ class Node(object):
         return None
 
     def __repr__(self, indent=''):
-        return "(url: %s type:%s)" % (self.url, str(type(self)))
+        return "%s(url: %s type:%s)" % (indent, self.url, str(type(self)))
 
 
 class FolderNode(Node):
     """
     A FolderNode object creates itself in the target folder (mkdir).
     """
-    def __init__(self, config, source, folder):
-        super(FolderNode, self).__init__(config)
+    def __init__(self, config, source, target):
+        super(FolderNode, self).__init__(config, target)
         self.source = source
-        self.folder = folder
 
         self.children = []
 
     def generate(self, site):
-        folder = os.path.join(self.folder, self.target_name)
+        folder = os.path.join(self.target, self.target_name)
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
 
@@ -210,14 +215,19 @@ class FolderNode(Node):
                     ret.append(child)
         return ret
 
+    def __repr__(self, indent=''):
+        ret = super(FolderNode, self).__repr__(indent)
+        indent += '	'
+        for child in self.children:
+            ret += "\n" + child.__repr__(indent)
+        return ret
+
+
 
 class RootFolderNode(FolderNode):
     """
     A RootFolderNode object does not append a target_name
     """
-    def __init__(self, config, source, folder):
-        super(RootFolderNode, self).__init__(config, source, folder)
-
     @property
     def url(self):
         return '/'
@@ -226,7 +236,7 @@ class RootFolderNode(FolderNode):
         """
         This is the only Node.generate method that doesn't require the 'site' argument.  'self' *is* the site arqument!
         """
-        folder = self.folder
+        folder = self.target
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
 
@@ -239,9 +249,10 @@ class FileNode(Node):
     A FileNode object is an abstract parent class for a "leaf".
     """
     def __init__(self, config, source, target):
-        super(FileNode, self).__init__(config)
+        super(FileNode, self).__init__(config, target)
+        if not source or not os.path.exists(source):
+            raise TypeError('source is a required argument in FileNode()')
         self.source = source
-        self.target = target
 
     ##|                        |##
     ##|  "special" properties  |##
