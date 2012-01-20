@@ -5,21 +5,24 @@ from processor import Registry
 import sys
 sys.path.append(os.getcwd())
 
-from strange_case_config import CONFIG
-
-# pull out important values.
-# these are not going to change after this point
-PROJECT_PATH = CONFIG['project_path']
-SITE_PATH = CONFIG['site_path']
-DEPLOY_PATH = CONFIG['deploy_path']
+from strange_case_config import config
 
 
-if __name__ == '__main__':
+def strange_case(config):
+    # pull out important values.
+    # these are not going to change after this point
+    site_path = config['site_path']
+    deploy_path = config['deploy_path']
+
     # look for files in content/
-    if not os.path.isdir(SITE_PATH):
-        raise IOError("Could not find SITE_PATH folder \"%s\"" % SITE_PATH)
+    if not os.path.isdir(site_path):
+        raise IOError("Could not find site_path folder \"%s\"" % site_path)
 
-    root_node = Registry.get('root', CONFIG, SITE_PATH, DEPLOY_PATH)[0]
+    root_node = Registry.get('root', config, site_path, deploy_path)[0]
 
     Registry.startup(root_node)
     root_node.generate()
+
+
+if __name__ == '__main__':
+    strange_case(config)
