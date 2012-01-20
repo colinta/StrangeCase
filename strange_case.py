@@ -1,12 +1,6 @@
 import os
 from processor import Registry
 
-# so that strange_case.py can be executed from any project folder, add CWD to the import paths
-import sys
-sys.path.append(os.getcwd())
-
-from strange_case_config import config
-
 
 def strange_case(config):
     # pull out important values.
@@ -25,4 +19,9 @@ def strange_case(config):
 
 
 if __name__ == '__main__':
-    strange_case(config)
+    # so that strange_case.py can be executed from any project folder, add CWD to the import paths
+    import sys
+    sys.path.append(os.getcwd())
+
+    from strange_case_config import CONFIG
+    strange_case(CONFIG)
