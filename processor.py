@@ -54,7 +54,7 @@ def check_for_front_matter(source_file):
     return {}
 
 
-def build_node_tree(parent_node, config, source_path, target_path):
+def build_node_tree(parent_node, source_path, target_path):
     # don't modify parent's node_config
     node_config = parent_node.config_copy()
 
@@ -181,7 +181,7 @@ def root_processor(config, deploy_path, target_path):
 
     node = RootFolderNode(config, deploy_path, target_path)
 
-    build_node_tree(node, config, deploy_path, target_path)
+    build_node_tree(node, deploy_path, target_path)
     return (node, )
 
 
@@ -190,7 +190,7 @@ def folder_processor(config, source_path, target_path):
 
     target_path = os.path.join(target_path, node.target_name)
     if source_path and os.path.isdir(source_path):
-        build_node_tree(node, config, source_path, target_path)
+        build_node_tree(node, source_path, target_path)
     return (node, )
 
 
