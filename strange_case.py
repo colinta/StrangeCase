@@ -14,7 +14,6 @@ def strange_case(config):
 
     root_node = Registry.get('root', config, site_path, deploy_path)[0]
 
-    Registry.startup(root_node)
     root_node.generate()
 
 

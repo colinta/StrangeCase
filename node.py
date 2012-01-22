@@ -45,6 +45,12 @@ class Node(object):
 
         return node_config
 
+    ##|                                  |##
+    ##|  NODES DON'T ACTUALLY POPULATE   |##
+    ##|                                  |##
+    def populate(self, site):
+        pass
+
     ##|                        |##
     ##|  "special" properties  |##
     ##|                        |##
@@ -71,6 +77,11 @@ class Node(object):
 
     @property
     @check_config_first
+    def is_processor(self):
+        return False
+
+    @property
+    @check_config_first
     def is_folder(self):
         return False
 
@@ -88,6 +99,10 @@ class Node(object):
     @check_config_first
     def title(self):
         return self.name.titlecase()
+
+    @title.setter
+    def title(self, title):
+        self.config['title'] = title
 
     ##|
     ##|  TRAVERSAL
@@ -154,9 +169,21 @@ class FolderNode(Node):
         for child in children:
             self.append(child)
 
+    def index(self, child):
+        return self.children.index(child)
+
     def remove(self, child):
         if child in self.children:
             self.children.remove(child)
+
+    def insert(self, i, children):
+        for child in children:
+            if child.parent:
+                child.parent.remove(child)
+
+            child.parent = self
+            self.children.insert(i, child)
+            i += 1
 
     def __getattr__(self, key):
         ret = super(FolderNode, self).__getattr__(key)
@@ -192,7 +219,7 @@ class FolderNode(Node):
     def is_folder(self):
         return True
 
-    def all(self, everything=False, folders=False, pages=True, assets=False, recursive=False):
+    def all(self, everything=False, folders=False, pages=True, assets=False, processors=False, recursive=False):
         """
         Returns descendants, ignoring iterability. Folders, assets, and
         pages can all be included or excluded as the case demands.  An easy
@@ -206,12 +233,15 @@ class FolderNode(Node):
                     ret.append(child)
 
                 if everything or recursive:
-                    ret.extend(child.all(everything, folders, pages, assets, recursive))
+                    ret.extend(child.all(everything, folders, pages, assets, processors, recursive))
             elif child.is_page:
                 if everything or pages:
                     ret.append(child)
             elif child.is_asset:
                 if everything or assets:
+                    ret.append(child)
+            elif child.is_processor:
+                if everything or processors:
                     ret.append(child)
             elif everything:
                 ret.append(child)
@@ -241,8 +271,63 @@ class RootFolderNode(FolderNode):
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
 
+        # before generation, give
+        # processor "nodes" their
+        # chance to disappear
+        processors = self.all(processors=True, pages=False, recursive=True)
+        while len(processors):
+            for child in processors:
+                child.populate(self)
+            processors = self.all(processors=True, pages=False, recursive=True)
+
         for child in self.children:
             child.generate(self)
+
+
+class Processor(Node):
+    """
+    Look at *this* nifty node class.  It masquerades as a node so
+    that it can be placed in the site tree, but later it modifies the
+    tree to include other nodes.  Neat!
+    """
+    def generate(self, site):
+        pass
+
+    @property
+    @check_config_first
+    def is_processor(self):
+        return True
+
+    ##|
+    ##|  POPULATING METHODS              |##
+    ##|                                  |##
+    def populate(self, site):
+        raise NotImplementedError("Your processor \"" + self.__class__.__name__ + "\" should implement populate(), and don't call super()")
+
+    def remove_self(self):
+        """
+        Removes self from its parent's children
+        """
+        if self.parent:
+            self.parent.remove(self)
+
+    def replace_with(self, children):
+        """
+        Removes self from its parent's children
+        """
+        if self.parent:
+            idx = self.parent.index(self)
+            self.parent.insert(idx, children)
+            self.remove_self()
+
+    def process(self, config, source_path, target_path):
+        """
+        Called when a node registers itself with this processor.
+
+        source_path can be None, if it doesn't refer to a source file.
+        target_path is a definite, though.  This is a site generator.  What are you generating if it's not a file!?
+        """
+        return ()  # implementations should return a tuple of nodes.
 
 
 class FileNode(Node):
