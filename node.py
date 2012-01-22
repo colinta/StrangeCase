@@ -27,7 +27,7 @@ class Node(object):
         self.target = target
 
     def generate(self, site):
-        raise NotImplementedError("Your node should implement generate(), and don't call super() unless you're extending a \"leaf\" class like FolderNode, AssetNode, or JinjaNode")
+        raise NotImplementedError("Your node \"" + self.__class__.__name__ + "\" should implement generate(), and don't call super() unless you're extending a \"leaf\" class like FolderNode, AssetNode, or JinjaNode")
 
     def config_copy(self, name=None, target_name=None):
         node_config = deepcopy(self.config)
@@ -213,6 +213,8 @@ class FolderNode(Node):
             elif child.is_asset:
                 if everything or assets:
                     ret.append(child)
+            elif everything:
+                ret.append(child)
         return ret
 
     def __repr__(self, indent=''):
@@ -221,7 +223,6 @@ class FolderNode(Node):
         for child in self.children:
             ret += "\n" + child.__repr__(indent)
         return ret
-
 
 
 class RootFolderNode(FolderNode):
@@ -295,7 +296,14 @@ class AssetNode(FileNode):
         copy2(self.source, target)
 
 
-class JinjaNode(FileNode):
+class PageNode(FileNode):
+    """
+    I'm not sure what should be done in this class should do.  But dibs!
+    """
+    pass
+
+
+class JinjaNode(PageNode):
     """
     A JinjaNode object is rendered before copied to its destination
     """

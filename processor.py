@@ -63,6 +63,7 @@ def build_node_tree(parent_node, config, source_path, target_path):
     if node_config['ignore'] is True:
         return
 
+    # scan the folder
     for file_name in os.listdir(source_path):
         if any(pattern for pattern in node_config['ignore'] if fnmatch(file_name, pattern)):
             continue
@@ -128,10 +129,10 @@ def build_node_tree(parent_node, config, source_path, target_path):
         if os.path.isdir(source_file):
             # this also happens in the root_processor.  I would prefer these be DRYer, but I
             # don't have a clear idea how to remove one or the other.  RootNode is created
-            # imperatively, and so must explicitly look for it.  Folders are detected
+            # imperatively, and so must explicitly look for config.yaml.  Folders are detected
             # after that point, but in order to be consistent with files' front matter parsing timing,
             # the config is read *before* its processor is invoked (so no matter what processor you
-            # use, it is guaranteed that YAML info)
+            # use, it is guaranteed that its config is complete)
             config_path = os.path.join(source_file, leaf_config['config_file'])
             leaf_config.update(process_config_yaml(config_path))
 
