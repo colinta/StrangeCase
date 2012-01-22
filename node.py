@@ -21,10 +21,10 @@ class Node(object):
     Parent class for all nodes (pages and folders)
     """
 
-    def __init__(self, config, target):
+    def __init__(self, config, target_path):
         self.config = config
         self.parent = None
-        self.target = target
+        self.target_path = target_path
 
     def generate(self, site):
         raise NotImplementedError("Your node \"" + self.__class__.__name__ + "\" should implement generate(), and don't call super() unless you're extending a \"leaf\" class like FolderNode, AssetNode, or JinjaNode")
@@ -129,14 +129,14 @@ class FolderNode(Node):
     """
     A FolderNode object creates itself in the target folder (mkdir).
     """
-    def __init__(self, config, source, target):
-        super(FolderNode, self).__init__(config, target)
-        self.source = source
+    def __init__(self, config, source_path, target_path):
+        super(FolderNode, self).__init__(config, target_path)
+        self.source_path = source_path
 
         self.children = []
 
     def generate(self, site):
-        folder = os.path.join(self.target, self.target_name)
+        folder = os.path.join(self.target_path, self.target_name)
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
 
@@ -235,9 +235,9 @@ class RootFolderNode(FolderNode):
 
     def generate(self):
         """
-        This is the only Node.generate method that doesn't require the 'site' argument.  'self' *is* the site arqument!
+        This is the only Node.generate method that doesn't require the 'site' argument.  it *is* the site arqument!
         """
-        folder = self.target
+        folder = self.target_path
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
 
@@ -249,11 +249,11 @@ class FileNode(Node):
     """
     A FileNode object is an abstract parent class for a "leaf".
     """
-    def __init__(self, config, source, target):
-        super(FileNode, self).__init__(config, target)
-        if not source or not os.path.exists(source):
-            raise TypeError('source is a required argument in FileNode()')
-        self.source = source
+    def __init__(self, config, source_path, target_path):
+        super(FileNode, self).__init__(config, target_path)
+        if not source_path or not os.path.exists(source_path):
+            raise TypeError('source_path is a required argument in FileNode()')
+        self.source_path = source_path
 
     ##|                        |##
     ##|  "special" properties  |##
@@ -292,8 +292,8 @@ class AssetNode(FileNode):
     Copies a file to a destination
     """
     def generate(self, site):
-        target = os.path.join(self.target, self.target_name)
-        copy2(self.source, target)
+        target_path = os.path.join(self.target_path, self.target_name)
+        copy2(self.source_path, target_path)
 
 
 class PageNode(FileNode):
@@ -323,9 +323,9 @@ class JinjaNode(PageNode):
         return cls.ENVIRONMENT
 
     def generate(self, site):
-        template = self.get_environment().get_template(self.source)
+        template = self.get_environment().get_template(self.source_path)
         content = template.render(self.config, my=self, site=site)
 
-        target = os.path.join(self.target, self.target_name)
-        with open(target, 'w') as dest:
+        target_path = os.path.join(self.target_path, self.target_name)
+        with open(target_path, 'w') as dest:
             dest.write(content.encode('utf-8'))

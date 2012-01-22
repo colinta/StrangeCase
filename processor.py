@@ -23,7 +23,7 @@ from copy import deepcopy
 from node import FolderNode, RootFolderNode, AssetNode, JinjaNode
 
 
-def process_config_yaml(config_path):
+def check_for_config(config_path):
     # merge folder/config.yaml
     if os.path.isfile(config_path):
         with open(config_path, 'r') as config_file:
@@ -34,7 +34,7 @@ def process_config_yaml(config_path):
     return {}
 
 
-def process_front_matter(source_file):
+def check_for_front_matter(source_file):
     with open(source_file, 'r') as f:
         contents = f.read()
         front_matter_match = re.match(r"\A([-]{3,})$", contents, re.MULTILINE)
@@ -124,7 +124,8 @@ def build_node_tree(parent_node, config, source_path, target_path):
         ### DEBUG
         ### print 'name:%s >> target_file:%s || target_name:%s @ url:%s' % (name, target_file, target_name)
 
-        # create node(s). if you specify a 'processor' it will override the default.
+        # create node(s). if you specify a 'type' it will override the default.
+        # built-in types are 'page', 'folder', and 'asset'
         nodes = ()  # if processor is None, nodes won't get assigned
         if os.path.isdir(source_file):
             # this also happens in the root_processor.  I would prefer these be DRYer, but I
@@ -134,18 +135,18 @@ def build_node_tree(parent_node, config, source_path, target_path):
             # the config is read *before* its processor is invoked (so no matter what processor you
             # use, it is guaranteed that its config is complete)
             config_path = os.path.join(source_file, leaf_config['config_file'])
-            leaf_config.update(process_config_yaml(config_path))
+            leaf_config.update(check_for_config(config_path))
 
-            if 'processor' in leaf_config:
-                processor = leaf_config['processor']
+            # if { ignore: true }, the entire directory is ignored
+            if leaf_config['ignore'] is True:
+                processor = False
+            elif 'type' in leaf_config:
+                processor = leaf_config['type']
             else:
                 processor = 'folder'
-
-            if processor:
-                nodes = Registry.get(processor, leaf_config, source_file, target_path)
         else:
-            if 'processor' in leaf_config:
-                processor = leaf_config['processor']
+            if 'type' in leaf_config:
+                processor = leaf_config['type']
             else:
                 # an entire folder can be marked 'dont_process' using 'dont_process': true
                 # or it can contain a list of glob patterns
@@ -158,29 +159,30 @@ def build_node_tree(parent_node, config, source_path, target_path):
                     should_process = False
 
                 if should_process:
-                    yaml_config = process_front_matter(source_file)
+                    yaml_config = check_for_front_matter(source_file)
                     if 'dont_process' in yaml_config:
                         raise KeyError('"dont_process" is not allowed in yaml front matter.')
                     leaf_config.update(yaml_config)
 
-                if 'processor' in leaf_config:
-                    processor = leaf_config['processor']
+                if leaf_config['ignore'] is True:
+                    processor = False
+                elif 'type' in leaf_config:
+                    processor = leaf_config['type']
                 elif should_process:
                     processor = 'page'
                 else:
                     processor = 'asset'
 
-            if processor:
-                nodes = Registry.get(processor, leaf_config, source_file, target_path)
-
-        if nodes:
-            parent_node.extend(nodes)
+        if processor:
+            nodes = Registry.get(processor, leaf_config, source_file, target_path)
+            if nodes:
+                parent_node.extend(nodes)
 
 
 def root_processor(config, deploy_path, target_path):
     # see note above about why root_processor has this code but folder_processor doesn't
     config_path = os.path.join(deploy_path, config['config_file'])
-    config.update(process_config_yaml(config_path))
+    config.update(check_for_config(config_path))
 
     node = RootFolderNode(config, deploy_path, target_path)
 
