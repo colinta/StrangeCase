@@ -21,10 +21,10 @@ class Node(object):
     Parent class for all nodes (pages and folders)
     """
 
-    def __init__(self, config, target_path):
+    def __init__(self, config, target_folder):
         self.config = config
         self.parent = None
-        self.target_path = target_path
+        self.target_folder = target_folder
 
     def generate(self, site):
         raise NotImplementedError("Your node \"" + self.__class__.__name__ + "\" should implement generate(), and don't call super() unless you're extending a \"leaf\" class like FolderNode, AssetNode, or JinjaNode")
@@ -144,14 +144,14 @@ class FolderNode(Node):
     """
     A FolderNode object creates itself in the target folder (mkdir).
     """
-    def __init__(self, config, source_path, target_path):
-        super(FolderNode, self).__init__(config, target_path)
+    def __init__(self, config, source_path, target_folder):
+        super(FolderNode, self).__init__(config, target_folder)
         self.source_path = source_path
 
         self.children = []
 
     def generate(self, site):
-        folder = os.path.join(self.target_path, self.target_name)
+        folder = os.path.join(self.target_folder, self.target_name)
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
 
@@ -267,7 +267,7 @@ class RootFolderNode(FolderNode):
         """
         This is the only Node.generate method that doesn't require the 'site' argument.  it *is* the site arqument!
         """
-        folder = self.target_path
+        folder = self.target_folder
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
 
@@ -320,12 +320,12 @@ class Processor(Node):
             self.parent.insert(idx, children)
             self.remove_self()
 
-    def process(self, config, source_path, target_path):
+    def process(self, config, source_path, target_folder):
         """
         Called when a node registers itself with this processor.
 
         source_path can be None, if it doesn't refer to a source file.
-        target_path is a definite, though.  This is a site generator.  What are you generating if it's not a file!?
+        target_folder is a definite, though.  This is a site generator.  What are you generating if it's not a file!?
         """
         return ()  # implementations should return a tuple of nodes.
 
@@ -334,8 +334,8 @@ class FileNode(Node):
     """
     A FileNode object is an abstract parent class for a "leaf".
     """
-    def __init__(self, config, source_path, target_path):
-        super(FileNode, self).__init__(config, target_path)
+    def __init__(self, config, source_path, target_folder):
+        super(FileNode, self).__init__(config, target_folder)
         if not source_path or not os.path.exists(source_path):
             raise TypeError('source_path is a required argument in FileNode()')
         self.source_path = source_path
@@ -377,7 +377,7 @@ class AssetNode(FileNode):
     Copies a file to a destination
     """
     def generate(self, site):
-        target_path = os.path.join(self.target_path, self.target_name)
+        target_path = os.path.join(self.target_folder, self.target_name)
         copy2(self.source_path, target_path)
 
 
@@ -411,6 +411,6 @@ class JinjaNode(PageNode):
         template = self.get_environment().get_template(self.source_path)
         content = template.render(self.config, my=self, site=site)
 
-        target_path = os.path.join(self.target_path, self.target_name)
+        target_path = os.path.join(self.target_folder, self.target_name)
         with open(target_path, 'w') as dest:
             dest.write(content.encode('utf-8'))
