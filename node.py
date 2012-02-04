@@ -2,6 +2,7 @@ import os
 from shutil import copy2
 import urllib
 from copy import deepcopy
+from PIL import Image
 
 
 def check_config_first(fn):
@@ -26,8 +27,69 @@ class Node(object):
         self.parent = None
         self.target_folder = target_folder
 
+        self.children = []
+
     def generate(self, site):
-        raise NotImplementedError("Your node \"" + self.__class__.__name__ + "\" should implement generate(), and don't call super() unless you're extending a \"leaf\" class like FolderNode, AssetNode, or JinjaNode")
+        for child in self.children:
+            child.generate(site)
+
+    def all(self, everything=False, folders=False, pages=True, assets=False, processors=False, recursive=False):
+        """
+        Returns descendants, ignoring iterability. Folders, assets, and
+        pages can all be included or excluded as the case demands.  An easy
+        trick is to call all(True), which will return everything, recursively.
+        """
+        ret = []
+
+        for child in self.children:
+            if child.is_folder:
+                if everything or folders:
+                    ret.append(child)
+
+                if everything or recursive:
+                    ret.extend(child.all(everything, folders, pages, assets, processors, recursive))
+            elif child.is_page:
+                if everything or pages:
+                    ret.append(child)
+            elif child.is_asset:
+                if everything or assets:
+                    ret.append(child)
+            elif child.is_processor:
+                if everything or processors:
+                    ret.append(child)
+            elif everything:
+                ret.append(child)
+        return ret
+
+    ##|
+    ##|  CHILDREN
+    ##|
+    def append(self, child):
+        if child.parent:
+            child.parent.remove(child)
+
+        child.parent = self
+        self.children.append(child)
+
+    def extend(self, children):
+        for child in children:
+            self.append(child)
+
+    def index(self, child):
+        return self.children.index(child)
+
+    def remove(self, child):
+        if child in self.children:
+            self.children.remove(child)
+
+    def insert(self, i, children):
+        for child in children:
+            if child.parent:
+                child.parent.remove(child)
+
+            child.parent = self
+            self.children.insert(i, child)
+            i += 1
 
     def config_copy(self, name=None, target_name=None):
         node_config = deepcopy(self.config)
@@ -106,7 +168,6 @@ class Node(object):
 
     ##|
     ##|  TRAVERSAL
-    ##|   see FolderNode for the children property
     ##|
     @property
     def next(self):
@@ -131,10 +192,27 @@ class Node(object):
     def __nonzero__(self):
         return True
 
+    def __setitem__(self, key, value):
+        self.config[key] = value
+
+    def __getitem__(self, key):
+        return self.__getattr__(key)
+
     def __getattr__(self, key):
         if key in self.config:
             return self.config.get(key)
-        return None
+
+        for child in self.children:
+            if child.name == key:
+                return child
+
+        return ''
+
+    def __len__(self):
+        return len([child for child in self.children if child.iterable])
+
+    def __iter__(self):
+        return iter([child for child in self.children if child.iterable])
 
     def __repr__(self, indent=''):
         return "%s(url: %s type:%s)" % (indent, self.url, str(type(self)))
@@ -148,58 +226,11 @@ class FolderNode(Node):
         super(FolderNode, self).__init__(config, target_folder)
         self.source_path = source_path
 
-        self.children = []
-
     def generate(self, site):
         folder = os.path.join(self.target_folder, self.target_name)
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
-
-        for child in self.children:
-            child.generate(site)
-
-    def append(self, child):
-        if child.parent:
-            child.parent.remove(child)
-
-        child.parent = self
-        self.children.append(child)
-
-    def extend(self, children):
-        for child in children:
-            self.append(child)
-
-    def index(self, child):
-        return self.children.index(child)
-
-    def remove(self, child):
-        if child in self.children:
-            self.children.remove(child)
-
-    def insert(self, i, children):
-        for child in children:
-            if child.parent:
-                child.parent.remove(child)
-
-            child.parent = self
-            self.children.insert(i, child)
-            i += 1
-
-    def __getattr__(self, key):
-        ret = super(FolderNode, self).__getattr__(key)
-        if ret is not None:
-            return ret
-
-        for child in self.children:
-            if child.name == key:
-                return child
-        return None
-
-    def __len__(self):
-        return len([child for child in self.children if child.iterable])
-
-    def __iter__(self):
-        return iter([child for child in self.children if child.iterable])
+        super(FolderNode, self).generate(site)
 
     ##|                        |##
     ##|  "special" properties  |##
@@ -218,34 +249,6 @@ class FolderNode(Node):
     @check_config_first
     def is_folder(self):
         return True
-
-    def all(self, everything=False, folders=False, pages=True, assets=False, processors=False, recursive=False):
-        """
-        Returns descendants, ignoring iterability. Folders, assets, and
-        pages can all be included or excluded as the case demands.  An easy
-        trick is to call all(True), which will return everything, recursively.
-        """
-        ret = []
-
-        for child in self.children:
-            if child.is_folder:
-                if everything or folders:
-                    ret.append(child)
-
-                if everything or recursive:
-                    ret.extend(child.all(everything, folders, pages, assets, processors, recursive))
-            elif child.is_page:
-                if everything or pages:
-                    ret.append(child)
-            elif child.is_asset:
-                if everything or assets:
-                    ret.append(child)
-            elif child.is_processor:
-                if everything or processors:
-                    ret.append(child)
-            elif everything:
-                ret.append(child)
-        return ret
 
     def __repr__(self, indent=''):
         ret = super(FolderNode, self).__repr__(indent)
@@ -290,9 +293,6 @@ class Processor(Node):
     that it can be placed in the site tree, but later it modifies the
     tree to include other nodes.  Neat!
     """
-    def generate(self, site):
-        pass
-
     @property
     @check_config_first
     def is_processor(self):
@@ -380,10 +380,34 @@ class AssetNode(FileNode):
         target_path = os.path.join(self.target_folder, self.target_name)
         copy2(self.source_path, target_path)
 
+        super(AssetNode, self).generate(site)
+
+
+class ImageNode(FileNode):
+    """
+    Copies a file to a destination
+    """
+    def generate(self, site):
+        target_path = os.path.join(self.target_folder, self.target_name)
+        if 'size' in self.config:
+            image = Image.open(self.source_path)
+            size = self.config['size']
+            if isinstance(size, basestring):
+                size = self.config['size'].split('x')
+            # ensure working with ints - strings do nothing (no error, nothing!)
+            size[0] = int(size[0])
+            size[1] = int(size[1])
+            image.thumbnail(size, Image.ANTIALIAS)
+            image.save(target_path)
+        else:
+            copy2(self.source_path, target_path)
+
+        super(ImageNode, self).generate(site)
+
 
 class PageNode(FileNode):
     """
-    I'm not sure what should be done in this class should do.  But dibs!
+    I'm not sure what should be done in this class.  But dibs!
     """
     pass
 
@@ -414,3 +438,5 @@ class JinjaNode(PageNode):
         target_path = os.path.join(self.target_folder, self.target_name)
         with open(target_path, 'w') as dest:
             dest.write(content.encode('utf-8'))
+
+        super(JinjaNode, self).generate(site)
