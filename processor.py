@@ -217,6 +217,7 @@ def image_processor(config, source_path, target_path):
         thumb_config = image_node.config_copy(name=thumbnail, target_name=target_name)
         thumb_config['size'] = config['thumbnails'][thumbnail]
         thumb_config['iterable'] = False
+        thumb_config['is_thumbnail'] = True
 
         thumbnail_node = ImageNode(thumb_config, source_path, target_path)
         image_node.config[thumbnail] = thumbnail_node
@@ -224,20 +225,7 @@ def image_processor(config, source_path, target_path):
     return (image_node, ) + tuple(thumbs)
 
 
-class ConcreteMetaclass(type):
-    """
-    Disables the ability to extend a class.
-    """
-    def __new__(cls, name, bases, dict):
-        for base in bases:
-            if isinstance(base, ConcreteMetaclass):
-                base_class_name = base.__name__
-                raise TypeError("{0} cannot be extended".format(base_class_name))
-        return super(ConcreteMetaclass, cls).__new__(cls, name, bases, dict)
-
-
 class Registry(object):
-    __metaclass__ = ConcreteMetaclass
     processors = {}
 
     def __new__(cls):

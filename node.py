@@ -107,12 +107,6 @@ class Node(object):
 
         return node_config
 
-    ##|                                  |##
-    ##|  NODES DON'T ACTUALLY POPULATE   |##
-    ##|                                  |##
-    def populate(self, site):
-        pass
-
     ##|                        |##
     ##|  "special" properties  |##
     ##|                        |##
@@ -319,15 +313,6 @@ class Processor(Node):
             idx = self.parent.index(self)
             self.parent.insert(idx, children)
             self.remove_self()
-
-    def process(self, config, source_path, target_folder):
-        """
-        Called when a node registers itself with this processor.
-
-        source_path can be None, if it doesn't refer to a source file.
-        target_folder is a definite, though.  This is a site generator.  What are you generating if it's not a file!?
-        """
-        return ()  # implementations should return a tuple of nodes.
 
 
 class FileNode(Node):
