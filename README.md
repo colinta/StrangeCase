@@ -336,34 +336,6 @@ a `Processor` class that extends `Node`, and a concept of "populating" the tree 
 it's a good system, but I'm open to friendly suggestions.
 
 
-ZEE FILES
----------
-
-```
-$ tree StrangeCase
-StrangeCase
-├── LICENSE
-├── README.md
-├── nodes
-│   ├── __init__.py
-│   └── image.py
-├── processors
-│   ├── __init__.py
-│   ├── categories.py
-│   └── image.py
-├── registry.py
-├── requirements.txt
-├── strange_case.py
-├── strange_case_config.py
-└── support
-    ├── __init__.py
-    └── jinja.py
-
-3 directories, 13 files
-```
-
-
-
 TODO
 ----
 
@@ -372,4 +344,7 @@ TODO
 LICENSE
 -------
 
-See [LICENSE](https://github.com/colinta/StrangeCase/blob/master/LICENSE).
+Copyright (c) 2012, Colin Thomas-Arnold
+All rights reserved.
+
+See [LICENSE](https://github.com/colinta/StrangeCase/blob/master/LICENSE) for more details (it's a simplified BSD license).

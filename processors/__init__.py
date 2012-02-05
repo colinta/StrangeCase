@@ -124,10 +124,6 @@ def build_node_tree(parent_node, source_path, target_path):
         # built-in types are 'page', 'folder', and 'asset'
         nodes = ()  # if processor is None, nodes won't get assigned
         if os.path.isdir(source_file):
-            # this also happens in the root_processor.  I would prefer these be DRYer, but I
-            # don't have a clear idea how to remove one or the other.  RootNode is created
-            # imperatively, and so must explicitly look for config.yaml.  Folders are detected
-            # after that point, but in order to be consistent with files' front matter parsing timing,
             # the config is read *before* its processor is invoked (so no matter what processor you
             # use, it is guaranteed that its config is complete)
             config_path = os.path.join(source_file, leaf_config['config_file'])
@@ -176,10 +172,6 @@ def build_node_tree(parent_node, source_path, target_path):
 
 
 def root_processor(config, deploy_path, target_path):
-    # see note above about why root_processor has this code but folder_processor doesn't
-    config_path = os.path.join(deploy_path, config['config_file'])
-    config.update(check_for_config(config_path))
-
     node = RootFolderNode(config, deploy_path, target_path)
 
     build_node_tree(node, deploy_path, target_path)

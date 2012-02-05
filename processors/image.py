@@ -1,5 +1,5 @@
 import os
-from nodes.image import ImageNode
+from nodes import ImageNode
 from registry import Registry
 
 

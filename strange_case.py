@@ -13,6 +13,11 @@ def strange_case(config):
     if not os.path.isdir(site_path):
         raise IOError("Could not find site_path folder \"%s\"" % site_path)
 
+    # this is the one folder that *doesn't* get processed by processers.build_page_tree,
+    # so it needs special handling here.
+    config_path = os.path.join(deploy_path, config['config_file'])
+    config.update(check_for_config(config_path))
+
     root_node = Registry.node('root', config, site_path, deploy_path)[0]
 
     root_node.generate()
