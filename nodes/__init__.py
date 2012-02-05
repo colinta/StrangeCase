@@ -1,8 +1,8 @@
 import os
 from shutil import copy2
 import urllib
+from registry import Registry
 from copy import deepcopy
-from PIL import Image
 
 
 def check_config_first(fn):
@@ -91,19 +91,16 @@ class Node(object):
             self.children.insert(i, child)
             i += 1
 
-    def config_copy(self, name=None, target_name=None):
+    def config_copy(self, **kwargs):
         node_config = deepcopy(self.config)
 
         # not merged
-        if name:
-            node_config['name'] = name
-        elif 'name' in node_config:
-            del node_config['name']
+        for key in ['name', 'target_name', 'type']:
+            if key in node_config:
+                del node_config[key]
 
-        if target_name:
-            node_config['target_name'] = target_name
-        elif 'target_name' in node_config:
-            del node_config['target_name']
+        if kwargs:
+            node_config.update(kwargs)
 
         return node_config
 
@@ -246,7 +243,7 @@ class FolderNode(Node):
 
     def __repr__(self, indent=''):
         ret = super(FolderNode, self).__repr__(indent)
-        indent += '	'
+        indent += ' '
         for child in self.children:
             ret += "\n" + child.__repr__(indent)
         return ret
@@ -368,28 +365,6 @@ class AssetNode(FileNode):
         super(AssetNode, self).generate(site)
 
 
-class ImageNode(FileNode):
-    """
-    Copies a file to a destination
-    """
-    def generate(self, site):
-        target_path = os.path.join(self.target_folder, self.target_name)
-        if 'size' in self.config:
-            image = Image.open(self.source_path)
-            size = self.config['size']
-            if isinstance(size, basestring):
-                size = self.config['size'].split('x')
-            # ensure working with ints - strings do nothing (no error, nothing!)
-            size[0] = int(size[0])
-            size[1] = int(size[1])
-            image.thumbnail(size, Image.ANTIALIAS)
-            image.save(target_path)
-        else:
-            copy2(self.source_path, target_path)
-
-        super(ImageNode, self).generate(site)
-
-
 class PageNode(FileNode):
     """
     I'm not sure what should be done in this class.  But dibs!
@@ -401,23 +376,8 @@ class JinjaNode(PageNode):
     """
     A JinjaNode object is rendered before copied to its destination
     """
-    ENVIRONMENT = None
-
-    @classmethod
-    def get_environment(cls):
-        if not cls.ENVIRONMENT:
-            ENVIRONMENT = None
-            try:
-                from config import ENVIRONMENT
-            except ImportError:
-                if not ENVIRONMENT:
-                    from strange_case_jinja import StrangeCaseEnvironment
-                    ENVIRONMENT = StrangeCaseEnvironment()
-            cls.ENVIRONMENT = ENVIRONMENT
-        return cls.ENVIRONMENT
-
     def generate(self, site):
-        template = self.get_environment().get_template(self.source_path)
+        template = Registry.get('jinja_environment').get_template(self.source_path)
         content = template.render(self.config, my=self, site=site)
 
         target_path = os.path.join(self.target_folder, self.target_name)

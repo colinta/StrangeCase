@@ -1,35 +1,20 @@
 import yaml
 import os
 
-##|                                               |##
-##|  Don't extend or mess with any of this stuff  |##
-##|  -------------------------------------------  |##
-##|    this used to be in strange_case.py, but    |##
-##|     that file was getting fat and bloated     |##
-##|                                               |##
-
-CONFIG = None
-try:
-    from config import CONFIG
-except ImportError:
-    if not CONFIG:
-        CONFIG = {}
 
 # first the lowest-level configs are merged with these defaults.
-default_config = {
+CONFIG = {
     'project_path': os.getcwd(),
     'site_path': u'site/',
     'deploy_path': u'public/',
     'config_file': u'config.yaml',
     'html_extension': u'.html',
+    'extensions': [],
+    'filters': {},
+    'processors': [],
 }
-default_config.update(CONFIG)
-CONFIG = default_config
 
-# this can only be set in config.py (config.yaml is expected to be in this folder)
-PROJECT_PATH = CONFIG['project_path']
-
-# this can change per folder
+# this can change per folder, but please don't, that's just weird.
 html_ext = CONFIG['html_extension']
 
 more_defaults = {
@@ -51,8 +36,8 @@ more_defaults = {
 more_defaults.update(CONFIG)
 CONFIG = more_defaults
 
-# we should now know
-config_path = os.path.join(PROJECT_PATH, CONFIG['config_file'])
+# now we can look for the app config
+config_path = os.path.join(CONFIG['project_path'], CONFIG['config_file'])
 
 with open(config_path, 'r') as config_file:
     yaml_config = yaml.load(config_file)

@@ -19,7 +19,8 @@ import os
 import re
 from fnmatch import fnmatch
 from copy import deepcopy
-from node import FolderNode, RootFolderNode, AssetNode, JinjaNode, ImageNode
+from nodes import FolderNode, RootFolderNode, AssetNode, JinjaNode
+from registry import Registry
 
 
 def check_for_config(config_path):
@@ -70,7 +71,7 @@ def build_node_tree(parent_node, source_path, target_path):
         base_name, ext = os.path.splitext(file_name)
 
         ##|  MERGE FILES CONFIG
-        # these use the "real" file_name
+        # these use the original file_name
         if 'files' in leaf_config:
             if file_name in leaf_config['files']:
                 leaf_config.update(leaf_config['files'][file_name])
@@ -169,7 +170,7 @@ def build_node_tree(parent_node, source_path, target_path):
                     processor = 'asset'
 
         if processor:
-            nodes = Registry.get(processor, leaf_config, source_file, target_path)
+            nodes = Registry.node(processor, leaf_config, source_file, target_path)
             if nodes:
                 parent_node.extend(nodes)
 
@@ -204,52 +205,7 @@ def page_processor(config, source_path, target_path):
     return (node, )
 
 
-def image_processor(config, source_path, target_path):
-    image_node = ImageNode(config, source_path, target_path)
-    if 'thumbnails' not in config:
-        return (image_node,)
-
-    thumbs = []
-    for thumbnail in config['thumbnails']:
-        target_name, ext = os.path.splitext(image_node.target_name)
-        target_name += '_' + thumbnail
-        target_name += ext
-        thumb_config = image_node.config_copy(name=thumbnail, target_name=target_name)
-        thumb_config['size'] = config['thumbnails'][thumbnail]
-        thumb_config['iterable'] = False
-        thumb_config['is_thumbnail'] = True
-
-        thumbnail_node = ImageNode(thumb_config, source_path, target_path)
-        image_node.config[thumbnail] = thumbnail_node
-        thumbs.append(thumbnail_node)
-    return (image_node, ) + tuple(thumbs)
-
-
-class Registry(object):
-    processors = {}
-
-    def __new__(cls):
-        raise TypeError("Don't instantiate Registry.")
-
-    @classmethod
-    def register(cls, name, processor):
-        cls.processors[name] = processor
-
-    @classmethod
-    def get(cls, name, *args, **kwargs):
-        try:
-            processor = cls.processors[name]
-
-            if isinstance(processor, type):  # You can pass a class object,
-                return processor().process(*args, **kwargs)  # and it gets instantiated here
-            else:
-                return processor(*args, **kwargs)
-        except KeyError:
-            raise NotImplementedError('Unknown processor "%s"' % name)
-
-
 Registry.register('root', root_processor)
 Registry.register('folder', folder_processor)
 Registry.register('asset', asset_processor)
 Registry.register('page', page_processor)
-Registry.register('image', image_processor)
