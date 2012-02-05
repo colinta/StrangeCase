@@ -59,8 +59,11 @@ title: My first page
 5. Run strange case:
    `$ python strange_case.py`
 
-6. Open public/index.html.  You might want to hold onto your jaw, lest it drop to the floor.
+6. Open `public/index.html`.  You might want to hold onto your jaw, lest it drop to the floor.  Yeah, it's not gonna say `{{ title }}`,
+   it's gonna say `My First Page` in big letters.
+
 7. Add more templates, add layouts, add include files, add static assets, and learn more about [jinja2](http://jinja.pocoo.org/).
+
 8. Because that is just about all that StrangeCase is gonna do for you!†
 
 † *this is not true, StrangeCase is capable of generating category pages, tag clouds, image listings, and it's all very straightforward.*
