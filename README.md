@@ -38,19 +38,23 @@ QUICK START
 2. Put index.j2 in site, and put some html in there.
 3. Add YAML front matter to that file.  It looks like this:
 
-   ---
-   title: My first page
-   ---
-   <!doctype html>
-   ...
+```
+---
+title: My first page
+---
+<!doctype html>
+...
+```
 
 4. Use that YAML in your page using [jinja2](http://jinja.pocoo.org/)'s template language syntax:
 
-   ---
-   title: My first page
-   ---
-   <!doctype html>
-   <h1>{{ title }}</h1>
+```
+---
+title: My first page
+---
+<!doctype html>
+<h1>{{ title }}</h1>
+```
 
 5. Run strange case:
    `$ python strange_case.py`
