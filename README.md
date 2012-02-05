@@ -346,6 +346,10 @@ TODO
 ----
 
 * Placing entries in `**/config.yaml` override parent configs, but i'd like to add a merging syntax to the YAML, as a little DSL.
+* I like to add date prefixes to my file names so that they get sorted in the order I want.  But I have to manually set the date
+  and name in the front matter, which is annoying.  Add a "filename parser" that is optional and configurable?
+* And if I'm gonna do that, isn't that just a subset of including front matter and config.yaml?  Maybe all these tasks can be converted
+  into a nifty new whizbang system.
 
 LICENSE
 -------
