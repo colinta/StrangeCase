@@ -72,9 +72,9 @@ def build_node_tree(parent_node, source_path, target_path):
 
         ##|  MERGE FILES CONFIG
         # these use the original file_name
-        if 'files' in leaf_config:
-            if file_name in leaf_config['files']:
-                leaf_config.update(leaf_config['files'][file_name])
+        if 'files' in node_config:
+            if file_name in node_config['files']:
+                leaf_config.update(node_config['files'][file_name])
             # the 'files' setting is not passed on to child pages
             del leaf_config['files']
 

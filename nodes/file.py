@@ -43,3 +43,8 @@ class FileNode(Node):
     @check_config_first
     def is_asset(self):
         return not self.is_page
+
+    def generate(self, site):
+        target_path = os.path.join(self.target_folder, self.target_name)
+        os.chmod(target_path, 0755)
+        super(FileNode, self).generate(site)
