@@ -117,9 +117,6 @@ def build_node_tree(parent_node, source_path, target_path):
             # target_name = re.sub(r'/\W/', '_', target_name)
             leaf_config['target_name'] = target_name
 
-        ### DEBUG
-        ### print 'name:%s >> target_file:%s || target_name:%s @ url:%s' % (name, target_file, target_name)
-
         # create node(s). if you specify a 'type' it will override the default.
         # built-in types are 'page', 'folder', and 'asset'
         nodes = ()  # if processor is None, nodes won't get assigned
