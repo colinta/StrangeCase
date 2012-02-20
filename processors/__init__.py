@@ -60,7 +60,7 @@ def build_node_tree(parent_node, source_path, target_path):
     node_config = parent_node.config_copy()
 
     # scan the folder
-    for file_name in os.listdir(source_path):
+    for file_name in os.listdir(source_path).sort():
         if any(pattern for pattern in node_config['ignore'] if fnmatch(file_name, pattern)):
             continue
 
