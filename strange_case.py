@@ -23,6 +23,18 @@ def strange_case(config):
     root_node.generate()
 
 
+def fancy_import(name):
+    """
+    This takes a fully qualified object name, like
+    'dinero.gateways.AuthorizeNet', and turns it into the
+    dinero.gateways.AuthorizeNet object.
+    """
+
+    import_path, import_me = name.rsplit('.', 1)
+    imported = __import__(import_path, globals(), locals(), [import_me], -1)
+    return getattr(imported, import_me)
+
+
 if __name__ == '__main__':
     # so that strange_case.py can be executed from any project folder, add CWD to the import paths
     import sys
@@ -41,9 +53,7 @@ if __name__ == '__main__':
     if 'extensions' in CONFIG:
         for extension in CONFIG['extensions']:
             if isinstance(extension, basestring):
-                imp, frm = extension.rsplit('.', 1)
-                ext = __import__(imp, globals(), locals(), [frm], -1)
-                extension = getattr(ext, frm)
+                extension = fancy_import(extension)
             extensions.append(extension)
         del CONFIG['extensions']
 
@@ -56,9 +66,7 @@ if __name__ == '__main__':
     if 'filters' in CONFIG:
         for filter_name, method in CONFIG['filters'].iteritems():
             if isinstance(method, basestring):
-                imp, frm = method.rsplit('.', 1)
-                ext = __import__(imp, globals(), locals(), [frm], -1)
-                method = getattr(ext, frm)
+                method = fancy_import(method)
             jinja_environment.filters[filter_name] = method
         del CONFIG['filters']
 
