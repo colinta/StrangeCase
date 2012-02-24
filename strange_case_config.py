@@ -31,6 +31,8 @@ more_defaults = {
     ],
     'dont_process': [
         '*.js', '*.css',
+        '*.png', '*.jpg',
+        '*.PNG', '*.JPG',
     ],
 }
 more_defaults.update(CONFIG)
