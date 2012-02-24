@@ -21,11 +21,11 @@ class RootFolderNode(FolderNode):
         # before generation, give
         # processor "nodes" their
         # chance to disappear
-        processors = self.all(processors=True, pages=False, recursive=True)
+        processors = self.processors(recursive=True)
         while len(processors):
             for child in processors:
                 child.populate(self)
-            processors = self.all(processors=True, pages=False, recursive=True)
+            processors = self.processors(recursive=True)
 
         for child in self.children:
             child.generate(self)

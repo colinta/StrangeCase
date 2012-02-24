@@ -19,7 +19,7 @@ class CategoryDetail(JinjaNode):
 
 class CategoryFolderProcesser(Processor):
     def populate(self, site):
-        pages = site.all(pages=True, recursive=True)
+        pages = site.pages(recursive=True)
         categories = {}
         for page in pages:
             if not page.category:

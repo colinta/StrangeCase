@@ -265,15 +265,39 @@ the `is_page`, `is_folder`, `is_asset` methods.  Internally this is done a lot, 
 you would need to do this in a template... but there it is!
 
 
-Lastly, the `.all()` method is useful.  The method definition says it all I think:
+Lastly, the `.all()` method, and its more specific variants, are useful.  The `all()` method definition says it all I think:
 
 ``` python
-def all(self, everything=False, folders=False, pages=True, assets=False, processors=False, recursive=False):
+def all(self, recursive=False, folders=None, pages=None, assets=None, processors=None):
     """
     Returns descendants, ignoring iterability. Folders, assets, and
-    pages can all be included or excluded as the case demands.  An easy
-    trick is to call all(True), which will return everything, recursively.
+    pages can all be included or excluded as the case demands.
+
+    If you specify any of folders, pages, assets or processors, only those objects
+    will be returned.
+    Otherwise all node types will be returned.
+
+    recursive, though, defaults to False.  calling all(True) is the same as all(recursive=True)
     """
+```
+
+The variants are all subsets of `all()`:
+
+``` python
+  def pages(self, recursive=False):
+      return self.all(recursive=recursive, pages=True)
+
+  def folders(self, recursive=False):
+      return self.all(recursive=recursive, folders=True)
+
+  def assets(self, recursive=False):
+      return self.all(recursive=recursive, assets=True)
+
+  def files(self, recursive=False):
+      return self.all(recursive=recursive, pages=True, assets=True)
+
+  def processors(self, recursive=False):
+      return self.all(recursive=recursive, processors=True)
 ```
 
 

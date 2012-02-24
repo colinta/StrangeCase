@@ -12,7 +12,7 @@ In the end, we will be creating:
 
 1)  Build your category_index and category_detail pages.  The location of category_index
     will determine what pages it looks in.  It will search all pages and folders that
-    are in the same folder (e.g. self.parent.all(pages=True) ).  The category_detail
+    are in the same folder (e.g. self.parent.pages(recursive=True) ).  The category_detail
     page should be in the same folder.
 
 2)  The category_index should register its processor as 'category_index'

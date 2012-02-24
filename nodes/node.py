@@ -30,33 +30,50 @@ class Node(object):
         for child in self.children:
             child.generate(site)
 
-    def all(self, everything=False, folders=False, pages=True, assets=False, processors=False, recursive=False):
+    def all(self, recursive=False, folders=None, pages=None, assets=None, processors=None):
         """
         Returns descendants, ignoring iterability. Folders, assets, and
-        pages can all be included or excluded as the case demands.  An easy
-        trick is to call all(True), which will return everything, recursively.
+        pages can all be included or excluded as the case demands.
+
+        If you specify any of folders, pages, assets or processors, only those objects
+        will be returned. Otherwise all node types will be returned.
+
+        recursive defaults to False.  Since it is in first position, calling `all(True)` is
+        the same as `all(recursive=True)`.
         """
+        everything = folders is None and pages is None and assets is None and processors is None
+
         ret = []
-
         for child in self.children:
-            if child.is_folder:
-                if everything or folders:
-                    ret.append(child)
-
-                if everything or recursive:
-                    ret.extend(child.all(everything, folders, pages, assets, processors, recursive))
-            elif child.is_page:
-                if everything or pages:
-                    ret.append(child)
-            elif child.is_asset:
-                if everything or assets:
-                    ret.append(child)
-            elif child.is_processor:
-                if everything or processors:
-                    ret.append(child)
-            elif everything:
+            if everything:
                 ret.append(child)
+            elif folders and child.is_folder:
+                ret.append(child)
+            elif pages and child.is_page:
+                ret.append(child)
+            elif assets and child.is_asset:
+                ret.append(child)
+            elif processors and child.is_processor:
+                ret.append(child)
+
+            if child.is_folder and recursive:
+                ret.extend(child.all(recursive, folders, pages, assets, processors))
         return ret
+
+    def pages(self, recursive=False):
+        return self.all(recursive=recursive, pages=True)
+
+    def folders(self, recursive=False):
+        return self.all(recursive=recursive, folders=True)
+
+    def assets(self, recursive=False):
+        return self.all(recursive=recursive, assets=True)
+
+    def files(self, recursive=False):
+        return self.all(recursive=recursive, pages=True, assets=True)
+
+    def processors(self, recursive=False):
+        return self.all(recursive=recursive, processors=True)
 
     ##|
     ##|  CHILDREN
