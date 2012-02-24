@@ -9,8 +9,10 @@ class FileNode(Node):
     """
     def __init__(self, config, source_path, target_folder):
         super(FileNode, self).__init__(config, target_folder)
-        if not source_path or not os.path.exists(source_path):
+        if not source_path:
             raise TypeError('source_path is a required argument in FileNode()')
+        if not os.path.exists(source_path):
+            raise TypeError('source_path "%s" does not exist in FileNode()' % source_path)
         self.source_path = source_path
 
     ##|                        |##
