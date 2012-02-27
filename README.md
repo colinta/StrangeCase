@@ -117,6 +117,9 @@ OK, SO
   better in some places because it makes it clear where the content comes from (e.g. `{{ my.title }}` as
   opposed to just `{{ title }}`).  Totally optional.
 
+* Based on the file name, config.yaml, and YAML front matter, a few config settings get changed.  This part
+  happens during the configuration stage, by `configurator` methods.
+
 
 DEFAULT/SPECIAL CONFIG
 ----------------------
@@ -138,12 +141,22 @@ DEFAULT/SPECIAL CONFIG
   extensions: []  # list of jinja2 extension classes as a dot-separated import path
   filters: {}  # dictionary of `filter_name: filter.method`.
   processors: []  # additional processors.  Processors register themselves as a certain type.
+  configurators: [  # list of configurators.  The built-ins do very importan things, so overriding this does *bad things*
+    configurators.ignore,                  # ignores files based on the 'ignore' setting
+    configurators.merge_files_config,      # merges files[filename] with filename
+    configurators.setdefault_name,         # if 'name' isn't assigned explicitly, this assigns it based on the file name and extension
+    configurators.setdefault_target_name,  # similarly for target_name
+    configurators.folder_pre,              # processes folder/config.yaml.  If the folder config contains `ignore: true`, the folder is skipped
+    configurators.file_pre,                # processes YAML front matter.  Again, the file can be ignored using `ignore: true`
+    configurators.date_from_name,          # Gets the date from the file name, and strips it from name.
+    ]
+  configurators +: []  # to solve the problem of not changing 'configurators', you can put additional configurators in here.
 ```
 
 RUNNING StrangeCase
 -------------------
 
-`$ python strange_case.py`
+`$ python /path/to/strange_case.py`
 
 
 RUNNING StrangeCase, PART 2
@@ -319,14 +332,18 @@ This relates to the `config.py` and `config.yaml` files mentioned above.
 You should glance at the colinta.github.com repository on the build branch.  It does most things that can be done (and look in
 `extensions/` for the markdown and date extension, I copied it from somewhere).
 
-You can define `extensions`, `filters`, and `processors`.  Filters are a dictionary of `filter: package`.  Extensions is a list of packages.
+You can define `extensions`, `filters`, "configurators", and `processors`.
+
+`filters` is a dictionary of `filter_name: package.path`.
+
+`extensions` is a list of `- package.paths`.
 
 If you specify these in config.py, you can import the extension/filter and assign it to the list.  Otherwise, in config.yaml,
 use a dot-separated path, similar to how you would write an `import` statement, but include the class name.
 
-There are a couple built-in processors that are not imported & registered by default: categories and image.  You can add these using similar tricks.
+There are a couple built-in processors that are not imported & registered by default: categories and image.
 
-Like I mentioned earlier, you can add context variables that need the **POWER OF PYTHON** to be determined. Like datetime.time().
+In config.py, you can add context variables that need the **POWER OF PYTHON**.  Things like datetime.time().
 I might add a way to do this in the YAML, but *probably not* (unless the community argues for its inclusion).
 
 
@@ -361,19 +378,25 @@ processors:
 # cannot assign time to datetime.time.  DANG.
 ```
 
-`processors/categories.py` has an explanation of how processors work, and how it was written.  I made it up as I went along, and ended up adding
-a `Processor` class that extends `Node`, and a concept of "populating" the tree after the initial build.  Read more in that file.  I think
-it's a good system, but I'm open to friendly suggestions.
+`processors/categories.py` has an explanation of how processors work, and how it was written.
+I made it up as I went along, and ended up adding a `Processor` class that extends `Node`,
+and a concept of "populating" the tree after the initial build.  Read more in that file.  I
+think it's a good system, but I'm open to friendly suggestions.
+
+Last but not least: configurators.  These are really the work horses of StrangeCase.  They
+look at YAML front matter, ignore files, set default processors, and so on.  If you need to
+do the equivalent of a context processor in django, this is where you would do that.
+
+Every configurator in `config['configurators']` is given the node config.  If it returns nothing,
+the node is skipped.  Otherwise, you can modify the config, or create a new one, and return it.
+
+See `date_from_name` for a good example of modifying the config based on the file name.
 
 
 TODO
 ----
 
 * Placing entries in `**/config.yaml` override parent configs, but i'd like to add a merging syntax to the YAML, as a little DSL.
-* I like to add date prefixes to my file names so that they get sorted in the order I want.  But I have to manually set the date
-  and name in the front matter, which is annoying.  Add a "filename parser" that is optional and configurable?
-* And if I'm gonna do that, isn't that just a subset of including front matter and config.yaml?  Maybe all these tasks can be converted
-  into a nifty new whizbang system.
 
 LICENSE
 -------

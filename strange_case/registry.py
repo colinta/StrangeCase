@@ -8,30 +8,52 @@ class Registry(object):
     """
     processors = {}
     misc = {}
+    configurators = []
 
     def __new__(cls):
         raise TypeError("Don't instantiate Registry.")
 
     @classmethod
-    def register(cls, name, processor):
-        cls.processors[name] = processor
+    def register(cls, node_type, processor):
+        """
+        Adds (or overrides) a processor to handle `node_type`
+        """
+        cls.processors[node_type] = processor
 
     @classmethod
-    def nodes(cls, name, *args, **kwargs):
+    def nodes(cls, node_type, *args, **kwargs):
+        """
+        Returns a node, instantiating it using the proper processor,
+        if it has been registered for `node_type`.
+        Other raises NotImplementedError
+        """
         try:
-            processor = cls.processors[name]
+            processor = cls.processors[node_type]
 
             if isinstance(processor, type):  # You can pass a class object,
                 return processor().process(*args, **kwargs)  # and it gets instantiated here
             else:
                 return processor(*args, **kwargs)
         except KeyError:
-            raise NotImplementedError('Unknown processor "%s"' % name)
+            raise NotImplementedError('Unknown processor "%s"' % node_type)
 
     @classmethod
     def set(cls, key, value):
+        """
+        Sets a generic system global.
+        """
         cls.misc[key] = value
 
     @classmethod
     def get(cls, key, *args):
+        """
+        Gets a generic system global.
+        """
         return cls.misc.get(key, *args)
+
+    @classmethod
+    def add_configurator(cls, configurator):
+        """
+        Adds a configurator callables.
+        """
+        cls.configurators.append(configurator)

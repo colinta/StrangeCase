@@ -5,7 +5,6 @@ from processors import *
 
 def strange_case(config):
     # pull out important values.
-    # these are not going to change after this point
     site_path = config['site_path']
     deploy_path = config['deploy_path']
 
@@ -15,10 +14,12 @@ def strange_case(config):
 
     # this is the one folder that *doesn't* get processed by processers.build_page_tree,
     # so it needs special handling here.
-    config_path = os.path.join(deploy_path, config['config_file'])
-    config.update(check_for_config(config_path))
+    # config_path = os.path.join(deploy_path, config['config_file'])
+    # config.update(check_for_config(config_path))
+    config.setdefault('type', 'root')
+    root_node = build_node(config, site_path, deploy_path, '')[0]
 
-    root_node = Registry.nodes('root', config, site_path, deploy_path)[0]
+    # root_node = Registry.nodes('root', config, site_path, deploy_path)[0]
 
     root_node.generate()
 
@@ -26,8 +27,8 @@ def strange_case(config):
 def fancy_import(name):
     """
     This takes a fully qualified object name, like
-    'dinero.gateways.AuthorizeNet', and turns it into the
-    dinero.gateways.AuthorizeNet object.
+    'extensions.Markdown2.markdown', and returns the last
+    object.  equivalent to `from extensions.Markdown2 import markdown`.
     """
 
     import_path, import_me = name.rsplit('.', 1)
@@ -73,5 +74,23 @@ if __name__ == '__main__':
         for processor in CONFIG['processors']:
             __import__(processor)
         del CONFIG['processors']
+
+    configurators = []
+    if 'configurators' in CONFIG:
+        for configurator in CONFIG['configurators']:
+            if isinstance(configurator, basestring):
+                configurator = fancy_import(configurator)
+            configurators.append(configurator)
+            Registry.add_configurator(configurator)
+        del CONFIG['configurators']
+
+    # additional configurators, in addition to the all-important defaults
+    if 'configurators +' in CONFIG:
+        for configurator in CONFIG['configurators +']:
+            if isinstance(configurator, basestring):
+                configurator = fancy_import(configurator)
+            configurators.append(configurator)
+            Registry.add_configurator(configurator)
+        del CONFIG['configurators']
 
     strange_case(CONFIG)

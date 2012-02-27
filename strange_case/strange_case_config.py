@@ -1,5 +1,6 @@
 import yaml
 import os
+from configurators import *
 
 
 # first the lowest-level configs are merged with these defaults.
@@ -12,6 +13,19 @@ CONFIG = {
     'extensions': [],
     'filters': {},
     'processors': [],
+    'configurators': [
+        # most of these configurators are *very*
+        # important, so if you're gonna go messing
+        # with them, be warned.  best to use insert()
+        # in config.py.
+        ignore,
+        merge_files_config,
+        setdefault_name,
+        setdefault_target_name,
+        folder_pre,
+        file_pre,
+        date_from_name,
+    ],
 }
 
 # this can change per folder, but please don't, that's just weird.
