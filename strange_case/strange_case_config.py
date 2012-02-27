@@ -66,7 +66,8 @@ CONFIG = more_defaults
 # now we can look for the app config
 config_path = os.path.join(CONFIG['project_path'], CONFIG['config_file'])
 
-with open(config_path, 'r') as config_file:
-    yaml_config = yaml.load(config_file)
-if yaml_config:
-    CONFIG.update(yaml_config)
+if os.path.isfile(config_path):
+    with open(config_path, 'r') as config_file:
+        yaml_config = yaml.load(config_file)
+    if yaml_config:
+        CONFIG.update(yaml_config)

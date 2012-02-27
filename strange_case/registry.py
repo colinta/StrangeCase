@@ -29,13 +29,13 @@ class Registry(object):
         """
         try:
             processor = cls.processors[node_type]
-
-            if isinstance(processor, type):  # You can pass a class object,
-                return processor().process(*args, **kwargs)  # and it gets instantiated here
-            else:
-                return processor(*args, **kwargs)
         except KeyError:
             raise NotImplementedError('Unknown processor "%s"' % node_type)
+
+        if isinstance(processor, type):  # You can pass a class object,
+            return processor().process(*args, **kwargs)  # and it gets instantiated here
+        else:
+            return processor(*args, **kwargs)
 
     @classmethod
     def set(cls, key, value):

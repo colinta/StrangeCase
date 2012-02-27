@@ -1,6 +1,6 @@
 import os
 from registry import Registry
-from processors import *
+from processors import build_node
 
 
 def strange_case(config):
@@ -18,8 +18,6 @@ def strange_case(config):
     # config.update(check_for_config(config_path))
     config.setdefault('type', 'root')
     root_node = build_node(config, site_path, deploy_path, '')[0]
-
-    # root_node = Registry.nodes('root', config, site_path, deploy_path)[0]
 
     root_node.generate()
 
