@@ -7,7 +7,7 @@ The long and short of it:
 
 If you return multiple nodes, they will all be added as children to the parent node.
 If instead you need to create some kind of tree structure, build the tree first and
-then return the top-level node (still in a tuple).  `build_node_tree` might be your
+then return the top-level node (still in a tuple).  `build_node` might be your
 friend.
 
 All files will be parsed for front matter unless it matches an entry in
@@ -65,7 +65,7 @@ def build_node(parent_node, source_path, target_path, file_name):
     base_name, ext = os.path.splitext(file_name)
 
     ##|  MERGE FILES CONFIG
-    # these use the original file_name
+    # these use the physical file_name
     if 'files' in leaf_config:
         if file_name in leaf_config['files']:
             leaf_config.update(leaf_config['files'][file_name])
@@ -73,42 +73,35 @@ def build_node(parent_node, source_path, target_path, file_name):
         del leaf_config['files']
 
     ##|  FIX EXTENSION
-    # .jinja2 should be served as .html
+    # .jinja2, .j2, and .md files should be served as .html
     if 'rename_extensions' in leaf_config and ext in leaf_config['rename_extensions']:
         ext = leaf_config['rename_extensions'][ext]
 
-    ##|  ASSIGN NAME
-    # name override
-    if 'name' in leaf_config:
-        # no error checking is done if you specify the name yourself.
-        name = leaf_config['name']
-    else:
+    ##|  ASSIGN DEFAULT NAME
+    if 'name' not in leaf_config:
         name = base_name
 
         ##|  FIX NAME
-        # modify the name: add the extension if it exists
-        # and isn't ".html", and replace non-word characters with _
+        # add the extension if it exists and isn't ".html"
         if ext and ext != leaf_config['html_extension']:
             name += '_' + ext[1:]  # pluck off the "." in front
 
-        # remove offending characters:
-        # non-word, hyphens, and spaces
+        # replace non-word, hyphens, and spaces characters with _
         name = re.sub(r'[\W -]', '_', name, re.UNICODE)
         leaf_config['name'] = name.encode('ascii')
 
     ##|  ASSIGN TARGET_NAME
     # allow target_name override, otherwise it is
     # `name + ext`
-    if 'target_name' in leaf_config:
-        target_name = leaf_config['target_name']
-    else:
+    if not 'target_name' in leaf_config:
         target_name = base_name + ext
 
         ### if ''fix_target_name'' ?
         ### this code makes target names "look purty", like their name counterpart
-        # target_name = target_name.replace('-', '_')
-        # target_name = target_name.replace(' ', '_')
-        # target_name = re.sub(r'/\W/', '_', target_name)
+        ### it's commented out because I'm not convinced target_names should get
+        ### this treatment.  If you have a strange character in your URL, that's
+        ### your business.  Or maybe I'll add something to the upcoming "renamers"
+        # target_name = re.sub(r'/[\W -]/', '_', target_name)
         leaf_config['target_name'] = target_name
 
     # create node(s). if you specify a 'type' it will override the default.
