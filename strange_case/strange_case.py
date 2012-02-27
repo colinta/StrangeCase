@@ -18,7 +18,7 @@ def strange_case(config):
     config_path = os.path.join(deploy_path, config['config_file'])
     config.update(check_for_config(config_path))
 
-    root_node = Registry.node('root', config, site_path, deploy_path)[0]
+    root_node = Registry.nodes('root', config, site_path, deploy_path)[0]
 
     root_node.generate()
 
@@ -38,14 +38,13 @@ def fancy_import(name):
 if __name__ == '__main__':
     # so that strange_case.py can be executed from any project folder, add CWD to the import paths
     import sys
-    sys.path.append(os.getcwd())
+    sys.path.insert(0, os.getcwd())
 
     CONFIG = None
-    try:
+    if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
         from config import CONFIG
-    except ImportError:
-        if not CONFIG:
-            from strange_case_config import CONFIG
+    else:
+        from strange_case_config import CONFIG
 
     from support.jinja import StrangeCaseEnvironment
 

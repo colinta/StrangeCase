@@ -335,13 +335,13 @@ Example of all this nonsense using `config.py`:
 ``` python
 from strange_case_config import CONFIG
 from processors import image, categories
-from extensions.Markdown2 import Markdown2Extension, markdown2_filter
+from extensions.Markdown2 import Markdown2Extension, markdown_filter
 from datetime.datetime import time
 
 CONFIG.update({
     'extensions': [Markdown2Extension],
     'filters': {
-        'markdown': markdown2_filter,
+        'markdown': markdown_filter,
     },
     'processors': [image, categories]
     'time': int(time()),
@@ -354,7 +354,7 @@ Equivalent in the root `config.yaml`:
 extensions:
   - extensions.Markdown2.Markdown2Extension
 filters:
-  markdown2: extensions.Markdown2.markdown2_filter
+  markdown: extensions.Markdown2.markdown_filter
 processors:
   - processors.image
   - processors.categories

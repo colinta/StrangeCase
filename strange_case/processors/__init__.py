@@ -106,7 +106,6 @@ def build_node(parent_node, source_path, target_path, file_name):
 
     # create node(s). if you specify a 'type' it will override the default.
     # built-in types are 'page', 'folder', and 'asset'
-    nodes = ()  # if processor is None, nodes won't get assigned
     if os.path.isdir(source_file):
         # the config is read *before* its processor is invoked (so no matter what processor you
         # use, it is guaranteed that its config is complete)
@@ -150,7 +149,7 @@ def build_node(parent_node, source_path, target_path, file_name):
                 processor = 'asset'
 
     if processor:
-        nodes = Registry.node(processor, leaf_config, source_file, target_path)
+        nodes = Registry.nodes(processor, leaf_config, source_file, target_path)
         if nodes:
             parent_node.extend(nodes)
 

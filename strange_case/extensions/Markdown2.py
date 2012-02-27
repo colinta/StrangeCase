@@ -7,13 +7,13 @@ markdowner = markdown2.Markdown()
 
 
 # filter
-def markdown2(markdown):
+def markdown(markdown):
     return markdowner.convert(markdown).strip()
 
 
 #block
 class Markdown2Extension(jinja2.ext.Extension):
-    tags = set(['markdown2'])
+    tags = set(['markdown'])
 
     def __init__(self, environment):
         super(Markdown2Extension, self).__init__(environment)
@@ -24,7 +24,7 @@ class Markdown2Extension(jinja2.ext.Extension):
     def parse(self, parser):
         lineno = parser.stream.next().lineno
         body = parser.parse_statements(
-            ['name:endmarkdown2'],
+            ['name:endmarkdown'],
             drop_needle=True
         )
         return jinja2.nodes.CallBlock(

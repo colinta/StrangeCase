@@ -17,7 +17,7 @@ class Registry(object):
         cls.processors[name] = processor
 
     @classmethod
-    def node(cls, name, *args, **kwargs):
+    def nodes(cls, name, *args, **kwargs):
         try:
             processor = cls.processors[name]
 
