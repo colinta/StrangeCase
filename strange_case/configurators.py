@@ -1,6 +1,7 @@
 import os
 import re
 import yaml
+import datetime
 from fnmatch import fnmatch
 
 
@@ -63,7 +64,7 @@ def setdefault_target_name(source_file, config):
         ### fix_target_name?
         ### this code makes target names "look purty", like their name counterpart
         ##
-        # target_name = re.sub(r'/[\W -]/', '_', target_name)
+        # target_name = re.sub(r'/[\W -]/', '_', target_name, re.UNICODE)
         ##
         ### it's commented out because I'm not convinced target_names should get
         ### this treatment.  If you have a strange character in your URL, that's
@@ -141,17 +142,71 @@ def file_pre(source_file, config):
     return config
 
 
-DATE_RE = re.compile(r'(?P<year>[1-9]\d{3})([-._])(?P<month>\d{2})\2(?P<day>\d{2})\2(?P<name>.*)')
+DATE_RE = re.compile(r'(?P<year>[1-9]\d{3})([-_])(?P<month>\d{2})\2(?P<day>\d{2})\2(?P<name>.*)')
 
 
 def date_from_name(source_file, config):
-    if 'date' not in config:
+    """
+    Matches a date in the name or target_name.  Makes it easy to sort a blog
+    and you don't have to add `date: ...` using YAML, plus you get a
+    python date object.
+    """
+    if 'created_at' not in config:
         matches = DATE_RE.match(config['name'])
         if matches:
-            config['date'] = matches.group('year') + '-' + matches.group('month') + '-' + matches.group('day')
+            date = datetime.date(
+                year=int(matches.group('year')),
+                month=int(matches.group('month')),
+                day=int(matches.group('day')),
+                )
+            config['created_at'] = date
             config['name'] = matches.group('name')
         else:
             matches = DATE_RE.match(config['target_name'])
             if matches:
-                config['date'] = matches.group('year') + '-' + matches.group('month') + '-' + matches.group('day')
+                date = datetime.date(
+                    year=int(matches.group('year')),
+                    month=int(matches.group('month')),
+                    day=int(matches.group('day')),
+                    )
+                config['created_at'] = date
+    return config
+
+
+INDEX_RE = re.compile(r'(?P<order>[0]\d+)[-_](?P<name>.*)')
+
+
+def order_from_name(source_file, config):
+    """
+    Adds ordering to a file name (when dates aren't quite enough).  The first digit
+    *must* be a "0", to distinguish it from a date.
+    """
+    if 'order' not in config:
+        matches = INDEX_RE.match(config['name'])
+        if matches:
+            config['order'] = int(matches.group('order'))
+            config['name'] = matches.group('name')
+        else:
+            matches = INDEX_RE.match(config['target_name'])
+            if matches:
+                config['order'] = matches.group('order')
+    return config
+
+
+def _titlecase(s):
+        return re.sub(r"[A-Za-z]+('[A-Za-z]+)?",
+                      lambda mo: mo.group(0)[0].upper() +
+                                 mo.group(0)[1:].lower(),
+                      s)
+
+
+def title_from_name(source_file, config):
+    """
+    Title-cases the name and stores it in config['title']
+    """
+    if os.path.isfile(source_file) and 'title' not in config:
+        title = config['name']
+        title = title.replace('_', ' ')
+        title = _titlecase(title)
+        config['title'] = title
     return config

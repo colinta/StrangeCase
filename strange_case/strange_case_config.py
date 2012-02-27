@@ -25,6 +25,9 @@ CONFIG = {
         folder_pre,
         file_pre,
         date_from_name,
+        order_from_name,
+        date_from_name,  # yup, try again!
+        title_from_name,
     ],
 }
 
