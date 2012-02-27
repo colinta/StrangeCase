@@ -109,7 +109,7 @@ class Node(object):
         node_config = deepcopy(self.config)
 
         # not merged
-        for key in ['name', 'target_name', 'type']:
+        for key in node_config['dont_inherit']:
             if key in node_config:
                 del node_config[key]
 

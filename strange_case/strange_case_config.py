@@ -51,6 +51,14 @@ more_defaults = {
         '*.png', '*.jpg',
         '*.PNG', '*.JPG',
     ],
+    'dont_inherit': [
+        'type',
+        'name',
+        'target_name',
+        'title',
+        'created_at',
+        'order',
+    ]
 }
 more_defaults.update(CONFIG)
 CONFIG = more_defaults
