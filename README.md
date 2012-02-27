@@ -9,27 +9,7 @@ But this one is:
 1. Written in python, unlike `jekyll`
 2. **NOT** complicated, unlike `hyde`.  And I mean *really* **NOT** complicated.
 
-----------------------------------------------------------------------------------------------------------------
-
-First, the complicated stuff.  This will hopefully make sense at the end.  I mention them
-first so that you get an idea for the *most* complicated parts (which aren't really that
-complicated)
-
-* `config.yaml` files can contain a `files:` dictionary where the keys refer to a file in that folder, and
-  the values are treated as yaml front matter.  This makes it possible to add meta data to binary files.
-
-* Index pages are not included when iterating over a folder.
-
-* Index pages' URLs do not include the filename.  This means they have the same name
-  as the folder they index.  That's good, right?
-
-* To add filters and extensions to jinja add `extensions` and `filters` to your base config.yaml file.  You
-  can also do this using config.py if you need to do some special importing or other runtime configuration.
-
-
-Now for the easy stuff!
-
-----------------------------------------------------------------------------------------------------------------
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 QUICK START
 -----------
@@ -38,9 +18,9 @@ QUICK START
 2. Put index.j2 in site, and put some html in there.
 3. Add YAML front matter to that file.  It looks like this:
 
-```
+```jinja
 ---
-title: My first page
+title: My first StrangeCase site
 ---
 <!doctype html>
 ...
@@ -48,29 +28,272 @@ title: My first page
 
 4. Use that YAML in your page using [jinja2](http://jinja.pocoo.org/)'s template language syntax:
 
-```
+```jinja
 ---
-title: My first page
+title: My first StrangeCase site
 ---
 <!doctype html>
 <h1>{{ title }}</h1>
 ```
 
 5. Run strange case:
-   `$ python strange_case.py`
+   `$ python /path/to/strange_case.py`
 
 6. Open `public/index.html`.  You might want to hold onto your jaw, lest it drop to the floor.  Yeah, it's not gonna say `{{ title }}`,
    it's gonna say `My First Page` in big letters.
 
-7. Add more templates, add layouts, add include files, add static assets, and learn more about [jinja2](http://jinja.pocoo.org/).
 
-8. Because that is just about all that StrangeCase is gonna do for you!†
+ SLOWER START
+--------------
 
-† *this is not true, StrangeCase is capable of generating category pages, tag clouds, image listings, and it's all very straightforward.*
+Whoopity freakin' do, right?  Let's add a layout and create a site.
+
+At this point this demo site looks like this:
+
+```
+project
+├── public
+│   └── index.html
+└── site
+    └── index.j2
+```
+
+Add a layouts folder, and put a layout in there:
+
+```
+project
+├── layouts
+│   └── base.j2
+├── public
+│   └── index.html
+└── site
+    └── index.j2
+```
+
+layouts/base.j2 looks like this:
+
+```jinja
+<!doctype html>
+<head>
+  <title>{{ title or "Nifty Wow!" }}</title>
+</head>
+<body>
+{% block content %}
+{% endblock %}
+</body>
+```
+
+And update index.j2 to use this layout:
+
+```jinja
+---
+title: My first StrangeCase site
+---
+{% extends "layouts/base.j2" %}
+{% block content %}
+<h1>{{ title }}</h1>
+{% endblock %}
+```
+
+You can run StrangeCase again.  public/index.html will now have <head> and <body> tags surrounding it.
+
+If you're lost at this point, you should read up on Jinja.  We haven't really done anything more than run
+index.j2 through jinja and wrote the output to index.html.
+
+Now let's add a projects folder and a couple projects.  When you add *content* to your site, put it in
+the site/ folder.  Most simple projects will pretty much only use the site/ folder.
+
+I'm going to throw a little curveball into the project file names.  StrangeCase orders files very simply: it
+sorts them.  So if you want to have them ordered by date or anything other than filename, you can put those at
+the beginning of the file name (jekyll does a similar thing).  I'm going to add both, so we can see what happens
+when we process files this way.
+
+```
+project
+├── layouts
+│   └── base.j2
+├── public
+│   └── index.html
+└── site
+    ├── index.j2
+    └── projects
+        ├── 001_2012_02_27_first_project.j2
+        ├── 002_2012_02_28_second_project.j2
+        └── 003_2012_02_27_third_project.j2
+```
+
+Here is what each project template looks like:
+
+```jinja
+{% extends "layouts/base.j2" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p>Project number #{{ order }} started on {{ created_at | date }}</p>
+{% endblock %}
+```
+
+A little shorter than our original index.j2.  Notice I've left out the YAML front matter, but I
+am using variables `title`, `order`, and `created_at`.  Where do they come from?  The file name.
+
+```
+001_2012_02_27_first_project
+\+/ \---+----/ \-----+-----/
+ |      |            +-title
+ |      +-created_at
+ +-order
+```
+
+So you can get a few variables for free just by using a smart file name.  You can write
+your own function that does this and more!  You can access and modify the entire config.
+
+If you tried to run strange case, you would get the following error:
+
+```shell
+$ python /path/to/strange_case.py
+...
+jinja2.exceptions.TemplateAssertionError: no filter named 'date'
+```
+
+No worries, there is a `date` filter built into StrangeCase.  It's just not enabled. So
+add a config.yaml file to the project root
+
+```
+project
+├── config.yaml
+├── layouts
+│   └── base.j2
+├── public
+│   └── index.html
+└── site
+    ├── index.j2
+    └── projects
+        ├── 001_2012_02_27_first_project.j2
+        ├── 002_2012_02_28_second_project.j2
+        └── 003_2012_02_27_third_project.j2
+```
+
+and add the date filter:
+
+```yaml
+filters:
+  date: extensions.date_extension.date
+```
 
 
-OK, SO
--------
+```shell
+$ python /path/to/strange_case.py
+$  # success!
+```
+
+```html
+<!doctype html>
+<head>
+  <title>Nifty Wow!</title>
+</head>
+<body>
+
+<h1></h1>
+<p>Project number #1 started on 27 Feb 2012</p>
+
+</body>
+```
+
+Now let's create a project listing at projects/index.j2
+
+```
+project
+├── config.yaml
+├── layouts
+│   └── base.j2
+├── public
+│   └── index.html
+└── site
+    ├── index.j2
+    └── projects
+        ├── index.j2
+        ├── 001_2012_02_27_first_project.j2
+        ├── 002_2012_02_28_second_project.j2
+        └── 003_2012_02_27_third_project.j2
+```
+
+```jinja
+{% extends "layouts/base.j2" %}
+
+{% block content %}
+{% for project in site.projects %}
+<p><a href="{{ project.url }}">{{ project.title }}</a></p>
+{% endfor %}
+{% endblock %}
+```
+
+Iterating over folders is a very important thing in StrangeCase.  It's how
+you do things like create an index page, as we saw here,
+or create a photo blog (`for photo in site.static.my_trip`).  It is what I
+found very frustrating in `jekyll` and `hyde` (especially `jekyll`).
+
+Notice that when we iterate over the `site.projects` folder, it does *not*
+include the index file.  Makes sense, though, right?  The index page is considered
+to be the same "page" as the folder.  Even though they are seperate nodes, they have
+the same URL.
+
+To wrap things up, let's make a link to the project page from the home page.  Every node
+has a `url` property, and you can access pages by their name.  "name" is whatever is "leftover"
+after the created_at date and order have been pulled out.  I'll add a link to the second project
+to demonstrate this.
+
+```jinja
+---
+title: My first StrangeCase site
+---
+{% extends "layouts/base.j2" %}
+{% block content %}
+<h1>{{ title }}</h1>
+<p><a href="{{ site.projects.url }}">Projects</a></p>
+<p>My favorite project: <a href="{{ site.projects.second_project.url }}">My second project</a></p>
+{% endblock %}
+```
+
+
+This wraps up the tutorial!
+
+
+ WHA' HAPPENED?
+----------------
+
+Here is the basic 1-2-3 of what StrangeCase does when you run it.
+
+### 1 - Build stage
+
+In the build stage, StrangeCase is looking at the files and folders in site/.  First a root node is created:
+
+```python
+root_node = build_node(config, site_path, deploy_path, '')[0]
+```
+
+The `build_node` method **configures** and **processes** the node.  **configures** means that it passes the `source_path`
+and `config` to each of the `configurators` (we saw these working in the tutorial above: `date_from_name`,
+`order_from_name`, and `title_from_name` in particular).  **processes** means that one or more nodes are instantiated.
+
+This process continues recursively for every file and folder in site (except `ignore`-d files).
+
+### 2 - Populating
+
+If you are using the category processor (or tags, archive, etc), this stage is important.  If you're not, it won't matter.
+
+Some nodes can't know what content they will generate until the entire site is scanned.  These nodes are called `ProcessorNode`s,
+and they are nodes that say "hold on, I'm not ready yet...".  They must implement a `populate` method, which when called *removes*
+the processor node from the tree and replaces itself with nodes (or it can insert nodes elsewhere in the tree, or do nothing I suppose).
+
+### 3 - Generating
+
+At this point all the nodes are instantiated and are arranged in a tree structure, with the root node at the top.  The `generate`
+method is called on the root node, and recursively on all the children.  This is where folders are created, pages are generated, and
+assets are copied over.  If you are using the image processor, you might also have thumbnails created.
+
+
+ OK, SO
+--------
 
 * In your project folder (where you execute StrangeCase), you can have `config.yaml` and/or `config.py`, and you *definitely* have a
   `site/` folder, where your site content is stored.  Why isn't this stuff in the "root" folder?  Because there are jinja2 layouts, includes,
@@ -124,13 +347,25 @@ OK, SO
 DEFAULT/SPECIAL CONFIG
 ----------------------
 
-``` yaml
+```yaml
   config_file: 'config.yaml'  # name of file that contains config
   host: "http://localhost:8000"  # hostname.  I'm not using this for anything, but it might be import for plugin authors one day
   index: index.html  # any file whose target_name matches this name will not be iterable
   ignore: ['config.yaml', '.*']  # which files to ignore altogether while building the site
-  dont_process: ['*.js', '*.css', images]  # do not run these files through jinja
-  rename_extensions: { '.j2': '.html', '.jinja2': '.html' }  # which extensions to rename
+  dont_process: ['*.js', '*.css', *images]  # do not run these files through jinja
+  dont_inherit: [  # nodes should not inherit these properties
+    # these are all assigned during the build/configure stage
+    'type',
+    'name',
+    'target_name',
+    'title',
+    'created_at',
+    'order',
+  ]
+  rename_extensions: {  # which extensions to rename, and how
+    '.j2': '.html',
+    '.jinja2': '.html'
+  }
   html_extension: '.html'  # files with this extension are html files (`page.is_page` => `True`)
 
   # PROTECTED
@@ -149,7 +384,7 @@ DEFAULT/SPECIAL CONFIG
     configurators.folder_pre,              # processes folder/config.yaml.  If the folder config contains `ignore: true`, the folder is skipped
     configurators.file_pre,                # processes YAML front matter.  Again, the file can be ignored using `ignore: true`
     configurators.date_from_name,          # Gets the date from the file name, and strips it from name.
-    ]
+  ]
   configurators +: []  # to solve the problem of not changing 'configurators', you can put additional configurators in here.
 ```
 
@@ -195,7 +430,7 @@ TEMPLATES
 
 `/config.yaml`:
 
-``` yaml
+```yaml
 meta:
   author:
     name: "Colin"
@@ -203,7 +438,7 @@ meta:
 
 `/site/index.html`:
 
-``` jinja
+```jinja
 ---
 # YAML front matter
 title: test
@@ -216,7 +451,7 @@ title: test
 
 =>
 
-``` html
+```html
 <h1>Colin</h1>
 <h2>test</h2>
 <h2>test</h2>
@@ -226,7 +461,7 @@ title: test
 
 (This is a common thing to do in StrangeCase)
 
-``` jinja
+```jinja
 <a href="{{ site.blogs.best_blog_ever.url }}">Best blog ever</a>.
 ```
 
@@ -241,7 +476,7 @@ THIS IS COOL AND SO WORTH POINTING OUT
 
 ### You can iterate over folders:
 
-``` jinja
+```jinja
 {% for blog in site.blogs %}
 <p>{{ loop.index }}. {{ blog.title }}</p>
 {% endfor %}
@@ -249,7 +484,7 @@ THIS IS COOL AND SO WORTH POINTING OUT
 
 =>
 
-``` html
+```html
 <p>1. Blog Title</p>
 <p>2. Blog Title</p>
 ```
@@ -262,7 +497,7 @@ available as a config setting.
 
 ### Iterate over a folder of images
 
-``` jinja
+```jinja
 {% for image in site.static.image %}
 <img src="{{ image.url }}" />
 {% endfor %}
@@ -280,7 +515,7 @@ you would need to do this in a template... but there it is!
 
 Lastly, the `.all()` method, and its more specific variants, are useful.  The `all()` method definition says it all I think:
 
-``` python
+```python
 def all(self, recursive=False, folders=None, pages=None, assets=None, processors=None):
     """
     Returns descendants, ignoring iterability. Folders, assets, and
@@ -296,7 +531,7 @@ def all(self, recursive=False, folders=None, pages=None, assets=None, processors
 
 The variants are all subsets of `all()`:
 
-``` python
+```python
   def pages(self, recursive=False):
       return self.all(recursive=recursive, pages=True)
 
@@ -349,7 +584,7 @@ I might add a way to do this in the YAML, but *probably not* (unless the communi
 
 Example of all this nonsense using `config.py`:
 
-``` python
+```python
 from strange_case_config import CONFIG
 from processors import image, categories
 from extensions.Markdown2 import Markdown2Extension, markdown_filter
@@ -367,7 +602,7 @@ CONFIG.update({
 
 Equivalent in the root `config.yaml`:
 
-``` yaml
+```yaml
 extensions:
   - extensions.Markdown2.Markdown2Extension
 filters:

@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
         name="StrangeCase",
-        version="v1.5.1",
+        version="v2.0.1",
         packages=["strange_case"],
         author="Colin Thomas-Arnold",
         author_email="colinta.com",
