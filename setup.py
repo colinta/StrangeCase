@@ -8,15 +8,26 @@ def read(fname):
 
 setup(
         name="StrangeCase",
-        version="v2.0.1",
-        packages=["strange_case"],
+        version="v2.1.1",
         author="Colin Thomas-Arnold",
         author_email="colinta.com",
-        keywords="strange_case static site generator",
+        url="https://github.com/colinta/StrangeCase",
+
         description="A straightforward python static site generator.",
         long_description=read("README.md"),
-        url="https://github.com/colinta/StrangeCase",
+
+        packages=["strange_case"],
+        keywords="strange_case static site generator",
         platforms="any",
         license="BSD",
-        install_requires=['Jinja2', 'MarkupSafe', 'PIL', 'PyYAML', 'markdown2', 'pymongo'],
+        classifiers=[
+            "Programming Language :: Python",
+            "Development Status :: Alpha",
+            "Environment :: Other Environment",
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: Simplified BSD License",
+            "Operating System :: OS Independent",
+            "Topic :: Software Development :: Libraries :: Python Modules",
+            "Topic :: Text Processing",
+        ],
         )
