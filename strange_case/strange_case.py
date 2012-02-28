@@ -39,6 +39,7 @@ if __name__ == '__main__':
     import sys
     sys.path.insert(0, os.getcwd())
 
+
     CONFIG = None
     if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
         from config import CONFIG
@@ -91,4 +92,51 @@ if __name__ == '__main__':
             Registry.add_configurator(configurator)
         del CONFIG['configurators']
 
-    strange_case(CONFIG)
+    import argparse
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--watch', dest='watch', action='store_const',
+                       const=True, default=False,
+                       help='watch the site_path for changes (default: find the max)')
+    args = parser.parse_args()
+
+    if args.watch:
+        import time
+        from watchdog.observers import Observer
+        from watchdog.events import FileSystemEventHandler
+
+        exclude_paths = [
+            os.path.abspath('.git'),
+            os.path.abspath(CONFIG['deploy_path']),
+        ]
+
+        class Regenerate(FileSystemEventHandler):
+            last_run = None
+
+            def on_any_event(self, event, alert=True):
+                if self.last_run and time.time() - self.last_run < .1:
+                    return
+
+                if alert:
+                    print "Change detected.  Running StrangeCase"
+                strange_case(CONFIG)
+                print "StrangeCase generated at %i" % int(time.time())
+                self.last_run = time.time()
+
+        observer = Observer()
+        handler = Regenerate()
+        for path in os.listdir(os.getcwd()):
+            path = os.path.abspath(path)
+            if os.path.isdir(path) and path not in exclude_paths:
+                print 'Watching "%s" for changes' % path
+                observer.schedule(handler, path=path, recursive=True)
+        observer.start()
+        try:
+            handler.on_any_event(None, False)  # run the first time, no alert
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print "Stopping"
+            observer.stop()
+        observer.join()
+    else:
+        strange_case(CONFIG)

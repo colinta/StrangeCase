@@ -269,6 +269,12 @@ title: My first StrangeCase site
 This wraps up the tutorial!  Next, I'll explain the inner workings.
 
 
+ BUT FIRST
+-----------
+
+`python /path/to/strange_case --watch` is very useful. :-)
+
+
  WHA' HAPPENED?
 ----------------
 
