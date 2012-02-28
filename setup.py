@@ -23,11 +23,19 @@ setup(
         classifiers=[
             "Programming Language :: Python",
             "Development Status :: 4 - Beta",
-            "Environment :: Other Environment",
-            "Intended Audience :: Developers",
+            'Environment :: Console',
             "License :: OSI Approved :: BSD License",
             "Operating System :: OS Independent",
-            "Topic :: Software Development :: Libraries :: Python Modules",
+
+            'Intended Audience :: End Users/Desktop',
+            'Intended Audience :: Developers',
+            'Intended Audience :: System Administrators',
+
             "Topic :: Text Processing",
+            'Topic :: Software Development',
+            'Topic :: Software Development :: Build Tools',
+            'Topic :: Software Development :: Code Generators',
+            'Topic :: Internet',
+            'Topic :: Internet :: WWW/HTTP :: Site Management',
         ],
         )
