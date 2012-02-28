@@ -10,7 +10,7 @@ def strange_case(config):
 
     # look for files in content/
     if not os.path.isdir(site_path):
-        raise IOError("Could not find site_path folder \"%s\"" % site_path)
+        raise IOError('Could not find site_path folder "%s"' % site_path)
 
     # this is the one folder that *doesn't* get processed by processers.build_page_tree,
     # so it needs special handling here.
