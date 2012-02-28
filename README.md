@@ -103,10 +103,12 @@ index.j2 through jinja and wrote the output to index.html.
 Now let's add a projects folder and a couple projects.  When you add *content* to your site, put it in
 the site/ folder.  Most simple projects will pretty much only use the site/ folder.
 
-I'm going to throw a little curveball into the project file names.  StrangeCase orders files very simply: it
-sorts them.  So if you want to have them ordered by date or anything other than filename, you can put those at
-the beginning of the file name (jekyll does a similar thing).  I'm going to add both, so we can see what happens
-when we process files this way.
+I'm going to throw a curveball into the project file names.  StrangeCase orders files by sorting them by file
+name.  This is important when you go to display images or blogs in order by date.  If you want to have them
+ordered by anything other than filename, you can use a couple different naming schemes at
+the beginning of the file name.  jekyll does a similar thing, btw.
+
+I'm going to add *two* prefixes so we can see what happens when we process files this way.
 
 ```
 project
@@ -117,12 +119,12 @@ project
 └── site
     ├── index.j2
     └── projects
-        ├── 001_2012_02_27_first_project.j2
-        ├── 002_2012_02_28_second_project.j2
-        └── 003_2012_02_27_third_project.j2
+        ├── 001_2012_02_27_first_project.j2   #
+        ├── 002_2012_02_28_second_project.j2  # look over here!
+        └── 003_2012_02_27_third_project.j2   #
 ```
 
-Here is what each project template looks like:
+And here is what each project template looks like:
 
 ```jinja
 {% extends "layouts/base.j2" %}
@@ -133,21 +135,25 @@ Here is what each project template looks like:
 {% endblock %}
 ```
 
-A little shorter than our original index.j2.  Notice I've left out the YAML front matter, but I
-am using variables `title`, `order`, and `created_at`.  Where do they come from?  The file name.
+A little shorter than our original index.j2.  Notice I've left out the YAML front matter, and yet I
+am using the variables `title`, `order`, and `created_at`.  Where do they get their value from?  The file name!
 
 ```
 001_2012_02_27_first_project
 \+/ \---+----/ \-----+-----/
+ |      |            |
  |      |            +-title
+ |      |
  |      +-created_at
+ |
  +-order
 ```
 
-So you can get a few variables for free just by using a smart file name.  You can write
-your own function that does this and more!  You can access and modify the entire config.
+You get a few variables for free just by naming your files with a date or order prefix.
+Later, you'll be able to write your a function that does this and more!  We are looking
+at the by-product of “configurators”, and they can access and modify the entire config.
 
-If you tried to run strange case, you would get the following error:
+BUT, if you tried to run StrangeCase right now, you would get the following error:
 
 ```shell
 $ python /path/to/strange_case.py
@@ -180,7 +186,6 @@ filters:
   date: extensions.date_extension.date
 ```
 
-
 ```shell
 $ python /path/to/strange_case.py
 $  # success!
@@ -199,7 +204,12 @@ $  # success!
 </body>
 ```
 
-Now let's create a project listing at projects/index.j2
+Moving along.  Now let's create a project listing at projects/index.j2.  We need a way
+to "fetch" the project pages.  This is going to be very easy, because really all that
+StrangeCase *does* is build a resource tree.  And we can walk that tree using the node
+names.  So if we just iterate over the projects folder, we'll have our project nodes.
+
+Add index.j2 to site/projects/
 
 ```
 project
@@ -211,7 +221,7 @@ project
 └── site
     ├── index.j2
     └── projects
-        ├── index.j2
+        ├── index.j2    # <===
         ├── 001_2012_02_27_first_project.j2
         ├── 002_2012_02_28_second_project.j2
         └── 003_2012_02_27_third_project.j2
@@ -229,8 +239,9 @@ project
 
 Iterating over folders is a very important thing in StrangeCase.  It's how
 you do things like create an index page, as we saw here,
-or create a photo blog (`for photo in site.static.my_trip`).  It is what I
-found very frustrating in `jekyll` and `hyde` (especially `jekyll`).
+or create a photo blog (`for photo in site.images.my_fun_trip`).  It is what I
+found very frustrating in `jekyll` and `hyde` (especially `jekyll`), and so
+it's what is *very easy* in StrangeCase.
 
 Notice that when we iterate over the `site.projects` folder, it does *not*
 include the index file.  Makes sense, though, right?  The index page is considered
@@ -255,7 +266,7 @@ title: My first StrangeCase site
 ```
 
 
-This wraps up the tutorial!
+This wraps up the tutorial!  Next, I'll explain the inner workings.
 
 
  WHA' HAPPENED?
