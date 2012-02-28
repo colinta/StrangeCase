@@ -22,10 +22,10 @@ setup(
         license="BSD",
         classifiers=[
             "Programming Language :: Python",
-            "Development Status :: Alpha",
+            "Development Status :: 4 - Beta",
             "Environment :: Other Environment",
             "Intended Audience :: Developers",
-            "License :: OSI Approved :: Simplified BSD License",
+            "License :: OSI Approved :: BSD License",
             "Operating System :: OS Independent",
             "Topic :: Software Development :: Libraries :: Python Modules",
             "Topic :: Text Processing",
