@@ -1,5 +1,5 @@
 import re
-from nodes import JinjaNode, Processor
+from strange_case.nodes import JinjaNode, Processor
 
 
 class CategoryDetail(JinjaNode):

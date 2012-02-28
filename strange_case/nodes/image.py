@@ -1,5 +1,5 @@
 import os
-from nodes import FileNode
+from strange_case.nodes import FileNode
 from PIL import Image
 from shutil import copy2
 

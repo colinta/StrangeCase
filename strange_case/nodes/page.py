@@ -1,4 +1,4 @@
-from nodes import FileNode
+from strange_case.nodes import FileNode
 
 
 class PageNode(FileNode):

@@ -1,6 +1,6 @@
 import os
 import urllib
-from nodes import Node, check_config_first
+from strange_case.nodes import Node, check_config_first
 
 
 class FileNode(Node):

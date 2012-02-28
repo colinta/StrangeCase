@@ -1,6 +1,6 @@
 import os
 from shutil import copy2
-from nodes import FileNode
+from strange_case.nodes import FileNode
 
 
 class AssetNode(FileNode):

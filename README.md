@@ -603,8 +603,8 @@ Example of all this nonsense using `config.py`:
 
 ```python
 from strange_case_config import CONFIG
-from processors import image, categories
-from extensions.Markdown2 import Markdown2Extension, markdown_filter
+from strange_case.processors import image, categories
+from strange_case.extensions.Markdown2 import Markdown2Extension, markdown_filter
 from datetime.datetime import time
 
 CONFIG.update({

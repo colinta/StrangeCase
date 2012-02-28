@@ -26,8 +26,8 @@ In the end, we will be creating:
 """
 
 import os
-from registry import Registry
-from nodes import CategoryFolderProcesser, FolderNode, JinjaNode, CategoryDetail
+from strange_case.registry import Registry
+from strange_case.nodes import CategoryFolderProcesser, FolderNode, JinjaNode, CategoryDetail
 from copy import deepcopy
 
 

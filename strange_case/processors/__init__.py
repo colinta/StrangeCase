@@ -15,8 +15,8 @@ All files will be parsed for front matter unless it matches an entry in
 """
 
 import os
-from nodes import FolderNode, RootFolderNode, AssetNode, JinjaNode
-from registry import Registry
+from strange_case.nodes import FolderNode, RootFolderNode, AssetNode, JinjaNode
+from strange_case.registry import Registry
 
 
 def build_node(config, source_path, target_path, file_name):

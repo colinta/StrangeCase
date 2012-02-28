@@ -1,5 +1,5 @@
 import os
-from nodes import FolderNode
+from strange_case.nodes import FolderNode
 
 
 class RootFolderNode(FolderNode):

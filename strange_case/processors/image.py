@@ -1,6 +1,6 @@
 import os
-from nodes import ImageNode
-from registry import Registry
+from strange_case.nodes import ImageNode
+from strange_case.registry import Registry
 
 
 def image_processor(config, source_path, target_path):

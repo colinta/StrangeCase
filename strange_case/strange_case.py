@@ -34,11 +34,10 @@ def fancy_import(name):
     return getattr(imported, import_me)
 
 
-if __name__ == '__main__':
+def run():
     # so that strange_case.py can be executed from any project folder, add CWD to the import paths
     import sys
     sys.path.insert(0, os.getcwd())
-
 
     CONFIG = None
     if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
@@ -140,3 +139,6 @@ if __name__ == '__main__':
         observer.join()
     else:
         strange_case(CONFIG)
+
+if __name__ == '__main__':
+    run()

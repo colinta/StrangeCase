@@ -1,6 +1,6 @@
 import os
-from nodes import PageNode
-from registry import Registry
+from strange_case.nodes import PageNode
+from strange_case.registry import Registry
 
 
 class JinjaNode(PageNode):
