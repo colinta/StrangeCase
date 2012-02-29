@@ -8,10 +8,11 @@ def read(fname):
 
 setup(
         name="StrangeCase",
-        version="v2.1.3",
+        version="v2.1.4",
         author="Colin Thomas-Arnold",
         author_email="colinta.com",
         url="https://github.com/colinta/StrangeCase",
+        requires=['Jinja2', 'PIL', 'PyYAML', 'markdown2', 'watchdog'],
 
         entry_points={
             'console_scripts': [
@@ -20,7 +21,7 @@ setup(
         },
 
         description="A straightforward python static site generator.",
-        long_description=read("README.md"),
+        long_description=read("README.rst"),
 
         packages=[
             "strange_case",

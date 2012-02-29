@@ -3,7 +3,7 @@ Jinja2==2.6
 MarkupSafe==0.15
 PIL==1.1.7
 PyYAML==3.10
-StrangeCase==v1.5.1
+StrangeCase==v2.1.4
 argh==0.15.0
 markdown2==1.0.1.19
 pathtools==0.1.2

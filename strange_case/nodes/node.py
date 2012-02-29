@@ -215,9 +215,6 @@ class Node(object):
     def __nonzero__(self):
         return True
 
-    def __setitem__(self, key, value):
-        self.config[key] = value
-
     def __getitem__(self, key):
         return self.__getattr__(key)
 
