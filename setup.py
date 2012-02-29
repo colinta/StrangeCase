@@ -16,7 +16,13 @@ setup(
         description="A straightforward python static site generator.",
         long_description=read("README.md"),
 
-        packages=["strange_case"],
+        packages=[
+            "strange_case",
+            "strange_case.extensions",
+            "strange_case.nodes",
+            "strange_case.processors",
+            "strange_case.support",
+        ],
         keywords="strange_case static site generator",
         platforms="any",
         license="BSD",

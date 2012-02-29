@@ -1,6 +1,6 @@
 import os
-from registry import Registry
-from processors import build_node
+from strange_case.registry import Registry
+from strange_case.processors import build_node
 
 
 def strange_case(config):
@@ -25,8 +25,8 @@ def strange_case(config):
 def fancy_import(name):
     """
     This takes a fully qualified object name, like
-    'extensions.Markdown2.markdown', and returns the last
-    object.  equivalent to `from extensions.Markdown2 import markdown`.
+    'strange_case.extensions.Markdown2.markdown', and returns the last
+    object.  equivalent to `from strange_case.extensions.Markdown2 import markdown`.
     """
 
     import_path, import_me = name.rsplit('.', 1)
@@ -43,9 +43,9 @@ def run():
     if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
         from config import CONFIG
     else:
-        from strange_case_config import CONFIG
+        from strange_case.strange_case_config import CONFIG
 
-    from support.jinja import StrangeCaseEnvironment
+    from strange_case.support.jinja import StrangeCaseEnvironment
 
     extensions = []
     if 'extensions' in CONFIG:
