@@ -175,7 +175,21 @@ class Node(object):
     ##|  TRAVERSAL
     ##|
     @property
+    def siblings(self):
+        """
+        Returns a list of siblings.  Does not include the index page of the parent folder.
+        """
+        if not self.parent:
+            return [self]
+
+        return [page for page in self.parent]
+
+    @property
     def next(self):
+        """
+        Returns the next node, or None if this is the last node or if this node does not
+        have a parent.
+        """
         if not self.parent:
             return None
 
@@ -186,6 +200,10 @@ class Node(object):
 
     @property
     def prev(self):
+        """
+        Returns the previous node, or None if this is the first node or if this node does not
+        have a parent.
+        """
         if not self.parent:
             return None
 
