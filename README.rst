@@ -556,6 +556,8 @@ is because *everything it does* can be controlled using the config. ::
     # be treated as plain ol' file data
     site_path: 'site/'                        # where to find site content
     deploy_path: 'public/'                    # where to put the generated site
+    remove_stale_files: true                  # removes files that were not generated.
+    dont_remove: ['.*']                       # list of glob patterns to ignore when removing stale files
     extensions: []                            # list of Jinja2 extension classes as a dot-separated import path
     filters: {}                               # dictionary of `filter_name: filter.method`.
     processors: []                            # additional processors.  Processors register themselves as a certain type.

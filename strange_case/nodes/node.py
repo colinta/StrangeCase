@@ -19,6 +19,9 @@ class Node(object):
     Parent class for all nodes (pages and folders)
     """
 
+    # stores a list of files written, so that stale files can be removed
+    files_written = []
+
     def __init__(self, config, target_folder):
         self.config = config
         self.parent = None

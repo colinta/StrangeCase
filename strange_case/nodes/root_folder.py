@@ -17,6 +17,7 @@ class RootFolderNode(FolderNode):
         folder = self.target_folder
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
+        self.files_written.append(folder)
 
         # before generation, give
         # processor "nodes" their

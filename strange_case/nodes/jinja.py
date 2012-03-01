@@ -13,6 +13,7 @@ class JinjaNode(PageNode):
         target_path = os.path.join(self.target_folder, self.target_name)
         with open(target_path, 'w') as dest:
             dest.write(content.encode('utf-8'))
+            self.files_written.append(target_path)
 
         super(JinjaNode, self).generate(site)
 

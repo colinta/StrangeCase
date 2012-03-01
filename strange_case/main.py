@@ -1,6 +1,20 @@
 import os
+from fnmatch import fnmatch
 from strange_case.registry import Registry
 from strange_case.processors import build_node
+
+
+def scan(folder):
+    ret = []
+    for f in os.listdir(folder):
+        if f.startswith('.'):
+            continue
+
+        f = os.path.join(folder, f)
+        ret.append(f)
+        if os.path.isdir(f):
+            ret.extend(scan(f))
+    return ret
 
 
 def strange_case(config):
@@ -19,7 +33,30 @@ def strange_case(config):
     config.setdefault('type', 'root')
     root_node = build_node(config, site_path, deploy_path, '')[0]
 
+    remove_stale_files = config['remove_stale_files']
+    dont_remove = config['dont_remove']
+    existing_files = []
+    if os.path.isdir(deploy_path):
+        existing_files = scan(deploy_path)
+    else:
+        os.makedirs(deploy_path, 0755)
     root_node.generate()
+    if remove_stale_files and existing_files:
+        paths = []
+        for f in existing_files:
+            if f not in root_node.files_written:
+                if any(pattern for pattern in dont_remove if fnmatch(f, pattern)):
+                    print "ignoring " + f
+                    continue
+
+                if os.path.isdir(f):
+                    paths.append(f)
+                else:
+                    print 'rm ' + f
+                    os.remove(f)
+        for p in paths:
+            print 'rmdir ' + p
+            os.removedirs(p)
 
 
 def fancy_import(name):

@@ -14,6 +14,7 @@ class FolderNode(Node):
         folder = os.path.join(self.target_folder, self.target_name)
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
+        self.files_written.append(folder)
         super(FolderNode, self).generate(site)
 
     ##|                        |##

@@ -8,6 +8,8 @@ CONFIG = {
     'project_path': os.getcwd(),
     'site_path': u'site/',
     'deploy_path': u'public/',
+    'remove_stale_files': True,
+    'dont_remove': ['.*'],
     'config_file': u'config.yaml',
     'html_extension': u'.html',
     'extensions': [],

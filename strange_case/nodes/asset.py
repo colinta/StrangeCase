@@ -10,5 +10,6 @@ class AssetNode(FileNode):
     def generate(self, site):
         target_path = os.path.join(self.target_folder, self.target_name)
         copy2(self.source_path, target_path)
+        self.files_written.append(target_path)
 
         super(AssetNode, self).generate(site)

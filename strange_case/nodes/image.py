@@ -20,7 +20,9 @@ class ImageNode(FileNode):
             size[1] = int(size[1])
             image.thumbnail(size, Image.ANTIALIAS)
             image.save(target_path)
+            self.files_written.append(target_path)
         else:
             copy2(self.source_path, target_path)
+            self.files_written.append(target_path)
 
         super(ImageNode, self).generate(site)
