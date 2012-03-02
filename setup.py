@@ -8,11 +8,11 @@ def read(fname):
 
 setup(
         name="StrangeCase",
-        version="v2.2.1",
+        version="v2.2.2",
         author="Colin Thomas-Arnold",
         author_email="colinta.com",
         url="https://github.com/colinta/StrangeCase",
-        requires=['Jinja2', 'PIL', 'PyYAML', 'markdown2', 'watchdog'],
+        install_requires=['Jinja2', 'PIL', 'PyYAML', 'markdown2', 'watchdog'],
 
         entry_points={
             'console_scripts': [
