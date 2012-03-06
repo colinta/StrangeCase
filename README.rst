@@ -24,7 +24,8 @@ INSTALLATION
 
     $ pip install StrangeCase
     $ scase  # generates the site
-    $ scase --watch  # generates the site and watches for changes to source files
+    $ scase --watch  # generates the site and watches
+                     # for changes to source files
 
 
 -----------
@@ -572,6 +573,36 @@ is because *everything it does* can be controlled using the config. ::
     ]
     configurators +: []                       # to solve the problem changing 'configurators',
                                               # you can put additional configurators in here.
+
+--------------------
+COMMAND LINE OPTIONS
+--------------------
+
+You can override configuration - or add to it - via the command-line.
+Here are all the command line arguments:
+
+    -p, --project:   project_path
+    -s, --site:      site_path
+    -d, --deploy:    deploy_path
+    -r, --remove:    remove_stale_files = true (default, but this can override -n)
+    -n, --no-remove: remove_stale_files = false
+    -c, --config:    config_file
+
+(and of course)
+
+    -w, --watch:     watch files for changes
+
+You can set/add arbitrary configuration using any number of ``key:value`` arguments:
+
+    + `key:value`:         any key/value
+    + `key: value`:        these don't have to be "touching"
+
+I use this to implement a simple code generator for my Sublime Text 2 plugins.  I run
+
+    scase --deploy ../NewProject project:new_project desc:'A great new package'
+
+See `My PackageTemplate <https://github.com/colinta/_SublimePackageTemplate_>`_ for an
+example of how this can be used.
 
 ---------------------------
 AND THAT'S (pretty much) IT
