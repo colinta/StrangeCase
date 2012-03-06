@@ -43,7 +43,7 @@ def folder_pre(source_file, config):
     return config
 
 
-def _check_for_front_matter(source_file):
+def _check_for_front_matter(source_file, config):
     with open(source_file, 'r') as f:
         contents = f.read()
         front_matter_match = re.match(r"\A([-]{3,})$", contents, re.MULTILINE)
@@ -60,7 +60,26 @@ def _check_for_front_matter(source_file):
 
             yaml_config = yaml.load(front_matter)
             if yaml_config:
-                return yaml_config
+                if 'dont_process' in yaml_config:
+                    raise KeyError('"dont_process" is not allowed in yaml front matter.')
+                config.update(yaml_config)
+                return
+
+        front_config_match = re.match(r"\A([`]{3,})$", contents, re.MULTILINE)
+        if front_config_match:
+            offset = len(front_config_match.group(0)) + 1  # +1 for newline
+            delim = re.compile("^" + front_config_match.group(1) + "$")
+            front_config = ""
+            lines = contents.split("\n")[1:]
+            for line in lines:
+                offset += len(line) + 1
+                if delim.match(line):
+                    break
+                front_config += line + "\n"
+
+            config_code = compile(front_config, 'config.py', 'exec')
+            eval(config_code, config, config)
+            return
     return {}
 
 
@@ -78,10 +97,7 @@ def file_pre(source_file, config):
             should_process = False
 
         if should_process:
-            yaml_config = _check_for_front_matter(source_file)
-            if 'dont_process' in yaml_config:
-                raise KeyError('"dont_process" is not allowed in yaml front matter.')
-            config.update(yaml_config)
+            _check_for_front_matter(source_file, config)
 
         if config['ignore'] is True:
             return
@@ -193,7 +209,7 @@ def setdefault_target_name(source_file, config):
     return config
 
 
-def _titlecase(s):
+def titlecase(s):
         return re.sub(r"[A-Za-z]+('[A-Za-z]+)?",
                       lambda mo: mo.group(0)[0].upper() +
                                  mo.group(0)[1:].lower(),
@@ -207,6 +223,6 @@ def title_from_name(source_file, config):
     if os.path.isfile(source_file) and 'title' not in config:
         title = config['name']
         title = title.replace('_', ' ')
-        title = _titlecase(title)
+        title = titlecase(title)
         config['title'] = title
     return config

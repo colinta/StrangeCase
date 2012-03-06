@@ -1,4 +1,5 @@
 import os
+import sys
 from fnmatch import fnmatch
 from strange_case.registry import Registry
 from strange_case.processors import build_node
@@ -45,17 +46,20 @@ def strange_case(config):
         paths = []
         for f in existing_files:
             if f not in root_node.files_written:
+                f = os.path.abspath(f)
+                f_rel = os.path.relpath(f)
                 if any(pattern for pattern in dont_remove if fnmatch(f, pattern)):
-                    print "ignoring " + f
+                    sys.stderr.write("ignoring \033[1m" + f_rel + "\033[0m\n")
                     continue
 
                 if os.path.isdir(f):
                     paths.append(f)
                 else:
-                    print 'rm ' + f
+                    sys.stderr.write("\033[31mrm\033[0m \033[1m" + f_rel + "\033[0m\n")
                     os.remove(f)
         for p in paths:
-            print 'rmdir ' + p
+            p_rel = os.path.relpath(p)
+            sys.stderr.write("\033[31mrmdir\033[0m \033[1m" + p_rel + "\033[0m\n")
             os.removedirs(p)
 
 
@@ -73,14 +77,67 @@ def fancy_import(name):
 
 def run():
     # so that strange_case.py can be executed from any project folder, add CWD to the import paths
-    import sys
     sys.path.insert(0, os.getcwd())
 
-    CONFIG = None
-    if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
-        from config import CONFIG
-    else:
-        from strange_case.strange_case_config import CONFIG
+    # config section catches assertion errors and prints them as error messages
+    try:
+        if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
+            from config import CONFIG
+        else:
+            from strange_case.strange_case_config import CONFIG
+
+        import argparse
+        parser = argparse.ArgumentParser(description='Process some integers.')
+        parser.add_argument('-w', '--watch', dest='watch', action='store_const',
+                           const=True, default=False,
+                           help='watch the site_path for changes (default: find the max)')
+
+        conf_overrides = [
+            'project_path',
+            'site_path',
+            'deploy_path',
+            'remove_stale_files',
+            'config_file',
+        ]
+        parser.add_argument('-p', '--project', dest='project_path')
+        parser.add_argument('-s', '--site', dest='site_path')
+        parser.add_argument('-d', '--deploy', dest='deploy_path')
+        parser.add_argument('-r', '--remove', dest='remove_stale_files', action='store_true', default=None)
+        parser.add_argument('-n', '--no-remove', dest='remove_stale_files', action='store_false', default=None)
+        parser.add_argument('-c', '--config', dest='config_file')
+        parser.add_argument('configs', nargs='*')
+
+        args = parser.parse_args()
+        for conf in conf_overrides:
+            if getattr(args, conf) is not None:
+                CONFIG[conf] = getattr(args, conf)
+
+        assign = None
+        for confs in args.configs:
+            if assign:
+                CONFIG[assign] = confs
+                assign = None
+            else:
+                key, val = confs.split(':', 1)
+                if len(val) == 0:
+                    assign = key
+                else:
+                    CONFIG[key] = val
+
+        if CONFIG['config_hook']:
+            CONFIG['config_hook'](CONFIG)
+            if CONFIG['config_hook']:
+                del CONFIG['config_hook']
+
+        assert CONFIG['project_path'], "project_path is required"
+        assert CONFIG['site_path'], "site_path is required"
+        assert CONFIG['deploy_path'], "deploy_path is required"
+    except AssertionError as e:
+        sys.stderr.write("\033[1;31mError:\033[0m \033[1m" + e.message + "\033[0m\n")
+        return
+
+    if not os.path.isdir(CONFIG['deploy_path']):
+        os.mkdir(CONFIG['deploy_path'])
 
     from strange_case.support.jinja import StrangeCaseEnvironment
 
@@ -128,13 +185,6 @@ def run():
             Registry.add_configurator(configurator)
         del CONFIG['configurators']
 
-    import argparse
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--watch', dest='watch', action='store_const',
-                       const=True, default=False,
-                       help='watch the site_path for changes (default: find the max)')
-    args = parser.parse_args()
-
     if args.watch:
         import time
         from watchdog.observers import Observer
@@ -153,9 +203,9 @@ def run():
                     return
 
                 if alert:
-                    print "Change detected.  Running StrangeCase"
+                    sys.stderr.write("Change detected.  Running StrangeCase\n")
                 strange_case(CONFIG)
-                print "StrangeCase generated at %i" % int(time.time())
+                sys.stderr.write("StrangeCase generated at %i\n" % int(time.time()))
                 self.last_run = time.time()
 
         observer = Observer()
@@ -163,7 +213,7 @@ def run():
         for path in os.listdir(os.getcwd()):
             path = os.path.abspath(path)
             if os.path.isdir(path) and path not in exclude_paths:
-                print 'Watching "%s" for changes' % path
+                sys.stderr.write('Watching "%s" for changes\n' % path)
                 observer.schedule(handler, path=path, recursive=True)
         observer.start()
         try:
@@ -171,7 +221,7 @@ def run():
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            print "Stopping"
+            sys.stderr("Stopping\n")
             observer.stop()
         observer.join()
     else:

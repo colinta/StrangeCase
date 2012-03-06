@@ -1,5 +1,5 @@
-import re
 import os
+import re
 from jinja2 import FileSystemLoader, Environment
 
 
@@ -18,7 +18,7 @@ class YamlFrontMatterLoader(FileSystemLoader):
 
     def get_source(self, environment, template):
         contents, filename, uptodate = super(YamlFrontMatterLoader, self).get_source(environment, template)
-        front_matter_match = re.match(r"\A([-]{3,})$", contents, re.MULTILINE)
+        front_matter_match = re.match(r"\A([-]{3,}|[`]{3,})$", contents, re.MULTILINE)
         if front_matter_match:
             offset = len(front_matter_match.group(0)) + 1  # +1 for newline
             delim = re.compile("^" + front_matter_match.group(1) + "$")
