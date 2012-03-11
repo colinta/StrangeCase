@@ -18,5 +18,9 @@ class JinjaNode(PageNode):
         super(JinjaNode, self).generate(site)
 
     def render(self, site=None):
-        template = Registry.get('jinja_environment').get_template(self.source_path)
+        try:
+            template = Registry.get('jinja_environment').get_template(self.source_path)
+        except UnicodeDecodeError:
+            print "Could not process '%s' because of unicode error." % self.source_path
+            raise
         return template.render(self.config, my=self, site=site)

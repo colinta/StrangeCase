@@ -37,7 +37,7 @@ class FolderNode(Node):
 
     def __repr__(self, indent=''):
         ret = super(FolderNode, self).__repr__(indent)
-        indent += ' '
+        indent += '    '
         for child in self.children:
             ret += "\n" + child.__repr__(indent)
         return ret
