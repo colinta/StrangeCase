@@ -246,4 +246,4 @@ class Node(object):
         return obj in self.children
 
     def __repr__(self, indent=''):
-        return "%s(url: %s type:%s)" % (indent, self.url, str(type(self)))
+        return "%s<url: %s type:%s>" % (indent, self.url, str(type(self)))
