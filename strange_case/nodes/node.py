@@ -126,6 +126,7 @@ class Node(object):
     ##|  "special" properties  |##
     ##|                        |##
     @property
+    @check_config_first
     def url(self):
         url = self.target_name
         if self.parent:
@@ -179,6 +180,7 @@ class Node(object):
     ##|  TRAVERSAL
     ##|
     @property
+    @check_config_first
     def siblings(self):
         """
         Returns a list of siblings.  Does not include the index page of the parent folder.
@@ -189,6 +191,7 @@ class Node(object):
         return [page for page in self.parent]
 
     @property
+    @check_config_first
     def next(self):
         """
         Returns the next node, or None if this is the last node or if this node does not
@@ -203,6 +206,7 @@ class Node(object):
             return iterables[index + 1]
 
     @property
+    @check_config_first
     def prev(self):
         """
         Returns the previous node, or None if this is the first node or if this node does not
@@ -237,6 +241,9 @@ class Node(object):
 
     def __iter__(self):
         return iter([child for child in self.children if child.iterable])
+
+    def __contains__(self, obj):
+        return obj in self.children
 
     def __repr__(self, indent=''):
         return "%s(url: %s type:%s)" % (indent, self.url, str(type(self)))
