@@ -148,7 +148,11 @@ def run():
     if 'extensions' in CONFIG:
         for extension in CONFIG['extensions']:
             if isinstance(extension, basestring):
-                extension = fancy_import(extension)
+                try:
+                    extension = fancy_import(extension)
+                except ImportError:
+                    print 'Error in processors: Could not find "%s"' % extension
+                    raise
             extensions.append(extension)
         del CONFIG['extensions']
 
@@ -161,13 +165,21 @@ def run():
     if 'filters' in CONFIG:
         for filter_name, method in CONFIG['filters'].iteritems():
             if isinstance(method, basestring):
-                method = fancy_import(method)
+                try:
+                    method = fancy_import(method)
+                except ImportError:
+                    print 'Error in filters: Could not find "%s"' % method
+                    raise
             jinja_environment.filters[filter_name] = method
         del CONFIG['filters']
 
     if 'processors' in CONFIG:
         for processor in CONFIG['processors']:
-            __import__(processor)
+            try:
+                __import__(processor)
+            except ImportError:
+                print 'Error in processors: Could not find "%s"' % processor
+                raise
         del CONFIG['processors']
 
     configurators = []
