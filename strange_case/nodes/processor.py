@@ -7,10 +7,18 @@ class Processor(Node):
     that it can be placed in the site tree, but later it modifies the
     tree to include other nodes.  Neat!
     """
+    def __init__(self, config, target_folder=None):
+        super(Processor, self).__init__(config, target_folder)
+
     @property
     @check_config_first
     def is_processor(self):
         return True
+
+    @property
+    @check_config_first
+    def iterable(self):
+        return False
 
     ##|
     ##|  POPULATING METHODS              |##
@@ -29,7 +37,9 @@ class Processor(Node):
         """
         Removes self from its parent's children
         """
-        if self.parent:
+        if self.parent and self in self.parent:
             idx = self.parent.index(self)
             self.parent.insert(idx, children)
             self.remove_self()
+        else:
+            self.parent.extend(children)
