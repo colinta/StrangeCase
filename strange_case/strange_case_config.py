@@ -59,6 +59,7 @@ more_defaults = {
         '*.js', '*.css',
         '*.png', '*.jpg',
         '*.PNG', '*.JPG',
+        'favicon.ico',
     ],
     'dont_inherit': [
         'type',
