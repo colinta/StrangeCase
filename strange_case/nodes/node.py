@@ -108,13 +108,14 @@ class Node(object):
             self.children.insert(i, child)
             i += 1
 
-    def config_copy(self, **kwargs):
+    def config_copy(self, all=False, **kwargs):
         node_config = deepcopy(self.config)
 
         # not merged
-        for key in node_config['dont_inherit']:
-            if key in node_config:
-                del node_config[key]
+        if not all:
+            for key in node_config['dont_inherit']:
+                if key in node_config:
+                    del node_config[key]
 
         if kwargs:
             node_config.update(kwargs)
