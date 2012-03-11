@@ -109,7 +109,7 @@ def file_pre(source_file, config):
     return config
 
 
-DATE_RE = re.compile(r'(?P<year>[1-9]\d{3})([-_])(?P<month>\d{2})\2(?P<day>\d{2})\2(?P<name>.*)')
+DATE_YMD_RE = re.compile(r'(?P<year>[1-9]\d{3})(?:([-_])(?P<month>\d{2})(?:\2(?P<day>\d{2}))?)?\2(?P<name>.*)')
 
 
 def date_from_name(source_file, config):
@@ -119,17 +119,27 @@ def date_from_name(source_file, config):
     python date object.
     """
     if 'created_at' not in config:
-        matches = DATE_RE.match(config['name'])
+        matches = DATE_YMD_RE.match(config['name'])
         if matches:
+            year = int(matches.group('year'))
+            if matches.group('month') is not None:
+                month = int(matches.group('month'))
+            else:
+                month = int(matches.group('month'))
+
+            if matches.group('day') is not None:
+                day = int(matches.group('day'))
+            else:
+                day = 1
             date = datetime.date(
-                year=int(matches.group('year')),
-                month=int(matches.group('month')),
-                day=int(matches.group('day')),
+                year=year,
+                month=month,
+                day=day,
                 )
             config['created_at'] = date
             config['name'] = matches.group('name')
         else:
-            matches = DATE_RE.match(config['target_name'])
+            matches = DATE_YMD_RE.match(config['target_name'])
             if matches:
                 date = datetime.date(
                     year=int(matches.group('year')),
