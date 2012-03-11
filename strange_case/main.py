@@ -3,6 +3,7 @@ import sys
 from fnmatch import fnmatch
 from strange_case.registry import Registry
 from strange_case.processors import build_node
+from strange_case.nodes import Node
 
 
 def scan(folder):
@@ -32,6 +33,7 @@ def strange_case(config):
     # config_path = os.path.join(deploy_path, config['config_file'])
     # config.update(check_for_config(config_path))
     config.setdefault('type', 'root')
+    Node.files_written = []
     root_node = build_node(config, site_path, deploy_path, '')[0]
 
     remove_stale_files = config['remove_stale_files']
@@ -45,7 +47,7 @@ def strange_case(config):
     if remove_stale_files and existing_files:
         paths = []
         for f in existing_files:
-            if f not in root_node.files_written:
+            if f not in Node.files_written:
                 f = os.path.abspath(f)
                 f_rel = os.path.relpath(f)
                 if any(pattern for pattern in dont_remove if fnmatch(f, pattern)):
