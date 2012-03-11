@@ -101,6 +101,7 @@ def run():
             'remove_stale_files',
             'config_file',
         ]
+        parser.add_argument('-x', '--exclude', nargs='*', dest='exclude_paths', default=None)
         parser.add_argument('-p', '--project', dest='project_path')
         parser.add_argument('-s', '--site', dest='site_path')
         parser.add_argument('-d', '--deploy', dest='deploy_path')
@@ -196,6 +197,8 @@ def run():
             os.path.abspath('.git'),
             os.path.abspath(CONFIG['deploy_path']),
         ]
+        if args.exclude_paths:
+            exclude_paths.extend([os.path.abspath(path) for path in args.exclude_paths])
 
         class Regenerate(FileSystemEventHandler):
             last_run = None
