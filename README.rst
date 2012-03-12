@@ -124,7 +124,7 @@ I'm going to add *two* prefixes so we can see what happens when we process files
     ├── layouts
     │   └── base.j2
     ├── public
-    │   └── index.html
+    │   └── ...
     └── site
         ├── index.j2
         └── projects
@@ -175,7 +175,7 @@ add a config.yaml file to the project root::
     ├── layouts
     │   └── base.j2
     ├── public
-    │   └── index.html
+    │   └── ...
     └── site
         ├── index.j2
         └── projects
@@ -213,7 +213,7 @@ Add ``index.j2`` to ``site/projects/`` ::
     ├── layouts
     │   └── base.j2
     ├── public
-    │   └── index.html
+    │   └── ...
     └── site
         ├── index.j2
         └── projects
@@ -357,7 +357,7 @@ In your templates, you have access to anything in the inherited config and in pe
       author:
         name: "Colin"
 
-``/site/index.html``::
+``/site/index.j2``::
 
     ---
     # YAML front matter
@@ -410,7 +410,7 @@ We've already seen this, but I'll include it again for completeness::
     <p>2. Blog Title</p>
 
 **Note:** Files named ``index.html`` will not be included in this list.  This is a
-very reasonable design decision, but I can imagin a situation where you have a file (think
+very reasonable design decision, but I can imagine a situation where you have a file (think
 ``robots.txt``) that *also* doesn't belong in the iterable pages list.  So ``iterable: false`` is
 available as a config setting.
 
@@ -517,7 +517,7 @@ Mostly random thoughts here.  Most of what you might want to know about StrangeC
   * register StrangeCase processors (or use 'processors' in config.yaml)
 
 * If you need a page to be processed differently, set ``type`` to the desired file type in the config for that file/folder.
-  For instance, the category index page should be ``type: category_index``.
+  For instance, the category index page should be ``type: categories``.
 
 * You can prefix variables on a page with ``my.`` (e.g. ``my.title`` or ``my.parent``). I think it looks
   better in some places because it makes it clear where the content comes from (e.g. ``{{ my.title }}`` as
@@ -682,6 +682,78 @@ the node is skipped.  Otherwise, you can modify the config, or create a new one,
 See ``date_from_name`` for a good example of modifying the config based on the file name.
 
 
+---------------
+IMAGE PROCESSOR
+---------------
+
+The image processor uses PIL to create thumbnails.  The usual way to do this is to specify
+the thumbnail size in a parent folder config, and then set `type: image` on all the image
+files.  This is done in the image folder's config.yaml file::
+
+    thumbnails:
+      thumb: '480x480'
+    files:
+      img_0001.jpg:
+        type: image
+        alt: a great picture
+      img_0002.jpg:
+        type: image
+      ...
+
+I will add a more automatic way to do this in v2.5, so you don't have to write an entry for
+every file in the folder.
+
+Enable the image processor in your ``config.yaml``::
+
+    processors:
+        - strange_case.processors.image
+
+
+------------------
+CATEGORY PROCESSOR
+------------------
+
+This processor scans your site pages, looking for pages that have a "category" property
+in their config.  For every category, it builds a ``category_detail`` page that can list
+the pages, and a ``category_index`` page to list the categories.
+
+Enable the category processor in your ``config.yaml``::
+
+    processors:
+        - strange_case.processors.category
+
+And build ``categories.j2`` and ``category_detail.j2``.  The ``category_detail`` page
+can be name anything (it will get renamed based on the category), but the ``categories``
+page will keep its name/title/etc, so give it a sensible name.
+
+In categories.j2 you can use the ``categories`` property to
+iterate through the category_detail pages::
+
+    ---
+    type: category_index
+    ---
+    {% extends 'layouts/base.j2' %}
+
+    {% for category in my.categories %}
+      <li><a href="{{ category.url }}">{{ category.title }}</a> (<span>{{ category.count }}</span>)</li>
+    {% endfor %}
+
+In category_detail.j2 you'll have a ``pages`` property::
+
+    ---
+    type: category_detail
+    ---
+    {% extends 'layouts/header.j2' %}
+
+    {% block content %}
+    <ul class="posts">
+    {%- for page in my.pages %}
+      <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+    {%- endfor %}
+    </ul>
+    {% endblock %}
+
+
 -------------------
 PAGINATED PROCESSOR
 -------------------
@@ -736,6 +808,8 @@ And change the ``type`` to ``paginated``, and update the HTML to use pagination:
 ----
 TODO
 ----
+
+* Associate file types with a default processor.
 
 * Placing entries in ``**/config.yaml`` override parent configs, but i'd like to add a
   merging syntax to the YAML, as a little DSL.

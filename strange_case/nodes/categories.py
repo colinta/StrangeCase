@@ -9,6 +9,7 @@ class CategoryDetail(JinjaNode):
     by the category_detail_processer.
     """
     source_path = None
+    index_node = None
 
     def __init__(self, config, target_path, category):
         super(CategoryDetail, self).__init__(config, CategoryDetail.source_path, target_path)
@@ -34,4 +35,8 @@ class CategoryFolderProcesser(Processor):
 
             categories[page.category].count += 1
             categories[page.category].pages.append(page)
+
+        # assign categories list to the category index page
+        if CategoryDetail.index_node:
+            CategoryDetail.index_node.config.setdefault('categories', categories.values())
         self.replace_with(categories.values())

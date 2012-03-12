@@ -1,3 +1,13 @@
+scheduled - 2.5
+===============
+
+* add support for assigning processors base on file type, so txt/html/j2 => page,
+  png/jpg/gif => image, folder => folder, .scss => sass, et.c.
+
+* add sass (less?) support
+
+* add CSS/JS compressor/minification/combinator support, probably as a tag.
+
 2012_03_11 - v2.4.0
 ===================
 

@@ -32,25 +32,30 @@ from copy import deepcopy
 
 
 def category_index_processor(config, source_path, target_path):
-    categories_name = 'categories'
+    categories_name = config.get('name', 'categories')
 
     folder_config = deepcopy(config)
     folder_config['target_name'] = categories_name
     folder_config['name'] = categories_name
     folder = FolderNode(folder_config, None, target_path)
+    categories_folder_target_path = os.path.join(target_path, categories_name)
 
     index_config = deepcopy(config)
     index_config['target_name'] = config['index']
     index_config['name'] = 'index'
-    categories_target_path = os.path.join(target_path, categories_name)
-    index = JinjaNode(index_config, source_path, categories_target_path)
+    index_node = JinjaNode(index_config, source_path, categories_folder_target_path)
+    folder.append(index_node)
+    CategoryDetail.index_node = index_node
 
-    folder.append(index)
-    folder.append(CategoryFolderProcesser(config, categories_target_path))
+    # attach Processor node - this is the class that will scan the pages for
+    # the `category` property:
+    folder.append(CategoryFolderProcesser(config, categories_folder_target_path))
     return (folder, )
 
 
 def category_detail_processer(config, source_path, target_path):
+    # just store the source path - when the detail pages get created, they
+    # will use this path.
     CategoryDetail.source_path = source_path
     return ()
 
