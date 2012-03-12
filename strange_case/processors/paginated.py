@@ -1,3 +1,86 @@
+"""
+Creates pages that browse through a folder of items.
+
+Let's say you've got 100s of blogs in your blogs/ folder:
+
+    site/
+    + blogs/
+      | index.html
+      | blog_001.html
+      | blog_002.html
+      | ...
+      + blog_999.html
+
+You probably don't want all of these on one page.  If
+you assign `type: paginated` to the index.html page,
+you will have a `Page` object available that you can
+use to link up many pages of content.
+
+In your template, you should iterate thourgh the page object and
+output links to the next and previous pages:
+
+    <ul>
+    {% for page in my.page %}
+        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+    {% endfor %}
+    </ul>
+
+    {% if my.page.prev %}<a href="{{ my.page.prev.url }}">&lsaquo; {{ my.page.prev.title }} |</a>
+    {% else %}&lsaquo;
+    {% endif %}
+    {{ my.page }}
+    {% if my.page.next %}| <a href="{{ my.page.next.url }}">{{ my.page.next.title }} &rsaquo;</a>
+    {% else %}&rsaquo;
+    {% endif %}
+
+The `Page` object has a few properties you might want
+to use in your template:
+
+    first: the first Page object
+    is_first: True if this is the first page, otherwise False
+    last: the last Page object
+    is_last: True if this is the last page, otherwise False
+    next: the next Page object
+    prev: the previous Page object
+    page: the 1-based index of the page object
+    index: the 0-based index of the page object
+    length/len: number of items on this page
+    limit: number of items *per page* (not necessarily the number on *this* page)
+    from/from_index: 1-based index of the first *item* in page
+    to/to_index: 1-based index of the last *item* in page
+
+You can output a str representation of a page object and it will
+look something like this:
+
+    Page n of N, item(s) a to b
+
+If you need to configure the page nodes that get created,
+you can add a `pages` dictionary to the first page.  For every
+page that gets created, that entry will be searched using the
+page number as the key.  So if you have this config:
+
+    ----
+    type: paginated
+    pages:
+        3: { title: 'The Third Page' }
+    ---
+
+The third page will use that title instead of the default ("Page 3")
+
+You can use different names than "page" and "Page" using the `paginated`
+option in config.  Here are the options it supports:
+
+    ----
+    type: paginated
+    paginated:
+        limit: 5  # default: 10
+        name: 'pagina'  # default: page
+        title: 'Página'  # default: Page
+    pages:
+        3: { title: 'The Third Page' }
+    ---
+"""
+
 import math
 from strange_case.registry import Registry
 from strange_case.nodes.jinja import JinjaNode
@@ -17,12 +100,6 @@ class Page(object):
     """
     Pretty much acts like a list (a "page") of StrangeCase nodes,
     but adds these properties:
-        `index`: 0-based index
-        `page`: 1-based index
-        `limit`: number of items *per page* (not necessarily the number on *this* page)
-        `from`: 1-based item index of first item in page
-        `to`: 1-based item index of last item in page
-        `length`/`len`: number of items on this page
     """
     def __init__(self, index, limit, total):
         self.items = []

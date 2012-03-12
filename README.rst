@@ -682,6 +682,57 @@ the node is skipped.  Otherwise, you can modify the config, or create a new one,
 See ``date_from_name`` for a good example of modifying the config based on the file name.
 
 
+-------------------
+PAGINATED PROCESSOR
+-------------------
+
+This processor can break up a large folder of pages.  It is designed so that converting
+from an index.j2 file to a paginated file is easy.  Let's say your existing blogs/index.j2
+lookes like this::
+
+    {% extends 'layouts/base.j2' %}
+
+    {% block content %}
+    <ul>
+    {% for page in site.blogs %}
+        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+    {% endfor %}
+    </ul>
+    {% endblock content %}
+
+We'll change this to use pagination.
+
+Enable the paginated processor in your ``config.yaml``::
+
+    processors:
+        - strange_case.processors.paginated
+
+And change the ``type`` to ``paginated``, and update the HTML to use pagination::
+
+    ----
+    type: paginated
+    ----
+    {% extends 'layouts/base.j2' %}
+
+    {% block content %}
+    <ul>
+    {% for page in my.page %}
+        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <div class="pagination">
+    {% if my.page.prev %}<a href="{{ my.page.prev.url }}">&lsaquo; {{ my.page.prev.title }} |</a>
+    {% else %}&lsaquo;
+    {% endif %}
+    {{ my.page }}
+    {% if my.page.next %}| <a href="{{ my.page.next.url }}">{{ my.page.next.title }} &rsaquo;</a>
+    {% else %}&rsaquo;
+    {% endif %}
+    </div>
+    {% endblock content %}
+
+
 ----
 TODO
 ----

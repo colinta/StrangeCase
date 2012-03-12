@@ -1,3 +1,19 @@
+2012_03_11 - v2.4.0
+===================
+
+* added a `paginated` processor.  it will iterate through all the pages in the folder and
+  create a `Page` object that holds `paginated.limit` items (default: 10).  the first page
+  will be named after the page that you assign `type: paginated`.  every page after that
+  will be named "pageN.html", where N is one-indexed (and therefore starts at "2", since
+  the first page is probably "index.html").  see the README or `processors/paginated.py`
+  file for more info
+
+* added favicon.ico to list of dont_process defaults
+
+* command-line options (`-x`, `--exclude`) to exclude folders from the `--watch` command.
+
+* date configurator matches Y, Y-M, or Y-M-D.  month and day default to 1.
+
 2012_03_01 - v2.3.0
 ===================
 
