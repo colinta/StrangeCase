@@ -1,5 +1,7 @@
-import sha
+import hashlib
 
 
 def sha_filter(s):
-    return sha.new(s).hexdigest()
+    sha = hashlib.sha1()
+    sha.update(s)
+    return sha.hexdigest()
