@@ -28,7 +28,7 @@ def strange_case(config):
     if not os.path.isdir(site_path):
         raise IOError('Could not find site_path folder "%s"' % site_path)
 
-    # this is the one folder that *doesn't* get processed by processers.build_page_tree,
+    # this is the one folder that *doesn't* get processed by processors.build_page_tree,
     # so it needs special handling here.
     # config_path = os.path.join(deploy_path, config['config_file'])
     # config.update(check_for_config(config_path))
@@ -68,8 +68,8 @@ def strange_case(config):
 def fancy_import(name):
     """
     This takes a fully qualified object name, like
-    'strange_case.extensions.Markdown2.markdown', and returns the last
-    object.  equivalent to `from strange_case.extensions.Markdown2 import markdown`.
+    'strange_case.extensions.markdown', and returns the last
+    object.  equivalent to `from strange_case.extensions import markdown`.
     """
 
     import_path, import_me = name.rsplit('.', 1)
@@ -176,7 +176,7 @@ def run():
     if 'processors' in CONFIG:
         for processor in CONFIG['processors']:
             try:
-                __import__(processor)
+                fancy_import(processor)
             except ImportError:
                 print 'Error in processors: Could not find "%s"' % processor
                 raise
@@ -200,17 +200,14 @@ def run():
             Registry.add_configurator(configurator)
         del CONFIG['configurators']
 
+    # additional file_types
+    for entry in Registry.file_types:
+        CONFIG['file_types'].append(entry)
+
     if args.watch:
         import time
         from watchdog.observers import Observer
         from watchdog.events import FileSystemEventHandler
-
-        exclude_paths = [
-            os.path.abspath('.git'),
-            os.path.abspath(CONFIG['deploy_path']),
-        ]
-        if args.exclude_paths:
-            exclude_paths.extend([os.path.abspath(path) for path in args.exclude_paths])
 
         class Regenerate(FileSystemEventHandler):
             last_run = None
@@ -224,6 +221,13 @@ def run():
                 strange_case(CONFIG)
                 sys.stderr.write("StrangeCase generated at %i\n" % int(time.time()))
                 self.last_run = time.time()
+
+        exclude_paths = [
+            os.path.abspath('.git'),
+            os.path.abspath(CONFIG['deploy_path']),
+        ]
+        if args.exclude_paths:
+            exclude_paths.extend([os.path.abspath(path) for path in args.exclude_paths])
 
         observer = Observer()
         handler = Regenerate()

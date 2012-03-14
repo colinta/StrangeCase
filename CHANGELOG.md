@@ -1,12 +1,25 @@
-scheduled - 2.5
-===============
+TODO
+====
 
-* add support for assigning processors base on file type, so txt/html/j2 => page,
-  png/jpg/gif => image, folder => folder, .scss => sass, et.c.
-
-* add sass (less?) support
+* merge YAML/config using a DSL that allows arrays to be extended instead of replaced
 
 * add CSS/JS compressor/minification/combinator support, probably as a tag.
+
+* table of contents
+
+2012_03_13 - v3.0.0
+===================
+
+* added scss_processor and clevercss_processor.  They compile and save SCSS/CleverCSS into CSS.
+
+* moved all extensions into the strange_case.extensions module.  processors, extensions, and filters
+  are all imported from there.
+
+* refactored configurator to use the 'file_types' config, which is modified during startup by
+  processors to associate file types with a default processor.  this replaces the `dont_process`
+  configuration.
+
+* updated README to reflect these changes
 
 2012_03_11 - v2.4.0
 ===================

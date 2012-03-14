@@ -3,15 +3,14 @@ The long and short of it:
 * write a function that looks like this:
       def your_processor(config, source_file, target_path):
           return (nodes, ...)
-* Registry.register('your_type', your_processor)
+* Registry.register('your_processor', your_processor)
 
 If you return multiple nodes, they will all be added as children to the parent node.
 If instead you need to create some kind of tree structure, build the tree first and
 then return the top-level node (still in a tuple).  `build_node` might be your
 friend, it handles the configurating.
 
-All files will be parsed for front matter unless it matches an entry in
-'dont_process' (using `fnmatch`).
+All files will be parsed for front matter unless `dont_process` is `true`.
 """
 
 import os
@@ -53,6 +52,7 @@ def root_processor(config, deploy_path, target_path):
 
     build_node_tree(node, deploy_path, target_path)
     return (node, )
+Registry.register('root', root_processor)
 
 
 def folder_processor(config, source_path, target_path):
@@ -62,19 +62,16 @@ def folder_processor(config, source_path, target_path):
     if source_path and os.path.isdir(source_path):
         build_node_tree(node, source_path, target_path)
     return (node, )
+Registry.register('folder', folder_processor)
 
 
 def asset_processor(config, source_path, target_path):
     node = AssetNode(config, source_path, target_path)
     return (node, )
+Registry.register('asset', asset_processor)
 
 
 def page_processor(config, source_path, target_path):
     node = JinjaNode(config, source_path, target_path)
     return (node, )
-
-
-Registry.register('root', root_processor)
-Registry.register('folder', folder_processor)
-Registry.register('asset', asset_processor)
 Registry.register('page', page_processor)

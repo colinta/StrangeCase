@@ -10,3 +10,4 @@ pathtools==0.1.2
 pymongo==2.1.1
 watchdog==0.5.4
 wsgiref==0.1.2
+CleverCSS==0.1

@@ -15,6 +15,15 @@ class FileNode(Node):
             raise TypeError('source_path "%s" does not exist in FileNode()' % source_path)
         self.source_path = source_path
 
+    def generate(self, site):
+        target_path = os.path.join(self.target_folder, self.target_name)
+        self.generate_file(site, self.source_path, target_path)
+        os.chmod(target_path, 0755)
+        super(FileNode, self).generate(site)
+
+    def generate_file(self, site, source_path, target_path):
+        pass
+
     ##|                        |##
     ##|  "special" properties  |##
     ##|                        |##
@@ -45,8 +54,3 @@ class FileNode(Node):
     @check_config_first
     def is_asset(self):
         return not self.is_page
-
-    def generate(self, site):
-        target_path = os.path.join(self.target_folder, self.target_name)
-        os.chmod(target_path, 0755)
-        super(FileNode, self).generate(site)

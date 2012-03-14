@@ -182,12 +182,12 @@ def paginate(all_items, limit):
 
 def paginated_processor(config, source_path, target_path):
     config['dont_inherit'].append('pages')
-    paginated = Processor(config)
+    paginated_processor = Processor(config)
     page_limit = int(config.get('paginated', {}).get('limit', 10))
     page_name = config.get('paginated', {}).get('name', 'page')
     page_title = config.get('paginated', {}).get('title', 'Page')
 
-    @bind(paginated)
+    @bind(paginated_processor)
     def populate(self, site):
         ret = []
         pages = paginate([node for node in self.parent if node.is_page], page_limit)
@@ -229,7 +229,7 @@ def paginated_processor(config, source_path, target_path):
             node.page.last = last_page
         return ret
 
-    return (paginated, )
+    return (paginated_processor, )
 
 
 Registry.register('paginated', paginated_processor)

@@ -25,14 +25,14 @@ defaults = {
     'configurators': [
         # most of these configurators are *very*
         # important, so if you're gonna go messing
-        # with them, be warned.  best to use insert()
-        # in config.py.
-        ignore,
+        # with them, be warned.
+        file_types,
         merge_files_config,
         setdefault_name,
         setdefault_target_name,
-        folder_pre,
-        file_pre,
+        folder_config_file,
+        front_matter_config,
+        ignore,
         date_from_name,
         order_from_name,
         date_from_name,  # yup, try again!
@@ -56,12 +56,6 @@ more_defaults = {
         '.*',
         CONFIG['config_file'],
     ],
-    'dont_process': [
-        '*.js', '*.css',
-        '*.png', '*.jpg',
-        '*.PNG', '*.JPG',
-        'favicon.ico',
-    ],
     'dont_inherit': [
         'type',
         'name',
@@ -69,6 +63,10 @@ more_defaults = {
         'title',
         'created_at',
         'order',
+    ],
+    'file_types': [
+        ('page', ('*.j2', '*.jinja2', '*.html', '*.txt', '*.md')),
+        ('asset', ('*')),
     ]
 }
 more_defaults.update(CONFIG)

@@ -7,6 +7,7 @@ class Registry(object):
     for example.
     """
     processors = {}
+    file_types = []
     misc = {}
     configurators = []
 
@@ -19,6 +20,13 @@ class Registry(object):
         Adds (or overrides) a processor to handle `node_type`
         """
         cls.processors[node_type] = processor
+
+    @classmethod
+    def associate(cls, node_type, globs):
+        """
+        Assigns a default type to files that match `globs`
+        """
+        cls.file_types.append((node_type, globs))
 
     @classmethod
     def nodes(cls, node_type, *args, **kwargs):

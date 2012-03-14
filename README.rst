@@ -186,7 +186,7 @@ add a config.yaml file to the project root::
 and add the date filter::
 
     filters:
-      date: extensions.date_extension.date
+      date: strange_case.extensions.date
 
 *Now* you can run StrangeCase with no errors, which will generate::
 
@@ -269,11 +269,10 @@ StrangeCase parses all the files and directories in ``site/``.
 
 * Files/Folders that match ``ignore`` are not processed at all.
 * Folders become ``FolderNode`` objects (``site/``, though, is a ``RootNode``) and scanned recursively.
-* Pagess (any file that doesn't match ``dont_process``) become ``JinjaNode(FileNode)`` objects.
-* Assets (anything that isn't a page) become ``AssetNode(FileNode)`` objects.
+* Pages (html and jinja files) become ``JinjaNode(FileNode)`` objects.
+* Assets (javascript, css, images) become ``AssetNode(FileNode)`` objects.
 * These can be overridden using the ``type`` config.
-* Additional nodes can be created by including the appropriate processor and setting the ``type``
-  to use that processor.
+* Additional nodes can be created by including the appropriate processor and setting the node's ``type`` to use that processor.
 
 The nodes are placed in a tree::
 
@@ -316,15 +315,20 @@ This process continues recursively for every file and folder in site (except ``i
 
 During the build stage, page, folder, and asset nodes are created using **processors**.  There are four built-in processors, and more
 available as extensions.  One important thing to note here is that assets and pages are differentiated only by the fact that one
-of them is passed through Jinja2.  If you want to process a JavaScript file through Jinja2, you should use the ``dont_process``
-configuration, or set ``type: page`` in the parent folder config.yaml file (using the ``files:`` dictionary)::
+of them is passed through Jinja2.  If you want to process a JavaScript file through Jinja2, you should associate "*.js" with the
+``page`` type, or set ``type: page`` in the parent folder config.yaml file (using the ``files:`` dictionary)::
 
+    file_types:
+        - [page, '*.js']
+    # or, if you want to only process a couple files:
+        - [page, ['special.js', 'special-2.js']]
+
+    # or just assign the 'page' processor
     files:
       special.js: { type: page }
-      # or
-      special.js: { dont_process: false }
 
-``type`` is not inherited, but ``dont_process`` is, so you can set a whole folder of assets to become page nodes using this config.
+
+``type`` is not inherited, but ``file_types`` is, so you can set a whole folder of assets to become page nodes using this config.
 
 2 - Populating
 ~~~~~~~~~~~~~~
@@ -537,7 +541,6 @@ is because *everything it does* can be controlled using the config. ::
     host: "http://localhost:8000"             # hostname.  I'm not using this for anything, but it might be import for plugin authors one day
     index: index.html                         # any file whose target_name matches this name will not be iterable
     ignore: ['config.yaml', '.*']             # which files to ignore altogether while building the site
-    dont_process: ['*.js', '*.css', *images]  # do not run these files through jinja
     dont_inherit: [                           # nodes will not inherit these properties
       'type',
       'name',
@@ -545,6 +548,10 @@ is because *everything it does* can be controlled using the config. ::
       'title',
       'created_at',
       'order',
+    ]
+    file_types: [                               # how files should be processed.
+        [page, ['*.j2', '*.jinja2', '*.html']], # the first glob to match wins
+        [asset, ['*']],                         # otherwise the file is ignored
     ]
     rename_extensions: {                      # which extensions to rename, and to what
       '.j2': '.html',
@@ -567,8 +574,8 @@ is because *everything it does* can be controlled using the config. ::
       configurators.merge_files_config,       # merges files[filename] with filename
       configurators.setdefault_name,          # if 'name' isn't assigned explicitly, this assigns it based on the file name and extension
       configurators.setdefault_target_name,   # similarly for target_name
-      configurators.folder_pre,               # processes folder/config.yaml.  If the folder config contains `ignore: true`, the folder is skipped
-      configurators.file_pre,                 # processes YAML front matter.  Again, the file can be ignored using `ignore: true`
+      configurators.folder_config_file,       # processes folder/config.yaml.  If the folder config contains `ignore: true`, the folder is skipped
+      configurators.front_matter_config,      # processes YAML front matter.  Again, the file can be ignored using `ignore: true`
       configurators.date_from_name,           # Gets the date from the file name, and strips it from name.
     ]
     configurators +: []                       # to solve the problem changing 'configurators',
@@ -642,32 +649,38 @@ I might add a way to do this in the YAML, but *probably not* (unless the communi
 
 Example of all this nonsense using ``config.py``::
 
+    # you must provide an initial CONFIG dictionary.
+    # unless you want to do something crazy, it is best to import it from strange_case_config
     from strange_case_config import CONFIG
-    from strange_case.processors import image, categories
-    from strange_case.extensions.Markdown2 import Markdown2Extension, markdown_filter
+
+    # import the processors you want to use.  you don't have to do anything with them,
+    # it is enough just to import them.
+    from strange_case.extensions import image, categories
+
+    # import the extensions and filters.  we still need to add these to CONFIG
+    from strange_case.extensions import Markdown2Extension, markdown
     from datetime.datetime import time
 
     CONFIG.update({
         'extensions': [Markdown2Extension],
         'filters': {
-            'markdown': markdown_filter,
+            'markdown': markdown,
         },
-        'processors': [image, categories]
         'time': int(time()),
     })
 
 Equivalent in the root ``config.yaml``::
 
     extensions:
-      - extensions.Markdown2.Markdown2Extension
+      - strange_case.extensions.Markdown2Extension
     filters:
-      markdown: extensions.Markdown2.markdown_filter
+      markdown: strange_case.extensions.markdown
     processors:
-      - processors.image
-      - processors.categories
+      - strange_case.extensions.image
+      - strange_case.extensions.categories
     # cannot assign time to datetime.time.  DANG.
 
-``processors/categories.py`` has an explanation of how processors work, and how it was written.
+``extensions/category_ext.py`` has an explanation of how processors work, and how it was written.
 I made it up as I went along, and ended up adding a ``Processor`` class that extends ``Node``,
 and a concept of "populating" the tree after the initial build.  Read more in that file.  I
 think it's a good system, but I'm open to friendly suggestions.
@@ -677,7 +690,7 @@ look at YAML front matter, ignore files, set default processors, and so on.  If 
 do the equivalent of a context processor in django, this is where you would do that.
 
 Every configurator in ``config['configurators']`` is given the node config.  If it returns nothing,
-the node is skipped.  Otherwise, you can modify the config, or create a new one, and return it.
+the node is ignored.  Otherwise, you can modify the config, or create a whole new one, and return it.
 
 See ``date_from_name`` for a good example of modifying the config based on the file name.
 
@@ -691,22 +704,22 @@ the thumbnail size in a parent folder config, and then set `type: image` on all 
 files.  This is done in the image folder's config.yaml file::
 
     thumbnails:
-      thumb: '480x480'
+        thumb: '480x480'
+    file_types:
+        - [image, '*.jpg']
     files:
-      img_0001.jpg:
-        type: image
-        alt: a great picture
-      img_0002.jpg:
-        type: image
-      ...
+        img_0001.jpg:
+            alt: a great picture
+        img_0002.jpg:
+        ...
 
-I will add a more automatic way to do this in v2.5, so you don't have to write an entry for
-every file in the folder.
+I've changed file_types so that all images are processed by the image processor, so you
+don't have to write an entry for every file in the folder.
 
-Enable the image processor in your ``config.yaml``::
+And of course, enable the image processor in your ``config.yaml``::
 
     processors:
-        - strange_case.processors.image
+        - strange_case.extensions.image_processor
 
 
 ------------------
@@ -720,7 +733,7 @@ the pages, and a ``category_index`` page to list the categories.
 Enable the category processor in your ``config.yaml``::
 
     processors:
-        - strange_case.processors.category
+        - strange_case.extensions.category_processor
 
 And build ``categories.j2`` and ``category_detail.j2``.  The ``category_detail`` page
 can be name anything (it will get renamed based on the category), but the ``categories``
@@ -777,7 +790,7 @@ We'll change this to use pagination.
 Enable the paginated processor in your ``config.yaml``::
 
     processors:
-        - strange_case.processors.paginated
+        - strange_case.extensions.paginated_processor
 
 And change the ``type`` to ``paginated``, and update the HTML to use pagination::
 
@@ -805,11 +818,21 @@ And change the ``type`` to ``paginated``, and update the HTML to use pagination:
     {% endblock content %}
 
 
+-----------------------------
+SCSS AND CLEVERCSS PROCESSORS
+-----------------------------
+
+These two get associated with ``.scss`` and ``.clevercss`` files and compile them to CSS files.
+
+::
+
+    processors:
+        - strange_case.extensions.scss_processor
+        - strange_case.extensions.clevercss_processor
+
 ----
 TODO
 ----
-
-* Associate file types with a default processor.
 
 * Placing entries in ``**/config.yaml`` override parent configs, but i'd like to add a
   merging syntax to the YAML, as a little DSL.
