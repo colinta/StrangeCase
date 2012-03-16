@@ -78,6 +78,9 @@ def fancy_import(name):
 
 
 def run():
+    import logging
+    logging.basicConfig()
+
     # so that strange_case.py can be executed from any project folder, add CWD to the import paths
     sys.path.insert(0, os.getcwd())
 
