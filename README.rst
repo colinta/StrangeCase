@@ -541,18 +541,16 @@ is because *everything it does* can be controlled using the config. ::
     host: "http://localhost:8000"             # hostname.  I'm not using this for anything, but it might be import for plugin authors one day
     index: index.html                         # any file whose target_name matches this name will not be iterable
     ignore: ['config.yaml', '.*']             # which files to ignore altogether while building the site
-    dont_inherit: [                           # nodes will not inherit these properties
-      'type',
-      'name',
-      'target_name',
-      'title',
-      'created_at',
-      'order',
-    ]
-    file_types: [                               # how files should be processed.
-        [page, ['*.j2', '*.jinja2', '*.html']], # the first glob to match wins
-        [asset, ['*']],                         # otherwise the file is ignored
-    ]
+    dont_inherit:                             # nodes will not inherit these properties
+      - type
+      - name
+      - target_name
+      - title
+      - created_at
+      - order
+    file_types:                                 # how files should be processed.  some processors add to this list, like to associate images
+        [page, ['*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt']],   # with the image processor
+    default_type: asset                       # if this is falsey, unassociated nodes will be ignored.
     rename_extensions: {                      # which extensions to rename, and to what
       '.j2': '.html',
       '.jinja2': '.html'

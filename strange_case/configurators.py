@@ -31,7 +31,10 @@ def file_types(source_file, config):
                 if fnmatch(file_name, pattern):
                     config['type'] = node_type
                     return config
-    return
+        if not config.get('default_type', None):
+            return None
+        config['type'] = config['default_type']
+        return config
 
 
 def merge_files_config(source_file, config):

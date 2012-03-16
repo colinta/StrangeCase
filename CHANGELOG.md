@@ -7,6 +7,13 @@ TODO
 
 * table of contents
 
+2012_03_13 - v3.0.3
+===================
+
+* refactored the extensions folder, but that shouldn't affect anyone
+
+* added 'default_type' config, used when `type` isn't set and no `file_types` match the file
+
 2012_03_13 - v3.0.0
 ===================
 

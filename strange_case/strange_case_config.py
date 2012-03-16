@@ -49,6 +49,7 @@ defaults = {
     'file_types': [
         ('page', ('*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt')),
     ],
+    'default_type': 'asset',
 }
 defaults.update(CONFIG)
 CONFIG.update(defaults)
