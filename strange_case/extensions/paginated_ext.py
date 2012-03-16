@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 """
 Creates pages that browse through a folder of items.
 
