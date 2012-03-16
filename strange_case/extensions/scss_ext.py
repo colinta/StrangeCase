@@ -1,4 +1,3 @@
-import os
 import jinja2
 import jinja2.ext
 from scss import Scss
@@ -40,14 +39,14 @@ class ScssNode(FileNode):
     def generate_file(self, site, source_path, target_path):
         scss_content = open(source_path, 'r').read()
         css_content = scss_compiler(scss_content)
-        with open(target_path) as f:
+        with open(target_path, 'w') as f:
             f.write(css_content)
         self.files_written.append(target_path)
 
 
 def scss_processor(config, source_path, target_path):
-    if config['target_name'][-4:] == 'scss':
-        config['target_name'][-4:] = 'css'
+    if config['target_name'].endswith('.scss'):
+        config['target_name'] = config['target_name'][:-4] + 'css'
 
     scss_node = ScssNode(config, source_path, target_path)
     return (scss_node,)
