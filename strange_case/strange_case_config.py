@@ -38,6 +38,17 @@ defaults = {
         date_from_name,  # yup, try again!
         title_from_name,
     ],
+    'dont_inherit': [
+        'type',
+        'name',
+        'target_name',
+        'title',
+        'created_at',
+        'order',
+    ],
+    'file_types': [
+        ('page', ('*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt')),
+    ],
 }
 defaults.update(CONFIG)
 CONFIG.update(defaults)
@@ -58,17 +69,6 @@ more_defaults = {
         '.*',
         CONFIG['config_file'],
     ],
-    'dont_inherit': [
-        'type',
-        'name',
-        'target_name',
-        'title',
-        'created_at',
-        'order',
-    ],
-    'file_types': [
-        ('page', ('*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt')),
-    ]
 }
 more_defaults.update(CONFIG)
 CONFIG.update(more_defaults)
