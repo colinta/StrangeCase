@@ -51,6 +51,8 @@ more_defaults = {
     'rename_extensions': {
         '.j2': html_ext,
         '.jinja2': html_ext,
+        '.jinja': html_ext,
+        '.md': html_ext,
     },
     'ignore': [
         '.*',
@@ -65,8 +67,7 @@ more_defaults = {
         'order',
     ],
     'file_types': [
-        ('page', ('*.j2', '*.jinja2', '*.html', '*.txt', '*.md')),
-        ('asset', ('*')),
+        ('page', ('*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt')),
     ]
 }
 more_defaults.update(CONFIG)
