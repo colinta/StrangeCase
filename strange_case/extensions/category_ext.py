@@ -72,7 +72,7 @@ class CategoryFolderProcesser(Processor):
         self.replace_with(categories.values())
 
 
-def category_index_processor(config, source_path, target_path):
+def category_processor(config, source_path, target_path):
     categories_name = config.get('name', 'categories')
 
     folder_config = deepcopy(config)
@@ -101,5 +101,5 @@ def category_detail_processor(config, source_path, target_path):
     return ()
 
 
-Registry.register('category_index', category_index_processor)
+Registry.register('category_index', category_processor)
 Registry.register('category_detail', category_detail_processor)
