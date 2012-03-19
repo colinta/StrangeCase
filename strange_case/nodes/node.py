@@ -192,6 +192,20 @@ class Node(object):
 
     @property
     @check_config_first
+    def ancestors(self):
+        """
+        Returns the list of ancestors, top-most first.
+        """
+        current = self
+        ret = [current]
+        while current.parent:
+            ret.insert(0, current.parent)
+            current = current.parent
+
+        return ret
+
+    @property
+    @check_config_first
     def next(self):
         """
         Returns the next node, or None if this is the last node or if this node does not
