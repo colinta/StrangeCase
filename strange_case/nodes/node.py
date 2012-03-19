@@ -1,5 +1,5 @@
 import urllib
-from copy import deepcopy
+from strange_case.config_dict import config_copy
 
 
 def check_config_first(fn):
@@ -109,7 +109,7 @@ class Node(object):
             i += 1
 
     def config_copy(self, all=False, **kwargs):
-        node_config = deepcopy(self.config)
+        node_config = config_copy(self.config, self)
 
         # not merged
         if not all:

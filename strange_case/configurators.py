@@ -58,7 +58,10 @@ def setdefault_name(source_file, config):
     if 'rename_extensions' in config and ext in config['rename_extensions']:
         ext = config['rename_extensions'][ext]
 
-    name = base_name
+    if file_name == config['index'] and hasattr(config, 'parent'):
+        name = config.parent.name
+    else:
+        name = base_name
 
     ##|  FIX NAME
     # add the extension if it exists and isn't ".html"

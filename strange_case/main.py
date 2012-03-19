@@ -1,9 +1,11 @@
 import os
 import sys
+
 from fnmatch import fnmatch
 from strange_case.registry import Registry
 from strange_case.processors import build_node
 from strange_case.nodes import Node
+from strange_case.config_dict import ConfigDict
 
 
 def scan(folder):
@@ -91,6 +93,7 @@ def run():
         else:
             from strange_case.strange_case_config import CONFIG
 
+        CONFIG = ConfigDict(CONFIG)
         import argparse
         parser = argparse.ArgumentParser(description='Process some integers.')
         parser.add_argument('-w', '--watch', dest='watch', action='store_const',
