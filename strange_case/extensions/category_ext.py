@@ -82,7 +82,7 @@ def category_processor(config, source_path, target_path):
     categories_folder_target_path = os.path.join(target_path, categories_name)
 
     index_config = deepcopy(config)
-    index_config['target_name'] = config['index']
+    index_config['target_name'] = config['index.html']
     index_config['name'] = 'index'
     index_node = JinjaNode(index_config, source_path, categories_folder_target_path)
     folder.append(index_node)

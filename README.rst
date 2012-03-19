@@ -539,7 +539,6 @@ is because *everything it does* can be controlled using the config. ::
 
     config_file: 'config.yaml'                # name of file that contains config
     host: "http://localhost:8000"             # hostname.  I'm not using this for anything, but it might be import for plugin authors one day
-    index: index.html                         # any file whose target_name matches this name will not be iterable
     ignore: ['config.yaml', '.*']             # which files to ignore altogether while building the site
     dont_inherit:                             # nodes will not inherit these properties
       - type
@@ -555,7 +554,9 @@ is because *everything it does* can be controlled using the config. ::
       '.j2': '.html',
       '.jinja2': '.html'
     }
+    index.html: index.html                    # determines which file is the index file
     html_extension: '.html'                   # files with this extension are html files (`page.is_page` => `True`)
+    is_index: false                           # any file whose target_name matches this name will not be iterable
 
     # PROTECTED
     # these can only be assigned in the root config file, otherwise they will

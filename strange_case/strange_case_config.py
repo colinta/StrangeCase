@@ -30,6 +30,7 @@ defaults = {
         merge_files_config,
         setdefault_name,
         setdefault_target_name,
+        setdefault_is_index,
         folder_config_file,
         front_matter_config,
         ignore,
@@ -45,6 +46,7 @@ defaults = {
         'title',
         'created_at',
         'order',
+        'is_index',
     ],
     'file_types': [
         ('page', ('*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt')),
@@ -59,7 +61,7 @@ html_ext = CONFIG['html_extension']
 
 more_defaults = {
     'host': 'http://localhost:8000',
-    'index': 'index' + html_ext,
+    'index.html': 'index' + html_ext,
     'rename_extensions': {
         '.j2': html_ext,
         '.jinja2': html_ext,

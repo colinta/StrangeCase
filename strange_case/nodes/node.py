@@ -138,7 +138,7 @@ class Node(object):
     def iterable(self):
         # if this file is an index file, it will not be included in the pages iterator.
         # all other pages and assets are iterable.
-        if self.target_name != self.config['index']:
+        if not self.config['is_index']:
             return True
         return False
 
@@ -197,9 +197,12 @@ class Node(object):
         Returns the list of ancestors, top-most first.
         """
         current = self
-        ret = [current]
+        ret = [self]
         while current.parent:
-            ret.insert(0, current.parent)
+            for page in current.parent.all():
+                if page.config['is_index'] and page != self:
+                    ret.insert(0, page)
+                    break
             current = current.parent
 
         return ret

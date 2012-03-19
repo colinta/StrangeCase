@@ -58,10 +58,7 @@ def setdefault_name(source_file, config):
     if 'rename_extensions' in config and ext in config['rename_extensions']:
         ext = config['rename_extensions'][ext]
 
-    if file_name == config['index'] and hasattr(config, 'parent'):
-        name = config.parent.name
-    else:
-        name = base_name
+    name = base_name
 
     ##|  FIX NAME
     # add the extension if it exists and isn't ".html"
@@ -98,6 +95,17 @@ def setdefault_target_name(source_file, config):
     ### this treatment.  If you have a strange character in your URL, that's
     ### your business.  Or maybe I'll add something to the upcoming "renamers"
     config['target_name'] = target_name
+    return config
+
+
+@provides('is_index')
+def setdefault_is_index(source_file, config):
+    ##|  ASSIGN DEFAULT NAME
+
+    config['is_index'] = False
+    if os.path.isfile(source_file):
+        if config['target_name'] == config['index.html'] and hasattr(config, 'parent'):
+            config['is_index'] = True
     return config
 
 
@@ -238,7 +246,10 @@ def title_from_name(source_file, config):
     Title-cases the name and stores it in config['title']
     """
     if os.path.isfile(source_file):
-        title = config['name']
+        if config['is_index'] and hasattr(config, 'parent'):
+            title = config.parent.name
+        else:
+            title = config['name']
         title = title.replace('_', ' ')
         title = titlecase(title)
         config['title'] = title

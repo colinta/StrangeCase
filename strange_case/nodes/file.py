@@ -29,7 +29,7 @@ class FileNode(Node):
     ##|                        |##
     @property
     def url(self):
-        if self.target_name == self.config['index']:
+        if self.config['is_index']:
             url = ''
         else:
             url = self.target_name
