@@ -12,7 +12,7 @@ setup(
         author="Colin Thomas-Arnold",
         author_email="colinta.com",
         url="https://github.com/colinta/StrangeCase",
-        install_requires=['Jinja2', 'PIL', 'PyYAML', 'markdown2', 'watchdog'],
+        install_requires=['Jinja2', 'PIL', 'PyYAML', 'markdown2', 'watchdog', 'clevercss', 'pyScss'],
 
         entry_points={
             'console_scripts': [
