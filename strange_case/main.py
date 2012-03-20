@@ -210,6 +210,9 @@ def run():
     for entry in Registry.file_types:
         CONFIG['file_types'].append(entry)
 
+    if 'file_types +' in CONFIG:
+        CONFIG['file_types'].extend(CONFIG['file_types +'])
+
     if args.watch:
         import time
         from watchdog.observers import Observer

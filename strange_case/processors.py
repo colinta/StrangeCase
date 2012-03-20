@@ -21,14 +21,9 @@ from strange_case.registry import Registry
 def build_node(config, source_path, target_path, file_name):
     source_file = os.path.join(source_path, file_name)
 
-    configurators = Registry.configurators
-    # Run the config through each configurator.
-    # If a configurator returns a falsey
-    # value, the node will be ignored.
-    for configurator in configurators:
-        config = configurator(source_file, config)
-        if not config:
-            return
+    config = Registry.configurate(config, source_file)
+    if not config:
+        return
 
     # create node(s). if you specify a 'type' it will override the default.
     # built-in types are 'page', 'folder', and 'asset'

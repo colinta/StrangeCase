@@ -200,6 +200,8 @@ class Node(object):
         ret = [self]
         while current.parent:
             for page in current.parent.all():
+                if 'is_index' not in page.config:
+                    print page.config
                 if page.config['is_index'] and page != self:
                     ret.insert(0, page)
                     break

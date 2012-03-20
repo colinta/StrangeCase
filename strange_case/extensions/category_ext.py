@@ -26,7 +26,6 @@ In the end, we will be creating:
 """
 import os
 import re
-from copy import deepcopy
 
 from strange_case.nodes import JinjaNode, Processor, FolderNode
 from strange_case.registry import Registry
@@ -61,6 +60,7 @@ class CategoryFolderProcesser(Processor):
                 target_name = re.sub(r'[\W -]+', '_', page.category, re.UNICODE)
                 config['name'] = target_name
                 config['target_name'] = target_name + config['html_extension']
+                Registry.configurate(config, CategoryDetail.source_path)
                 categories[page.category] = CategoryDetail(config, self.target_folder, page.category)
 
             categories[page.category].count += 1
@@ -75,15 +75,17 @@ class CategoryFolderProcesser(Processor):
 def category_processor(config, source_path, target_path):
     categories_name = config.get('name', 'categories')
 
-    folder_config = deepcopy(config)
+    folder_config = config.copy()
     folder_config['target_name'] = categories_name
     folder_config['name'] = categories_name
+    Registry.configurate(folder_config, source_path)
     folder = FolderNode(folder_config, None, target_path)
     categories_folder_target_path = os.path.join(target_path, categories_name)
 
-    index_config = deepcopy(config)
+    index_config = config.copy()
     index_config['target_name'] = config['index.html']
     index_config['name'] = 'index'
+    Registry.configurate(index_config, os.path.join(source_path, index_config['target_name']))
     index_node = JinjaNode(index_config, source_path, categories_folder_target_path)
     folder.append(index_node)
     CategoryDetail.index_node = index_node

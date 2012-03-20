@@ -6,6 +6,12 @@ class ConfigDict(dict):
         self.parent = parent
         super(ConfigDict, self).__init__(d)
 
+    def copy(self):
+        ret = ConfigDict({}, self)
+        for key in self.keys():
+            ret[key] = copy.deepcopy(self[key])
+        return ret
+
 
 def config_copy(source, parent=None):
     ret = ConfigDict({}, parent)

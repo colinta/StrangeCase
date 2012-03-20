@@ -86,6 +86,7 @@ import math
 from strange_case.registry import Registry
 from strange_case.nodes.jinja import JinjaNode
 from strange_case.nodes import Processor
+from strange_case.processors import build_node
 import types
 
 
@@ -187,11 +188,15 @@ def paginated_processor(config, source_path, target_path):
     page_limit = int(config.get('paginated', {}).get('limit', 10))
     page_name = config.get('paginated', {}).get('name', 'page')
     page_title = config.get('paginated', {}).get('title', 'Page')
+    page_order = config.get('paginated', {}).get('order', 'asc')
 
     @bind(paginated_processor)
     def populate(self, site):
         ret = []
-        pages = paginate([node for node in self.parent if node.is_page], page_limit)
+        nodes = [node for node in self.parent if node.is_page]
+        if page_order.upper() == 'DESC':
+            nodes.reverse()
+        pages = paginate(nodes, page_limit)
 
         first_page = None
         last_page = None
@@ -214,6 +219,7 @@ def paginated_processor(config, source_path, target_path):
             page_config.setdefault('title', "%s %i" % (page_title, 1 + len(ret)))
             page_config.setdefault('page', page)
             page_config.setdefault('iterable', False)
+            Registry.configurate(page_config, source_path)
             node = JinjaNode(page_config, source_path, target_path)
 
             # now that we have node objects we can assign prev and next properties onto

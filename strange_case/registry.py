@@ -65,3 +65,15 @@ class Registry(object):
         Adds a configurator callables.
         """
         cls.configurators.append(configurator)
+
+    @classmethod
+    def configurate(cls, config, source_file):
+        configurators = Registry.configurators
+        # Run the config through each configurator.
+        # If a configurator returns a falsey
+        # value, the node will be ignored.
+        for configurator in configurators:
+            config = configurator(source_file, config)
+            if not config:
+                return
+        return config
