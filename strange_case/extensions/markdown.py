@@ -1,6 +1,10 @@
 import jinja2
 import jinja2.ext
-import markdown2
+try:
+    import markdown2
+except ImportError:
+    from strange_case import require_package
+    require_package('Markdown2')
 
 
 markdowner = markdown2.Markdown()

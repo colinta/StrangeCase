@@ -16,7 +16,7 @@ setup(
 
         entry_points={
             'console_scripts': [
-                'scase = strange_case.main:run'
+                'scase = strange_case:run'
             ]
         },
 

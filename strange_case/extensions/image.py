@@ -1,6 +1,10 @@
 import os
 from shutil import copy2
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:
+    from strange_case import require_package
+    require_package('PIL')
 
 from strange_case.nodes import FileNode
 from strange_case.registry import Registry

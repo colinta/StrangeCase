@@ -26,6 +26,9 @@ TODO
 * Thanks to this refactor, CleverCSS, PIL, markdown2, and PySCSS are now
   optional, not installed as part of `pip install StrangeCase`
 
+* Added `require_package` helper to output error message when a package is not
+  installed.  Usage: `require_package("PIL")`.
+
 2012_03_13 - v3.0.3
 ===================
 

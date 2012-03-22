@@ -1,6 +1,10 @@
 import jinja2
 import jinja2.ext
-import clevercss
+try:
+    import clevercss
+except ImportError:
+    from strange_case import require_package
+    require_package('CleverCSS')
 
 from strange_case.registry import Registry
 from strange_case.nodes import FileNode

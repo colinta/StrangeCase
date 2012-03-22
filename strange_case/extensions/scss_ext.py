@@ -1,6 +1,10 @@
 import jinja2
 import jinja2.ext
-from scss import Scss
+try:
+    from scss import Scss
+except ImportError:
+    from strange_case import require_package
+    require_package('PySCSS')
 
 from strange_case.registry import Registry
 from strange_case.nodes import FileNode
