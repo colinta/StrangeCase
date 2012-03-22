@@ -54,14 +54,16 @@ def strange_case(config):
                 f = os.path.abspath(f)
                 f_rel = os.path.relpath(f)
                 if any(pattern for pattern in dont_remove if fnmatch(f, pattern)):
-                    sys.stderr.write("ignoring \033[1m" + f_rel + "\033[0m\n")
+                    sys.stderr.write("\033[32mignoring\033[0m \033[1m" + f_rel + "\033[0m\n")
                     continue
 
                 if os.path.isdir(f):
-                    paths.append(f)
+                    paths.insert(0, f)
                 else:
                     sys.stderr.write("\033[31mrm\033[0m \033[1m" + f_rel + "\033[0m\n")
                     os.remove(f)
+        # filter out directories that are not empty
+        paths = [p for p in paths if not os.listdir(p)]
         for p in paths:
             p_rel = os.path.relpath(p)
             sys.stderr.write("\033[31mrmdir\033[0m \033[1m" + p_rel + "\033[0m\n")
