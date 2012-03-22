@@ -3,7 +3,7 @@ from strange_case.extensions import *
 from strange_case.support import *
 from strange_case.nodes import *
 from strange_case.processors import *
-from strange_case.main import run
+from strange_case.__main__ import run
 
 
 def output_error(msg):
@@ -16,7 +16,3 @@ def output_error(msg):
 
 def require_package(pkg):
     output_error("\033[1m" + pkg + "\033[0m is required.\n  > pip install " + pkg)
-
-
-if __name__ == '__main__':
-    run()

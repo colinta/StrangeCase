@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
         name="StrangeCase",
-        version="v3.1.1",
+        version="v3.1.2",
         author="Colin Thomas-Arnold",
         author_email="colinta.com",
         url="https://github.com/colinta/StrangeCase",
@@ -16,7 +16,7 @@ setup(
 
         entry_points={
             'console_scripts': [
-                'scase = strange_case:run'
+                'scase = strange_case.__main__:run'
             ]
         },
 

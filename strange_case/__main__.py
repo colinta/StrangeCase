@@ -274,3 +274,7 @@ def run():
         observer.join()
     else:
         strange_case(CONFIG)
+
+
+if __name__ == '__main__':
+    run()
