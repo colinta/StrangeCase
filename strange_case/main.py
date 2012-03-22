@@ -1,5 +1,6 @@
 import os
 import sys
+import yaml
 
 from fnmatch import fnmatch
 from strange_case.registry import Registry
@@ -67,14 +68,14 @@ def strange_case(config):
             os.removedirs(p)
 
 
-def fancy_import(name):
+def fancy_import(import_name):
     """
     This takes a fully qualified object name, like
     'strange_case.extensions.markdown', and returns the last
     object.  equivalent to `from strange_case.extensions import markdown`.
     """
 
-    import_path, import_me = name.rsplit('.', 1)
+    import_path, import_me = import_name.rsplit('.', 1)
     imported = __import__(import_path, globals(), locals(), [import_me], -1)
     return getattr(imported, import_me)
 
@@ -86,40 +87,56 @@ def run():
     # so that strange_case.py can be executed from any project folder, add CWD to the import paths
     sys.path.insert(0, os.getcwd())
 
+    import argparse
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('-w', '--watch', dest='watch', action='store_const',
+                       const=True, default=False,
+                       help='watch the site_path for changes (default: find the max)')
+    conf_overrides = [
+        'project_path',
+        'site_path',
+        'deploy_path',
+        'remove_stale_files',
+        'config_file',
+    ]
+    parser.add_argument('-x', '--exclude', nargs='*', dest='exclude_paths', default=None)
+    parser.add_argument('-p', '--project', dest='project_path')
+    parser.add_argument('-s', '--site', dest='site_path')
+    parser.add_argument('-d', '--deploy', dest='deploy_path')
+    parser.add_argument('-r', '--remove', dest='remove_stale_files', action='store_true', default=None)
+    parser.add_argument('-n', '--no-remove', dest='remove_stale_files', action='store_false', default=None)
+    parser.add_argument('-c', '--config', dest='config_file')
+    parser.add_argument('configs', nargs='*')
+
     # config section catches assertion errors and prints them as error messages
     try:
         if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
             from config import CONFIG
+            if not isinstance(CONFIG, ConfigDict):
+                CONFIG = ConfigDict(CONFIG)
         else:
             from strange_case.strange_case_config import CONFIG
-
-        CONFIG = ConfigDict(CONFIG)
-        import argparse
-        parser = argparse.ArgumentParser(description='Process some integers.')
-        parser.add_argument('-w', '--watch', dest='watch', action='store_const',
-                           const=True, default=False,
-                           help='watch the site_path for changes (default: find the max)')
-
-        conf_overrides = [
-            'project_path',
-            'site_path',
-            'deploy_path',
-            'remove_stale_files',
-            'config_file',
-        ]
-        parser.add_argument('-x', '--exclude', nargs='*', dest='exclude_paths', default=None)
-        parser.add_argument('-p', '--project', dest='project_path')
-        parser.add_argument('-s', '--site', dest='site_path')
-        parser.add_argument('-d', '--deploy', dest='deploy_path')
-        parser.add_argument('-r', '--remove', dest='remove_stale_files', action='store_true', default=None)
-        parser.add_argument('-n', '--no-remove', dest='remove_stale_files', action='store_false', default=None)
-        parser.add_argument('-c', '--config', dest='config_file')
-        parser.add_argument('configs', nargs='*')
 
         args = parser.parse_args()
         for conf in conf_overrides:
             if getattr(args, conf) is not None:
                 CONFIG[conf] = getattr(args, conf)
+
+        # normalize paths
+        for conf in ['project_path', 'site_path', 'deploy_path']:
+            if CONFIG[conf][0] == '~':
+                CONFIG[conf] = os.path.expanduser(CONFIG[conf])
+            elif CONFIG[conf][0] == '.':
+                CONFIG[conf] = os.path.abspath(CONFIG[conf])
+
+        # now we can look for the app config
+        config_path = os.path.join(CONFIG['project_path'], CONFIG['config_file'])
+
+        if os.path.isfile(config_path):
+            with open(config_path, 'r') as config_file:
+                yaml_config = yaml.load(config_file)
+            if yaml_config:
+                CONFIG.update(yaml_config)
 
         assign = None
         for confs in args.configs:
@@ -135,8 +152,7 @@ def run():
 
         if CONFIG['config_hook']:
             CONFIG['config_hook'](CONFIG)
-            if CONFIG['config_hook']:
-                del CONFIG['config_hook']
+            del CONFIG['config_hook']
 
         assert CONFIG['project_path'], "project_path is required"
         assert CONFIG['site_path'], "site_path is required"

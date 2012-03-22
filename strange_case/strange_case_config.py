@@ -1,12 +1,9 @@
 import os
-import yaml
 
-from configurators import *
+from strange_case.config_dict import ConfigDict
+from strange_case.configurators import *
 
-
-CONFIG = {}
-# first the lowest-level configs are merged with these defaults.
-defaults = {
+CONFIG = ConfigDict({
     'project_path': os.getcwd(),
     'site_path': u'site/',
     'deploy_path': u'public/',
@@ -52,42 +49,16 @@ defaults = {
         ('page', ('*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt')),
     ],
     'default_type': 'asset',
-}
-defaults.update(CONFIG)
-CONFIG.update(defaults)
-
-# this can change per folder, but please don't, that's just weird.
-html_ext = CONFIG['html_extension']
-
-more_defaults = {
-    'host': 'http://localhost:8000',
-    'index.html': 'index' + html_ext,
+    'host': u'http://localhost:8000',
+    'index.html': u'index.html',
     'rename_extensions': {
-        '.j2': html_ext,
-        '.jinja2': html_ext,
-        '.jinja': html_ext,
-        '.md': html_ext,
+        '.j2': u'.html',
+        '.jinja2': u'.html',
+        '.jinja': u'.html',
+        '.md': u'.html',
     },
     'ignore': [
-        '.*',
-        CONFIG['config_file'],
+        u'.*',
+        u'config.yaml',
     ],
-}
-more_defaults.update(CONFIG)
-CONFIG.update(more_defaults)
-
-# normalize paths
-for conf in ['project_path', 'site_path', 'deploy_path']:
-    if CONFIG[conf][0] == '~':
-        CONFIG[conf] = os.path.expanduser(CONFIG[conf])
-    elif CONFIG[conf][0] == '.':
-        CONFIG[conf] = os.path.abspath(CONFIG[conf])
-
-# now we can look for the app config
-config_path = os.path.join(CONFIG['project_path'], CONFIG['config_file'])
-
-if os.path.isfile(config_path):
-    with open(config_path, 'r') as config_file:
-        yaml_config = yaml.load(config_file)
-    if yaml_config:
-        CONFIG.update(yaml_config)
+})

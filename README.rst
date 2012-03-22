@@ -384,7 +384,7 @@ Accessing any page by name
 This is a common thing to do in StrangeCase.  The ``name``, if it is not explicitly declared, is detemined by the
 file name.  The default configurators will remove ordering (``order_from_name``) and date (``date_from_name``)
 from the front, and then the default name (``setdefault_name``) will be the file name with non-alphanumerics
-replaced with underscores, lowercased, and the html extension is removed.  All other extensions are left.
+replaced with underscores, lowercased, and the html extension is removed.  All other extensions will remain.
 
 ``This is a file name - DUH.j2`` becomes ``this_is_a_file_name___duh``
 
@@ -548,12 +548,13 @@ is because *everything it does* can be controlled using the config. ::
       - created_at
       - order
     file_types:                                 # how files should be processed.  some processors add to this list, like to associate images
-        [page, ['*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt']],   # with the image processor
+        - [page, ['*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt']],   # with the image processor
     default_type: asset                       # if this is falsey, unassociated nodes will be ignored.
-    rename_extensions: {                      # which extensions to rename, and to what
+    rename_extensions:                        # which extensions to rename, and to what
       '.j2': '.html',
       '.jinja2': '.html'
-    }
+      '.jinja': '.html',
+      '.md': '.html',
     index.html: index.html                    # determines which file is the index file
     html_extension: '.html'                   # files with this extension are html files (`page.is_page` => `True`)
     is_index: false                           # any file whose target_name matches this name will not be iterable
@@ -628,14 +629,13 @@ REALLY COMPLICATED STUFF
 
 This relates to the ``config.py`` and ``config.yaml`` files mentioned above.
 
-You should glance at the colinta.github.com repository on the build branch.  It does most things that can be done (and look in
-``extensions/`` for the markdown and date extension, I copied it from somewhere).
+Take a glance at the colinta.com repository.  It does most things that can be done.
 
 You can define ``extensions``, ``filters``, "configurators", and ``processors``.
 
 ``filters`` is a dictionary of ``filter_name: package.path``.
 
-``extensions`` is a list of ``- package.paths``.
+``extensions`` is a list of ``package.paths``.
 
 If you specify these in config.py, you can import the extension/filter and assign it to the list.  Otherwise, in config.yaml,
 use a dot-separated path, similar to how you would write an ``import`` statement, but include the class name.
@@ -657,11 +657,11 @@ Example of all this nonsense using ``config.py``::
     from strange_case.extensions import image, categories
 
     # import the extensions and filters.  we still need to add these to CONFIG
-    from strange_case.extensions import Markdown2Extension, markdown
+    from strange_case.extensions.markdown import MarkdownExtension, markdown
     from datetime.datetime import time
 
     CONFIG.update({
-        'extensions': [Markdown2Extension],
+        'extensions': [MarkdownExtension],
         'filters': {
             'markdown': markdown,
         },
@@ -671,7 +671,7 @@ Example of all this nonsense using ``config.py``::
 Equivalent in the root ``config.yaml``::
 
     extensions:
-      - strange_case.extensions.Markdown2Extension
+      - strange_case.extensions.markdown.MarkdownExtension
     filters:
       markdown: strange_case.extensions.markdown
     processors:
@@ -718,7 +718,7 @@ don't have to write an entry for every file in the folder.
 And of course, enable the image processor in your ``config.yaml``::
 
     processors:
-        - strange_case.extensions.image_processor
+        - strange_case.extensions.image
 
 
 ------------------
@@ -732,7 +732,7 @@ the pages, and a ``category_index`` page to list the categories.
 Enable the category processor in your ``config.yaml``::
 
     processors:
-        - strange_case.extensions.category_processor
+        - strange_case.extensions.category
 
 And build ``categories.j2`` and ``category_detail.j2``.  The ``category_detail`` page
 can be name anything (it will get renamed based on the category), but the ``categories``
@@ -789,7 +789,7 @@ We'll change this to use pagination.
 Enable the paginated processor in your ``config.yaml``::
 
     processors:
-        - strange_case.extensions.paginated_processor
+        - strange_case.extensions.paginated
 
 And change the ``type`` to ``paginated``, and update the HTML to use pagination::
 

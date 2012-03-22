@@ -44,12 +44,12 @@ class ScssNode(FileNode):
         self.files_written.append(target_path)
 
 
-def scss_processor(config, source_path, target_path):
+def processor(config, source_path, target_path):
     if config['target_name'].endswith('.scss'):
         config['target_name'] = config['target_name'][:-4] + 'css'
 
     scss_node = ScssNode(config, source_path, target_path)
     return (scss_node,)
 
-Registry.register('scss', scss_processor)
+Registry.register('scss', processor)
 Registry.associate('scss', ['*.scss'])

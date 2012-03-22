@@ -12,11 +12,11 @@ def markdown(markdown):
 
 
 #block
-class Markdown2Extension(jinja2.ext.Extension):
+class MarkdownExtension(jinja2.ext.Extension):
     tags = set(['markdown'])
 
     def __init__(self, environment):
-        super(Markdown2Extension, self).__init__(environment)
+        super(MarkdownExtension, self).__init__(environment)
         environment.extend(
             markdowner=markdowner
         )

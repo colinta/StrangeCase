@@ -10,6 +10,25 @@ TODO
 2012_03_13 - v3.0.3
 ===================
 
+* refactored the extensions folder *again*.  removed all the imports from `__init__.py`.
+  you **WILL** need to update your imports:
+
+      strange_case.extensions.Markdown2Extension => strange_case.extensions.markdown.MarkdownExtension
+      strange_case.extensions.markdown => strange_case.extensions.markdown.markdown
+      strange_case.extensions.date => strange_case.extensions.date.date
+      strange_case.extensions.sha => strange_case.extensions.sha.sha
+      strange_case.extensions.image_processor => strange_case.extensions.image
+      strange_case.extensions.paginated_processor => strange_case.extensions.paginated
+      strange_case.extensions.category_processor => strange_case.extensions.category
+      strange_case.extensions.clevercss_processor => strange_case.extensions.clevercss_ext
+      strange_case.extensions.scss_processor => strange_case.extensions.scss_ext
+
+* Thanks to this refactor, CleverCSS, PIL, markdown2, and PySCSS are now
+  optional, not installed as part of `pip install StrangeCase`
+
+2012_03_13 - v3.0.3
+===================
+
 * refactored the extensions folder, but that shouldn't affect anyone
 
 * added 'default_type' config, used when `type` isn't set and no `file_types` match the file

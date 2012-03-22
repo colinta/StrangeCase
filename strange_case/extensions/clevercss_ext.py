@@ -45,7 +45,7 @@ class CleverCssNode(FileNode):
         super(CleverCssNode, self).generate(site)
 
 
-def clevercss_processor(config, source_path, target_path):
+def processor(config, source_path, target_path):
     if config['target_name'][-4:] == 'ccss':
         config['target_name'][-4:] = 'css'
     if config['target_name'][-9:] == 'clevercss':
@@ -55,5 +55,5 @@ def clevercss_processor(config, source_path, target_path):
     return (ccss_node,)
 
 
-Registry.register('clevercss', clevercss_processor)
+Registry.register('clevercss', processor)
 Registry.associate('clevercss', ['*.ccss', '*.clevercss'])

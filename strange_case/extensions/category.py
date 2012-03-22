@@ -72,7 +72,7 @@ class CategoryFolderProcesser(Processor):
         self.replace_with(categories.values())
 
 
-def category_processor(config, source_path, target_path):
+def processor(config, source_path, target_path):
     categories_name = config.get('name', 'categories')
 
     folder_config = config.copy()
@@ -96,12 +96,12 @@ def category_processor(config, source_path, target_path):
     return (folder, )
 
 
-def category_detail_processor(config, source_path, target_path):
+def detail_processor(config, source_path, target_path):
     # just store the source path - when the detail pages get created, they
     # will use this path.
     CategoryDetail.source_path = source_path
     return ()
 
 
-Registry.register('category_index', category_processor)
-Registry.register('category_detail', category_detail_processor)
+Registry.register('category_index', processor)
+Registry.register('category_detail', detail_processor)

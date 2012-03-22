@@ -6,6 +6,9 @@ class ConfigDict(dict):
         self.parent = parent
         super(ConfigDict, self).__init__(d)
 
+    def update(self, other):
+        super(ConfigDict, self).update(other)
+
     def copy(self):
         ret = ConfigDict({}, self)
         for key in self.keys():

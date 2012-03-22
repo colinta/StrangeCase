@@ -28,7 +28,7 @@ class ImageNode(FileNode):
             self.files_written.append(target_path)
 
 
-def image_processor(config, source_path, target_path):
+def processor(config, source_path, target_path):
     image_node = ImageNode(config, source_path, target_path)
     if 'thumbnails' not in config:
         return (image_node,)
@@ -49,5 +49,5 @@ def image_processor(config, source_path, target_path):
         thumbs.append(thumbnail_node)
     return (image_node, ) + tuple(thumbs)
 
-Registry.register('image', image_processor)
+Registry.register('image', processor)
 Registry.associate('image', ['*.png', '*.jpg', '*.jpeg', '*.gif'])
