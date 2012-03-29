@@ -145,12 +145,11 @@ def run():
             if assign:
                 CONFIG[assign] = confs
                 assign = None
-            else:
+            elif ':' in confs:
                 key, val = confs.split(':', 1)
-                if len(val) == 0:
-                    assign = key
-                else:
-                    CONFIG[key] = val
+                CONFIG[key] = val
+            else:
+                assign = confs
 
         if CONFIG['config_hook']:
             CONFIG['config_hook'](CONFIG)
