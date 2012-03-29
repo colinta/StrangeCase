@@ -6,13 +6,18 @@ The Strange Case of...
 :Version: v2.1.4
 :Copyright: 2012 Colin Thomas-Arnold <http://colinta.com/>
 
-It's yet another static site generator.  Have you seen `jekyll <https://github.com/mojombo/jekyll>`_?
-`hyde <http://ringce.com/hyde>`_?  Yup.  Like those.
+It's yet another static site generator.  Have you seen `jekyll`_?
+`hyde`_?  Yup.  Like those.
 
 But this one is:
 
 1. Written in python, unlike ``jekyll``
 2. **NOT** complicated, unlike ``hyde``.  And I mean *really* **NOT** complicated.
+
+I just read about `webby`_, and realized that it is the Ruby equivalent to
+StrangeCase.  I commend them!  I had considered porting StrangeCase to Ruby
+(and maybe I will some day, just for kicks), but for now, I would say to
+Rubyists: use `webby`_.
 
 ---------------------------------------------------------
 
@@ -378,7 +383,7 @@ Generates::
     <h2>test</h2>
     <h2>test</h2>
 
-Accessing any page by name
+Accessing any node by name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is a common thing to do in StrangeCase.  The ``name``, if it is not explicitly declared, is detemined by the
@@ -850,3 +855,4 @@ See LICENSE_ for more details (it's a simplified BSD license).
 .. _Jinja2:  http://jinja.pocoo.org/
 .. _LICENSE: https://github.com/colinta/StrangeCase/blob/master/LICENSE
 .. _PIL:     http://www.pythonware.com/products/pil/
+.. _webby:   http://webby.rubyforge.org/
