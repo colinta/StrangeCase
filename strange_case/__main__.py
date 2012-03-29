@@ -180,7 +180,7 @@ def run():
         del CONFIG['extensions']
 
     if not Registry.get('jinja_environment', None):
-        jinja_environment = StrangeCaseEnvironment(extensions=extensions)
+        jinja_environment = StrangeCaseEnvironment(extensions=extensions, project_path=CONFIG['project_path'])
         Registry.set('jinja_environment', jinja_environment)
     else:
         jinja_environment = Registry.get('jinja_environment')
