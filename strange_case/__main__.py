@@ -119,11 +119,6 @@ def run():
         else:
             from strange_case.strange_case_config import CONFIG
 
-        args = parser.parse_args()
-        for conf in conf_overrides:
-            if getattr(args, conf) is not None:
-                CONFIG[conf] = getattr(args, conf)
-
         # normalize paths
         for conf in ['project_path', 'site_path', 'deploy_path']:
             if CONFIG[conf][0] == '~':
@@ -139,6 +134,11 @@ def run():
                 yaml_config = yaml.load(config_file)
             if yaml_config:
                 CONFIG.update(yaml_config)
+
+        args = parser.parse_args()
+        for conf in conf_overrides:
+            if getattr(args, conf) is not None:
+                CONFIG[conf] = getattr(args, conf)
 
         assign = None
         for confs in args.configs:
