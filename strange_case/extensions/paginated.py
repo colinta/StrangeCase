@@ -213,14 +213,13 @@ def paginated_processor(config, source_path, target_path):
             # page configuration can be further customized by creating a
             # pages: {} dictionary.  The key names should be the page index
             page_index = 1 + len(ret)
-            more_page_config = self.config.get('pages', {}).get(page_index, None)
-            if more_page_config:
-                page_config.update(more_page_config)
-                print page_config
             page_config.setdefault('title', "%s %i" % (page_title, page_index))
             page_config.setdefault('page', page)
             page_config.setdefault('iterable', False)
             Registry.configurate(page_config, source_path)
+            more_page_config = self.config.get('pages', {}).get(page_index, None)
+            if more_page_config:
+                page_config.update(more_page_config)
             node = JinjaNode(page_config, source_path, target_path)
 
             # now that we have node objects we can assign prev and next properties onto
