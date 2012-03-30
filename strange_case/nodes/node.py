@@ -92,9 +92,6 @@ class Node(object):
         for child in children:
             self.append(child)
 
-    def index(self, child):
-        return self.children.index(child)
-
     def remove(self, child):
         if child in self.children:
             self.children.remove(child)
@@ -108,6 +105,68 @@ class Node(object):
             self.children.insert(i, child)
             i += 1
 
+    ##|
+    ##|  TRAVERSAL
+    ##|
+    @property
+    def siblings(self):
+        """
+        Returns a list of siblings.  Does not include the index page of the parent folder.
+        """
+        if not self.parent:
+            return self.iterable and [self] or []
+
+        return [page for page in self.parent]
+
+    @property
+    def ancestors(self):
+        """
+        Returns the list of ancestors, top-most first.
+        """
+        current = self
+        ret = [self]
+        while current.parent:
+            for page in current.parent.all():
+                if 'is_index' not in page.config:
+                    print page.config
+                if page.config['is_index'] and page != self:
+                    ret.insert(0, page)
+                    break
+            current = current.parent
+
+        return ret
+
+    @property
+    def next(self):
+        """
+        Returns the next node, or None if this is the last node or if this node does not
+        have a parent.
+        """
+        if not self.parent:
+            return None
+
+        iterables = [page for page in self.parent]
+        index = iterables.index(self)
+        if len(iterables) > index + 1:
+            return iterables[index + 1]
+
+    @property
+    def prev(self):
+        """
+        Returns the previous node, or None if this is the first node or if this node does not
+        have a parent.
+        """
+        if not self.parent:
+            return None
+
+        iterables = [page for page in self.parent]
+        index = iterables.index(self)
+        if index - 1 >= 0:
+            return iterables[index - 1]
+
+    ##|
+    ##|  CONFIG COPY
+    ##|
     def config_copy(self, all=False, **kwargs):
         node_config = config_copy(self.config, self)
 
@@ -168,73 +227,16 @@ class Node(object):
         return False
 
     ##|
-    ##|  TRAVERSAL
+    ##|  OBJECT-MODEL STUFF
     ##|
-    @property
-    @check_config_first
-    def siblings(self):
-        """
-        Returns a list of siblings.  Does not include the index page of the parent folder.
-        """
-        if not self.parent:
-            return [self]
-
-        return [page for page in self.parent]
-
-    @property
-    @check_config_first
-    def ancestors(self):
-        """
-        Returns the list of ancestors, top-most first.
-        """
-        current = self
-        ret = [self]
-        while current.parent:
-            for page in current.parent.all():
-                if 'is_index' not in page.config:
-                    print page.config
-                if page.config['is_index'] and page != self:
-                    ret.insert(0, page)
-                    break
-            current = current.parent
-
-        return ret
-
-    @property
-    @check_config_first
-    def next(self):
-        """
-        Returns the next node, or None if this is the last node or if this node does not
-        have a parent.
-        """
-        if not self.parent:
-            return None
-
-        iterables = [page for page in self.parent]
-        index = iterables.index(self)
-        if len(iterables) > index + 1:
-            return iterables[index + 1]
-
-    @property
-    @check_config_first
-    def prev(self):
-        """
-        Returns the previous node, or None if this is the first node or if this node does not
-        have a parent.
-        """
-        if not self.parent:
-            return None
-
-        iterables = [page for page in self.parent]
-        index = iterables.index(self)
-        if index - 1 >= 0:
-            return iterables[index - 1]
-
     def __nonzero__(self):
         return True
 
     def __getitem__(self, key):
-        return self.__getattr__(key)
+        try:
+            return self.__getattr__(key)
+        except AttributeError:
+            raise KeyError
 
     def __getattr__(self, key):
         if key in self.config:
@@ -243,8 +245,7 @@ class Node(object):
         for child in self.children:
             if child.name == key:
                 return child
-
-        return ''
+        raise AttributeError
 
     def __len__(self):
         return len([child for child in self.children if child.iterable])

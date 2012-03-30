@@ -37,8 +37,8 @@ class Processor(Node):
         """
         Removes self from its parent's children
         """
-        if self.parent and self in self.parent:
-            idx = self.parent.index(self)
+        if self in self.parent.children:
+            idx = self.parent.children.index(self)
             self.parent.insert(idx, children)
             self.remove_self()
         else:
