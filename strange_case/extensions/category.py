@@ -41,7 +41,7 @@ class CategoryDetail(JinjaNode):
     index_node = None
 
     def __init__(self, config, target_path, category):
-        self.config['title'] = category
+        config['title'] = category
         super(CategoryDetail, self).__init__(config, CategoryDetail.source_path, target_path)
         self.count = 0
         self.pages = []
@@ -52,7 +52,7 @@ class CategoryFolderProcesser(Processor):
         pages = site.pages(recursive=True)
         categories = {}
         for page in pages:
-            if not page.category:
+            if not page['category']:
                 continue
 
             if page.category not in categories:

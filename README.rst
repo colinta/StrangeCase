@@ -58,8 +58,9 @@ QUICK START
 5. Run strange case:
    ``$ scase``
 
-6. Open ``public/index.html``.  You might want to hold onto your jaw, lest it drop to the floor.  Yeah, it's not gonna say ``{{ title }}``,
-   it's gonna say ``My First Page`` in big letters.
+6. Open ``public/index.html``.  You might want to hold onto your jaw, lest it
+   drop to the floor.  Yeah, it's not gonna say ``{{ title }}``, it's gonna say
+   ``My First Page`` in big letters.
 
 
 ------------
@@ -107,21 +108,26 @@ And update ``index.j2`` to use this layout::
     <h1>{{ title }}</h1>
     {% endblock %}
 
-You can run StrangeCase again.  ``public/index.html`` will now have ``<head>`` and ``<body>`` tags surrounding it.
+You can run StrangeCase again.  ``public/index.html`` will now have ``<head>``
+and ``<body>`` tags surrounding it.
 
-If you're lost at this point, you should read up on Jinja.  We haven't really done anything more than run
-``index.j2`` through jinja and wrote the output to ``index.html``.
+If you're lost at this point, you should read up on Jinja.  We haven't really
+done anything more than run ``index.j2`` through jinja and wrote the output to
+``index.html``.
 
-Now let's add a projects folder and a couple projects.  When you add *content* to your site, put it in
-the ``site/`` folder.  Most simple projects will pretty much only use the ``site/`` folder and a ``layouts/``
-folder wth one or two layouts in there.
+Now let's add a projects folder and a couple projects.  When you add *content*
+to your site, put it in the ``site/`` folder.  Most simple projects will pretty
+much only use the ``site/`` folder and a ``layouts/`` folder wth one or two
+layouts in there.
 
-I'm going to throw a curveball into the project file names.  StrangeCase orders files by sorting them by file
-name.  This is important when you go to display images or blogs in order by date.  If you want to have them
-ordered by anything other than filename, you can use a couple different naming schemes at
-the beginning of the file name.  jekyll does a similar thing, btw.
+I'm going to throw a curveball into the project file names.  StrangeCase orders
+files by sorting them by file name.  This is important when you go to display
+images or blogs in order by date.  If you want to have them ordered by anything
+other than filename, you can use a couple different naming schemes at the
+beginning of the file name.  jekyll does a similar thing, btw.
 
-I'm going to add *two* prefixes so we can see what happens when we process files this way.
+I'm going to add *two* prefixes so we can see what happens when we process
+files this way.
 
 ::
 
@@ -146,8 +152,9 @@ And here is what each project template looks like::
     <p>Project number #{{ order }} started on {{ created_at | date }}</p>
     {% endblock %}
 
-A little shorter than our original ``index.j2``.  Notice I've left out the YAML front matter, and yet I
-am using the variables `title`, `order`, and `created_at`.  Where do they get their value from?
+A little shorter than our original ``index.j2``.  Notice I've left out the YAML
+front matter, and yet I am using the variables `title`, `order`, and
+`created_at`.  Where do they get their value from?
 
 The file name!
 
@@ -162,18 +169,20 @@ The file name!
      |
      +-order
 
-In this way, you get some variables for free just by naming your files with a date and/or order prefix.
-Later, you'll be able to write your own function that does this — and more!  We are looking
-at the by-product of “configurators”, and they can access and modify the entire config for the node.
+In this way, you get some variables for free just by naming your files with a
+date and/or order prefix. Later, you'll be able to write your own function that
+does this — and more!  We are looking at the by-product of “configurators”, and
+they can access and modify the entire config for the node.
 
-BUT, if you tried to run StrangeCase right now, you would get the following error::
+BUT, if you tried to run StrangeCase right now, you would get the following
+error::
 
     $ scase
     ...
     jinja2.exceptions.TemplateAssertionError: no filter named 'date'
 
-No worries, there is a `date` filter built into StrangeCase.  It's just not enabled. So
-add a config.yaml file to the project root::
+No worries, there is a `date` filter built into StrangeCase.  It's just not
+enabled. So add a config.yaml file to the project root::
 
     project
     ├── config.yaml
@@ -206,10 +215,11 @@ and add the date filter::
 
     </body>
 
-Moving along.  Now let's create a project listing at ``projects/index.j2``.  We need a way
-to "fetch" the project pages.  This is going to be very easy, because really all that
-StrangeCase *does* is build a resource tree.  And we can walk that tree using the node
-names.  So if we just iterate over the ``projects/`` folder, we'll have our project nodes.
+Moving along.  Now let's create a project listing at ``projects/index.j2``.  We
+need a way to "fetch" the project pages.  This is going to be very easy,
+because really all that StrangeCase *does* is build a resource tree.  And we
+can walk that tree using the node names.  So if we just iterate over the
+``projects/`` folder, we'll have our project nodes.
 
 Add ``index.j2`` to ``site/projects/`` ::
 
@@ -237,21 +247,21 @@ Add ``index.j2`` to ``site/projects/`` ::
     {% endfor %}
     {% endblock %}
 
-Iterating over folders is a very easy thing to do in StrangeCase.  It's how
-you do things like create an index page, as we saw here,
-or create a photo blog (``for photo in site.images.my_fun_trip``).  It is what I
-found very frustrating in ``jekyll`` and ``hyde`` (especially ``jekyll``), and so
-it's what is *very easy* in ``StrangeCase``.
+Iterating over folders is a very easy thing to do in StrangeCase.  It's how you
+do things like create an index page, as we saw here, or create a photo blog
+(``for photo in site.images.my_fun_trip``).  It is what I found very
+frustrating in ``jekyll`` and ``hyde`` (especially ``jekyll``), and so it's
+what is *very easy* in ``StrangeCase``.
 
 Notice that when we iterate over the ``site.projects`` folder, it does *not*
-include the ``index.html`` file.  Makes sense, though, right?  The index page is considered
-to be the same "page" as the folder.  Even though they are seperate nodes, they have
-the same URL.
+include the ``index.html`` file.  Makes sense, though, right?  The index page
+is considered to be the same "page" as the folder.  Even though they are
+seperate nodes, they have the same URL.
 
-To wrap things up, let's make a link to the project page from the home page.  Every node
-has a ``url`` property, and you can access pages by their name.  "name" is whatever is "leftover"
-after the created_at date and order have been pulled out.  I'll add a link to the second project
-to demonstrate this::
+To wrap things up, let's make a link to the project page from the home page.
+Every node has a ``url`` property, and you can access pages by their name.
+"name" is whatever is "leftover" after the created_at date and order have been
+pulled out.  I'll add a link to the second project to demonstrate this::
 
     ---
     title: My first StrangeCase site
@@ -273,11 +283,13 @@ STRANGECASE OVERVIEW
 StrangeCase parses all the files and directories in ``site/``.
 
 * Files/Folders that match ``ignore`` are not processed at all.
-* Folders become ``FolderNode`` objects (``site/``, though, is a ``RootNode``) and scanned recursively.
+* Folders become ``FolderNode`` objects (``site/``, though, is a ``RootNode``)
+  and scanned recursively.
 * Pages (html and jinja files) become ``JinjaNode(FileNode)`` objects.
 * Assets (javascript, css, images) become ``AssetNode(FileNode)`` objects.
 * These can be overridden using the ``type`` config.
-* Additional nodes can be created by including the appropriate processor and setting the node's ``type`` to use that processor.
+* Additional nodes can be created by including the appropriate processor and
+  setting the node's ``type`` to use that processor.
 
 The nodes are placed in a tree::
 
@@ -304,24 +316,62 @@ Here is a more thorough 1-2-3 of what StrangeCase does when you run it.
 1 - Build stage
 ~~~~~~~~~~~~~~~
 
-In the build stage, StrangeCase is looking at the files and folders in site/.  First a root node is created::
+In the build stage, StrangeCase is looking at the files and folders in site/.
+First a root node is created::
 
     root_node = build_node(config, site_path, deploy_path, '')[0]
 
-The ``build_node`` method **configures** and **processes** the node.  **configures** means that it passes the ``source_path``
-and ``config`` to each of the ``configurators`` (we saw these working in the tutorial above: ``date_from_name``,
-``order_from_name``, and ``title_from_name`` in particular).  **processes** means that one or more nodes are instantiated
-and added to the node tree.  The ``root_node`` sits at the top, and in your templates you access it using ``{{ site }}``.
+The ``build_node`` method **configures** and **processes** the node.
+**configures** means that it passes the ``source_path`` and ``config`` to each
+of the ``configurators`` (we saw these working in the tutorial above:
+``date_from_name``, ``order_from_name``, and ``title_from_name`` in
+particular).  **processes** means that one or more nodes are instantiated and
+added to the node tree.  The ``root_node`` sits at the top, and in your
+templates you access it using ``{{ site }}``.
 
-This process continues recursively for every file and folder in site (except ``ignore``-d files).
+This process continues recursively for every file and folder in site (except
+``ignore``-d files).
 
-1.a - Processors
+1.a - Configuration
+~~~~~~~~~~~~~~~~~~~
+
+When you run StrangeCase, it immediately starts building a config object. This
+object will be used throughout the generation of your site, so it is important
+to understand what it does, and how you control it.
+
+First, ``strange_case_config.py`` establishes the initial defaults.  Look at
+that file, or read about the defaults below.  Next, the project config file is
+merged in.  This is the ``config.yaml`` file that sits at the top of your
+project.  Then command-line arguments are processed.  **Finally**, if a function
+is assigned to ``config_hook``, it will be passed the configuration, and it is
+expected to throw errors or make changes to that object as needed.
+
+There are many ways that configuration can be added to a node during the build
+stage.  The first way is inheritance.  Nodes inherit all the configuration of
+the parent node except for the keys that are in ``dont_inherit`` (name,
+target_name, type, and most of the config options that are assigned by
+configurators).
+
+If the node is a folder, the special file config.yaml will be merged into that
+node if it exists.  If it is a file node, the parent folder's config is checked
+for a ``files`` entry, and if the current file is in there, that config is
+merged in.  ``page`` types can have YAML front matter.
+
+See the section below that outlines the default config, and how those options
+affect processing.  Know this: everything is controlled using config.  If you're
+trying to do something complicated and having trouble, please create an issue.
+I'd like to compile a list of HOWTOs/FAQs.
+
+1.b - Processors
 ~~~~~~~~~~~~~~~~
 
-During the build stage, page, folder, and asset nodes are created using **processors**.  There are four built-in processors, and more
-available as extensions.  One important thing to note here is that assets and pages are differentiated only by the fact that one
-of them is passed through Jinja2.  If you want to process a JavaScript file through Jinja2, you should associate "*.js" with the
-``page`` type, or set ``type: page`` in the parent folder config.yaml file (using the ``files:`` dictionary)::
+During the build stage, page, folder, and asset nodes are created using
+**processors**.  There are four built-in processors, and more available as
+extensions.  One important thing to note here is that assets and pages are
+differentiated only by the fact that one of them is passed through Jinja2.  If
+you want to process a JavaScript file through Jinja2, you should associate
+"*.js" with the ``page`` type, or set ``type: page`` in the parent folder
+config.yaml file (using the ``files:`` dictionary)::
 
     file_types:
         - [page, '*.js']
@@ -332,20 +382,31 @@ of them is passed through Jinja2.  If you want to process a JavaScript file thro
     files:
       special.js: { type: page }
 
+``type`` is not inherited, but ``file_types`` is, so you can set a whole folder
+of assets to become page nodes using this config.
 
-``type`` is not inherited, but ``file_types`` is, so you can set a whole folder of assets to become page nodes using this config.
 
 2 - Populating
 ~~~~~~~~~~~~~~
 
-If you are using the category processor this stage is important.  If you're not, it won't matter.
+If you are using the category processor this stage is important.  If you're not,
+it won't matter.
 
-Some nodes can't know what content they will generate until the entire site is scanned.  Like categories!  We need to know *all*
-the pages in the site before we know what all the categories are, and how many pages have that category.
+Some nodes can't know what content they will generate until the entire site is
+scanned.  Like categories!  We need to know *all* the pages in the site before
+we know what all the categories are, and how many pages have that category.
 
-These nodes are stored as ``ProcessorNode``s, and they are nodes that say "hold on, I'm not ready yet...".  They must implement
-a ``populate`` method, which when called *removes* the processor node from the tree and replaces itself with nodes (or it can
-insert nodes elsewhere in the tree, or do nothing I suppose).
+These nodes are stored as ``ProcessorNode``s, and they are nodes that say "hold
+on, I'm not ready yet...".  They must implement a ``populate`` method, which
+when called *removes* the processor node from the tree and replaces itself with
+nodes (or it can insert nodes elsewhere in the tree, or do nothing I suppose).
+
+If you are writing your own processor, and need to access a node's config, use
+the item-index operators, ``[]``.  If the configuration is not set, you'll get
+``None`` instead of an ``AttributeError``.
+
+    node.thingy     # => AttributeError
+    node['thingy']  # => None
 
 3 - Generating
 ~~~~~~~~~~~~~~

@@ -236,9 +236,12 @@ class Node(object):
         try:
             return self.__getattr__(key)
         except AttributeError:
-            raise KeyError
+            return None
 
     def __getattr__(self, key):
+        if key == 'config':
+            return {}
+
         if key in self.config:
             return self.config.get(key)
 
