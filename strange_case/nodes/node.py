@@ -167,15 +167,6 @@ class Node(object):
     def is_asset(self):
         return False
 
-    @property
-    @check_config_first
-    def title(self):
-        return self.name.titlecase()
-
-    @title.setter
-    def title(self, title):
-        self.config['title'] = title
-
     ##|
     ##|  TRAVERSAL
     ##|

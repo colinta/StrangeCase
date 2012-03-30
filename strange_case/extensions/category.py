@@ -41,8 +41,8 @@ class CategoryDetail(JinjaNode):
     index_node = None
 
     def __init__(self, config, target_path, category):
+        self.config['title'] = category
         super(CategoryDetail, self).__init__(config, CategoryDetail.source_path, target_path)
-        self.title = category
         self.count = 0
         self.pages = []
 
