@@ -86,7 +86,6 @@ import math
 from strange_case.registry import Registry
 from strange_case.nodes.jinja import JinjaNode
 from strange_case.nodes import Processor
-from strange_case.processors import build_node
 import types
 
 
@@ -213,10 +212,12 @@ def paginated_processor(config, source_path, target_path):
                     )
             # page configuration can be further customized by creating a
             # pages: {} dictionary.  The key names should be the page index
-            more_page_config = self.config.get('pages', {}).get(1 + len(ret), None)
+            page_index = 1 + len(ret)
+            more_page_config = self.config.get('pages', {}).get(page_index, None)
             if more_page_config:
                 page_config.update(more_page_config)
-            page_config.setdefault('title', "%s %i" % (page_title, 1 + len(ret)))
+                print page_config
+            page_config.setdefault('title', "%s %i" % (page_title, page_index))
             page_config.setdefault('page', page)
             page_config.setdefault('iterable', False)
             Registry.configurate(page_config, source_path)
