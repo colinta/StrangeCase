@@ -268,7 +268,7 @@ def run():
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            sys.stderr("Stopping\n")
+            sys.stderr.write("Stopping\n")
             observer.stop()
         observer.join()
     else:
