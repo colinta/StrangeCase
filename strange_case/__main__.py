@@ -2,6 +2,12 @@ import os
 import sys
 import yaml
 
+notifier = None
+try:
+    from gntp import notifier
+except ImportError:
+    pass
+
 from fnmatch import fnmatch
 from strange_case.registry import Registry
 from strange_case.processors import build_node
@@ -68,6 +74,23 @@ def strange_case(config):
             p_rel = os.path.relpath(p)
             sys.stderr.write("\033[31mrmdir\033[0m \033[1m" + p_rel + "\033[0m\n")
             os.removedirs(p)
+
+    if notifier:
+        growl = notifier.GrowlNotifier(
+            applicationName="StrangeCase",
+            notifications=["New Messages"],
+            defaultNotifications=["New Messages"],
+        )
+        growl.register()
+
+        # Send one message
+        growl.notify(
+            noteType="New Messages",
+            title="StrangeCase site generated",
+            description="site is available at:\n"
+                "{config[deploy_path]}"\
+                .format(config=config),
+        )
 
 
 def fancy_import(import_name):
