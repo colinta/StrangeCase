@@ -43,6 +43,7 @@ def strange_case(config):
     config.setdefault('type', 'root')
     Node.files_written = []
     root_node = build_node(config, site_path, deploy_path, '')[0]
+    Registry.set('root', root_node)
 
     remove_stale_files = config['remove_stale_files']
     dont_remove = config['dont_remove']

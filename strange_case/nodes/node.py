@@ -1,5 +1,6 @@
 import urllib
 from strange_case.config_dict import config_copy
+from strange_case.registry import Registry
 
 
 def check_config_first(fn):
@@ -248,6 +249,21 @@ class Node(object):
         for child in self.children:
             if child.name == key:
                 return child
+
+        # look for a "pointer" attribute
+        if not key.endswith(' ->'):
+            try:
+                ret = self[key + ' ->']
+                path = ret.split('.')
+                assert path.pop(0) == 'site'
+                search_in = Registry.get('root')
+                while path:
+                    part = path.pop(0)
+                    search_in = search_in[part]
+                return search_in
+            except AttributeError:
+                pass
+
         raise AttributeError
 
     def __len__(self):

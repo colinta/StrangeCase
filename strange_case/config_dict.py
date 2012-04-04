@@ -15,6 +15,14 @@ class ConfigDict(dict):
             ret[key] = copy.deepcopy(self[key])
         return ret
 
+    def __setitem__(self, key, value):
+        if key.endswith(' ->'):
+            try:
+                del self[key[:-3]]
+            except KeyError:
+                pass
+        return super(ConfigDict, self).__setitem__(key, value)
+
 
 def config_copy(source, parent=None):
     ret = ConfigDict({}, parent)
