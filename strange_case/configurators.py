@@ -127,7 +127,7 @@ def folder_config_file(source_file, config):
 
 
 def front_matter_config(source_file, config):
-    if config['type'] == 'page' and os.path.isfile(source_file):
+    if config['type'] != 'asset' and os.path.isfile(source_file):
         with open(source_file, 'r') as f:
             contents = f.read()
             front_config_match = re.match(r"\A([`]{3,})$", contents, re.MULTILINE)
