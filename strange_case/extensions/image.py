@@ -21,6 +21,10 @@ class ImageNode(FileNode):
             size = self.config['size']
             if isinstance(size, basestring):
                 size = self.config['size'].split('x')
+                if len(size) == 1:
+                    size = [size[0], size[0]]
+            elif isinstance(size, int):
+                size = [size, size]
             # ensure working with ints - strings do nothing (no error, nothing!)
             size[0] = int(size[0])
             size[1] = int(size[1])
@@ -33,17 +37,40 @@ class ImageNode(FileNode):
 
 
 def processor(config, source_path, target_path):
+    """
+    If 'thumbnails' or 'thumbnail' has been set, thumbnails will be generated.
+
+    Examples:
+        thumbnail: 75x150  # one thumbnail, specifying width and height as a string
+        thumbnails:  # multiple thumbnails, by name
+            medium: [200, 200]  # array of [width, height]
+            large: 1000         # max dimension for both width and height
+        thumbnails:  # multiple thumbnails by index
+            - 200  # this will be image_node.thumbnail
+            - 1000  # this will be image_node.thumbnail_2
+    """
     image_node = ImageNode(config, source_path, target_path)
+
+    if 'thumbnail' in config and 'thumbnails' not in config:
+        config['thumbnails'] = {'thumbnail': config['thumbnail']}
+
     if 'thumbnails' not in config:
         return (image_node,)
 
     thumbs = []
+    thumb_index = 0
     for thumbnail in config['thumbnails']:
+        if isinstance(config['thumbnails'], list):
+            thumb_index += 1
+            size = thumbnail
+            thumbnail = thumb_index = 1 and 'thumbnail' or 'thumbnail_' + thumb_index
+        else:
+            size = config['thumbnails'][thumbnail]
         target_name, ext = os.path.splitext(image_node.target_name)
         target_name += '_' + thumbnail
         target_name += ext
         thumb_config = image_node.config_copy(name=thumbnail, target_name=target_name)
-        thumb_config['size'] = config['thumbnails'][thumbnail]
+        thumb_config['size'] = size
         thumb_config['iterable'] = False
         thumb_config['is_thumbnail'] = True
 
