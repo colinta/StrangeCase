@@ -39,8 +39,6 @@ def strange_case(config):
 
     # this is the one folder that *doesn't* get processed by processors.build_page_tree,
     # so it needs special handling here.
-    # config_path = os.path.join(deploy_path, config['config_file'])
-    # config.update(check_for_config(config_path))
     config.setdefault('type', 'root')
     Node.files_written = []
     root_node = build_node(config, site_path, deploy_path, '')[0]
