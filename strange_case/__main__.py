@@ -1,6 +1,7 @@
 import os
 import sys
 import yaml
+import pickle
 
 notifier = None
 try:
@@ -53,6 +54,15 @@ def strange_case(config):
     else:
         os.makedirs(deploy_path, 0755)
     root_node.generate()
+
+    # create timestamps file
+    timestamps = {}
+    for file_tracked in Node.files_tracked:
+        f = os.path.abspath(file_tracked)
+        timestamps[f] = os.stat(file_tracked).st_mtime
+    timestamps_file = os.path.join(config['project_path'], '.timestamps')
+    pickle.dump(timestamps, open(timestamps_file, 'w'))
+
     if remove_stale_files and existing_files:
         paths = []
         for f in existing_files:
@@ -255,6 +265,16 @@ def run():
 
     if 'file_types +' in CONFIG:
         CONFIG['file_types'].extend(CONFIG['file_types +'])
+
+    # read timestamps file
+    timestamps_file = os.path.join(CONFIG['project_path'], '.timestamps')
+    if os.path.exists(timestamps_file):
+        CONFIG['file_mtimes'] = pickle.load(open(timestamps_file))
+
+    timestamps = {}
+    for file_tracked in Node.files_tracked:
+        f = os.path.abspath(file_tracked)
+        timestamps[f] = os.stat(file_tracked).st_mtime
 
     if args.watch:
         import time

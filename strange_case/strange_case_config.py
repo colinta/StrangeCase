@@ -35,6 +35,7 @@ CONFIG = ConfigDict({
         order_from_name,
         date_from_name,  # yup, try again!
         title_from_name,
+        skip,  # sets 'skip' if mtime is set
     ],
     'dont_inherit': [
         'type',
@@ -44,7 +45,9 @@ CONFIG = ConfigDict({
         'created_at',
         'order',
         'is_index',
+        'skip',
     ],
+    'file_mtimes': {},
     'file_types': [
         ('page', ('*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt')),
     ],

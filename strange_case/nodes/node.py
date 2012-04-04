@@ -20,6 +20,8 @@ class Node(object):
     Parent class for all nodes (pages and folders)
     """
 
+    # stores the tracked files, which is used to write the timestamps file
+    files_tracked = []
     # stores a list of files written, so that stale files can be removed
     files_written = []
 

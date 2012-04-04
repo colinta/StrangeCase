@@ -41,10 +41,12 @@ class ScssNode(FileNode):
     Converts a .scss file into css
     """
     def generate_file(self, site, source_path, target_path):
-        scss_content = open(source_path, 'r').read()
-        css_content = scss_compiler(scss_content)
-        with open(target_path, 'w') as f:
-            f.write(css_content)
+        if not self['skip']:
+            scss_content = open(source_path, 'r').read()
+            css_content = scss_compiler(scss_content)
+            with open(target_path, 'w') as f:
+                f.write(css_content)
+        self.files_tracked.append(source_path)
         self.files_written.append(target_path)
 
 

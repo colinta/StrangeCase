@@ -17,23 +17,28 @@ class ImageNode(FileNode):
     """
     def generate_file(self, site, source_path, target_path):
         if 'size' in self.config:
-            image = Image.open(source_path)
-            size = self.config['size']
-            if isinstance(size, basestring):
-                size = self.config['size'].split('x')
-                if len(size) == 1:
-                    size = [size[0], size[0]]
-            elif isinstance(size, int):
-                size = [size, size]
-            # ensure working with ints - strings do nothing (no error, nothing!)
-            size[0] = int(size[0])
-            size[1] = int(size[1])
-            image.thumbnail(size, Image.ANTIALIAS)
-            image.save(target_path)
-            self.files_written.append(target_path)
+            if not self['skip']:
+                image = Image.open(source_path)
+                size = self.config['size']
+
+                if isinstance(size, basestring):
+                    size = self.config['size'].split('x')
+                    if len(size) == 1:
+                        size = [size[0], size[0]]
+                elif isinstance(size, int):
+                    size = [size, size]
+
+                # ensure working with ints - strings do nothing in PIL (no
+                # error, nothing!)
+                size[0] = int(size[0])
+                size[1] = int(size[1])
+                image.thumbnail(size, Image.ANTIALIAS)
+                image.save(target_path)
         else:
-            copy2(source_path, target_path)
-            self.files_written.append(target_path)
+            if not self['skip']:
+                copy2(source_path, target_path)
+            self.files_tracked.append(source_path)
+        self.files_written.append(target_path)
 
 
 def processor(config, source_path, target_path):
@@ -73,6 +78,7 @@ def processor(config, source_path, target_path):
         thumb_config['size'] = size
         thumb_config['iterable'] = False
         thumb_config['is_thumbnail'] = True
+        thumb_config['skip'] = config['skip']
 
         Registry.configurate(thumb_config, os.path.join(source_path, target_name))
         thumbnail_node = ImageNode(thumb_config, source_path, target_path)
