@@ -5,6 +5,7 @@ import yaml
 notifier = None
 try:
     from gntp import notifier
+    import socket
 except ImportError:
     pass
 
@@ -74,21 +75,24 @@ def strange_case(config):
             os.removedirs(p)
 
     if notifier:
-        growl = notifier.GrowlNotifier(
-            applicationName="StrangeCase",
-            notifications=["New Messages"],
-            defaultNotifications=["New Messages"],
-        )
-        growl.register()
+        try:
+            growl = notifier.GrowlNotifier(
+                applicationName="StrangeCase",
+                notifications=["New Messages"],
+                defaultNotifications=["New Messages"],
+            )
+            growl.register()
 
-        # Send one message
-        growl.notify(
-            noteType="New Messages",
-            title="StrangeCase site generated",
-            description="site is available at:\n"
-                "{config[deploy_path]}"\
-                .format(config=config),
-        )
+            # Send one message
+            growl.notify(
+                noteType="New Messages",
+                title="StrangeCase site generated",
+                description="site is available at:\n"
+                    "{config[deploy_path]}"\
+                    .format(config=config),
+            )
+        except socket.error:
+            pass
 
 
 def fancy_import(import_name):
