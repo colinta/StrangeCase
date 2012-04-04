@@ -10,20 +10,14 @@ except ImportError:
 markdowner = markdown2.Markdown()
 
 
-# filter
+# markdown filter
 def markdown(markdown):
     return markdowner.convert(markdown).strip()
 
 
-#block
+# markdown block
 class MarkdownExtension(jinja2.ext.Extension):
-    tags = set(['markdown'])
-
-    def __init__(self, environment):
-        super(MarkdownExtension, self).__init__(environment)
-        environment.extend(
-            markdowner=markdowner
-        )
+    tags = ('markdown',)
 
     def parse(self, parser):
         lineno = parser.stream.next().lineno
@@ -32,11 +26,11 @@ class MarkdownExtension(jinja2.ext.Extension):
             drop_needle=True
         )
         return jinja2.nodes.CallBlock(
-            self.call_method('_markdown_support'),
+            self.call_method('markdown'),
             [],
             [],
             body
         ).set_lineno(lineno)
 
-    def _markdown_support(self, caller):
-        return self.environment.markdowner.convert(caller()).strip()
+    def markdown(self, caller):
+        return markdowner.convert(caller()).strip()
