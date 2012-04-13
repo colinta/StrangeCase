@@ -7,11 +7,10 @@ class JinjaNode(PageNode):
     A JinjaNode object is rendered before copied to its destination
     """
     def generate_file(self, site, source_path, target_path):
-        if not self['skip']:
-            content = self.render(site)
+        content = self.render(site)
 
-            with open(target_path, 'w') as dest:
-                dest.write(content.encode('utf-8'))
+        with open(target_path, 'w') as dest:
+            dest.write(content.encode('utf-8'))
 
         self.files_tracked.append(source_path)
         self.files_written.append(target_path)
