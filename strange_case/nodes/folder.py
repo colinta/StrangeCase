@@ -14,7 +14,10 @@ class FolderNode(Node):
         folder = os.path.join(self.target_folder, self.target_name)
         if not os.path.isdir(folder):
             os.mkdir(folder, 0755)
-        self.files_tracked.append(self.source_path)
+
+        # folders can be 'virtual', like the category folder
+        if self.source_path:
+            self.files_tracked.append(self.source_path)
         self.files_written.append(folder)
         super(FolderNode, self).generate(site)
 
