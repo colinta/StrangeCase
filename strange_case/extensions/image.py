@@ -17,7 +17,9 @@ class ImageNode(FileNode):
     """
     def generate_file(self, site, source_path, target_path):
         if 'size' in self.config:
-            if not self['skip']:
+            if self['skip']:
+                print "Skipping %s" % target_path
+            else:
                 image = Image.open(source_path)
                 size = self.config['size']
 
