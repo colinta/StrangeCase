@@ -280,5 +280,8 @@ class Node(object):
     def __contains__(self, obj):
         return obj in self.children
 
+    def __str__(self, indent=''):
+        return self.url
+
     def __repr__(self, indent=''):
         return "%s<url: %s type:%s>" % (indent, self.url, str(type(self)))
