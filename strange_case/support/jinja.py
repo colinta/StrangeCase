@@ -1,3 +1,15 @@
+"""
+Jinja support adds the following abilities:
+
+1. Adds a ``YamlFrontMatterLoader``, which searchs the beginning of the file for
+   YAML between two lines of an equal number of three or more dashes.
+
+   These lines are stripped off before rendering.
+2. Jinja has nice support for displaying errors, but the YAML front matter
+   confuses things.  This module fixes that, too, using a ``StrangeCaseStr``
+   which keeps track of how many lines to ignore.  The blank lines are included
+   during compilation, and removed after the file is generated.
+"""
 import re
 from jinja2 import FileSystemLoader, Environment, Template
 from jinja2.utils import internalcode
@@ -71,11 +83,9 @@ class YamlFrontMatterLoader(FileSystemLoader):
 
     @internalcode
     def load(self, environment, name, globals=None):
-        """Loads a template.  This method looks up the template in the cache
-        or loads one by calling :meth:`get_source`.  Subclasses should not
-        override this method as loaders working on collections of other
-        loaders (such as :class:`PrefixLoader` or :class:`ChoiceLoader`)
-        will not call this method but `get_source` directly.
+        """
+        If a ``StrangeCaseStr`` is found, ``str.number_yaml_lines`` are stripped
+        off the front of the file after it is generated.
         """
         code = None
         if globals is None:
