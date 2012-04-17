@@ -14,5 +14,16 @@ def output_error(msg):
     sys.exit(1)
 
 
+def output_warning(msg):
+    import sys
+    if msg[-1] != "\n":
+        msg += "\n"
+    sys.stderr.write(msg)
+
+
 def require_package(pkg):
     output_error("\033[1m" + pkg + "\033[0m is required.\n  > pip install " + pkg)
+
+
+def recommend_package(pkg):
+    output_warning("\033[1m" + pkg + "\033[0m is recommend.\n  > pip install " + pkg)

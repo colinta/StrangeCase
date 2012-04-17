@@ -6,6 +6,12 @@ except ImportError:
     from strange_case import require_package
     require_package('Markdown2')
 
+try:
+    import pygments
+except ImportError:
+    from strange_case import require_package
+    recommend_package('pygments')
+
 
 markdowner = markdown2.Markdown()
 
