@@ -6,11 +6,11 @@ from fnmatch import fnmatch
 from functools import wraps
 
 
-def provides(*confs):
+def provides(conf):
     def decorator(function):
         @wraps(function)
         def wrapper(source_file, config):
-            if all(conf not in config for conf in confs):
+            if conf not in config:
                 return function(source_file, config)
             return config
         return wrapper
