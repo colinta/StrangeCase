@@ -13,7 +13,8 @@ except ImportError:
     recommend_package('pygments')
 
 
-markdowner = markdown2.Markdown()
+markdowner = markdown2.Markdown(extras=["fenced-code-blocks", "header-ids",
+    "code-friendly"])
 
 
 # markdown filter
