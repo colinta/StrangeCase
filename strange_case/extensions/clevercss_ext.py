@@ -40,22 +40,22 @@ class CleverCssNode(FileNode):
     Converts a .ccss file into css
     """
     def generate_file(self, site, source_path, target_path):
+        if self['skip']:
+            print 'Skipping %s' % target_path
         if not self['skip']:
             ccss_content = open(source_path, 'r').read()
             css_content = clevercss_compiler(ccss_content)
-            with open(self.target_path) as f:
+            with open(target_path, 'w') as f:
                 f.write(css_content)
         self.files_tracked.append(source_path)
         self.files_written.append(target_path)
 
-        super(CleverCssNode, self).generate(site)
-
 
 def processor(config, source_path, target_path):
     if config['target_name'][-4:] == 'ccss':
-        config['target_name'][-4:] = 'css'
+        config['target_name'] = config['target_name'][:-4] + 'css'
     if config['target_name'][-9:] == 'clevercss':
-        config['target_name'][-9:] = 'css'
+        config['target_name'] = config['target_name'][:-9] + 'css'
 
     ccss_node = CleverCssNode(config, source_path, target_path)
     return (ccss_node,)
