@@ -52,9 +52,9 @@ class CleverCssNode(FileNode):
 
 
 def processor(config, source_path, target_path):
-    if config['target_name'][-4:] == 'ccss':
+    if config['target_name'].endswith('ccss'):
         config['target_name'] = config['target_name'][:-4] + 'css'
-    if config['target_name'][-9:] == 'clevercss':
+    if config['target_name'].endswith('clevercss'):
         config['target_name'] = config['target_name'][:-9] + 'css'
 
     ccss_node = CleverCssNode(config, source_path, target_path)
