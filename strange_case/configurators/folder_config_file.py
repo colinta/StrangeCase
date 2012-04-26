@@ -3,7 +3,7 @@ import yaml
 
 
 def folder_config_file(source_file, config):
-    if config['type'] == 'folder':
+    if config['type'] == 'folder' and config.get('config_file'):
         # the config is read *before* its processor is invoked (so no matter what processor you
         # use, it is guaranteed that its config is complete)
         config_path = os.path.join(source_file, config['config_file'])
@@ -14,6 +14,6 @@ def folder_config_file(source_file, config):
             if yaml_config:
                 config.update(yaml_config)
         # if { ignore: true }, the entire directory is ignored
-        if config['ignore'] is True:
+        if config.get('ignore') is True:
             return
     return config

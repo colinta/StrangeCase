@@ -23,7 +23,7 @@ def front_matter_config(source_file, config):
                 eval(config_code, config, config)
                 return config
 
-            front_matter_match = re.match(r"\A([-]{3,})$", contents, re.MULTILINE)
+            front_matter_match = re.match(r"\A([-]{3,})$(.*\n)*?\1", contents, re.MULTILINE)
             if front_matter_match:
                 offset = len(front_matter_match.group(0)) + 1  # +1 for newline
                 delim = re.compile("^" + front_matter_match.group(1) + "$")
