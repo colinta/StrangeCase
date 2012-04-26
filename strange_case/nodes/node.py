@@ -96,10 +96,16 @@ class Node(object):
             self.append(child)
 
     def remove(self, child):
+        if child.parent == self:
+            child.parent = None
         if child in self.children:
             self.children.remove(child)
 
-    def insert(self, i, children):
+    def insert(self, i, child_or_children):
+        if isinstance(child_or_children, list) or isinstance(child_or_children, tuple):
+            children = child_or_children
+        else:
+            children = [child_or_children]
         for child in children:
             if child.parent:
                 child.parent.remove(child)
@@ -130,7 +136,7 @@ class Node(object):
         ret = [self]
         while current.parent:
             for page in current.parent.all():
-                if page.config['is_index'] and page != self:
+                if page.config.get('is_index') and page != self:
                     ret.insert(0, page)
                     break
             current = current.parent
@@ -198,7 +204,7 @@ class Node(object):
     def iterable(self):
         # if this file is an index file, it will not be included in the pages iterator.
         # all other pages and assets are iterable.
-        if not self.config['is_index']:
+        if not self.config.get('is_index'):
             return True
         return False
 

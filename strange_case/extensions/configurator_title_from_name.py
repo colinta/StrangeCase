@@ -10,7 +10,8 @@ def titlecase(s):
                              mo.group(0)[1:].lower(),
                   s)
     s = re.sub(r'\b(A|The)\b', lambda mo: mo.group(1).lower(), s)
-    s = s[0].upper() + s[1:]
+    if len(s) > 1:
+        s = s[0].upper() + s[1:]
     return s
 
 
