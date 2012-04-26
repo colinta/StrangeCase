@@ -37,6 +37,8 @@ Already!?  Geez::
 
     #strangecase @ irc.freenode.net
 
+    (i'm colinta)
+
 
 -----------
 QUICK START
