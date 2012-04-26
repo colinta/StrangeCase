@@ -4,7 +4,10 @@ import datetime
 from strange_case.configurators import provides
 
 
-DATE_YMD_RE = re.compile(r'(?P<year>[1-9]\d{3})(?:([-_])(?P<month>\d{2})(?:\2(?P<day>\d{2}))?)?\2(?P<name>.*)')
+DATE_YMD_RE = re.compile(r'(?P<year>[1-9]\d{3})' + \
+                         r'(?:([-_])(?P<month>\d{2})' + \
+                         r'(?:([-_])(?P<day>\d{2}))?' + \
+                         r')?([-_])(?P<name>.*)')
 
 
 @provides('created_at')
@@ -20,12 +23,13 @@ def created_at_from_name(source_file, config):
         if matches.group('month') is not None:
             month = int(matches.group('month'))
         else:
-            month = int(matches.group('month'))
+            month = 1
 
         if matches.group('day') is not None:
             day = int(matches.group('day'))
         else:
             day = 1
+
         date = datetime.date(
             year=year,
             month=month,

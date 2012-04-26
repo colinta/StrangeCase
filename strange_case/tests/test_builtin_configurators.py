@@ -1,22 +1,6 @@
 import os
 from strange_case.configurators import *
-
-
-def test_test_setup():
-    assert True == os.path.isdir(get_test_file('a_folder'))
-
-    assert True == os.path.exists(get_test_file('a_folder/a_file.bin'))
-    assert True == os.path.exists(get_test_file('a_folder/a_file.txt'))
-    assert True == os.path.exists(get_test_file('a_folder/bad_page1.j2'))
-    assert True == os.path.exists(get_test_file('a_folder/bad_page2.j2'))
-    assert True == os.path.exists(get_test_file('a_folder/config.yaml'))
-    assert True == os.path.exists(get_test_file('a_folder/files_config.yaml'))
-    assert True == os.path.exists(get_test_file('a_folder/ignore_config.yaml'))
-    assert True == os.path.exists(get_test_file('a_folder/page.j2'))
-    assert True == os.path.exists(get_test_file('a_folder/page_ticks.j2'))
-
-    assert False == os.path.exists(get_test_file('a_folder/HUH.yml'))
-    assert False == os.path.exists(get_test_file('a_folder/not_a_file.j2'))
+from strange_case.tests import *
 
 
 def test_provides_decorator():
@@ -38,10 +22,6 @@ def test_provides_decorator():
 
     assert a['dont_change_me'] == 'not changed'
     assert a['change_me'] == 'changed'
-
-
-def get_test_file(source):
-    return os.path.join(os.path.dirname(__file__), source)
 
 
 def test_file_types_folder():
