@@ -396,7 +396,7 @@ Some nodes can't know what content they will generate until the entire site is
 scanned.  Like categories!  We need to know *all* the pages in the site before
 we know what all the categories are, and how many pages have that category.
 
-These nodes are stored as ``ProcessorNode``s, and they are nodes that say "hold
+These nodes are stored as ``Processor``s, and they are nodes that say "hold
 on, I'm not ready yet...".  They must implement a ``populate`` method, which
 when called *removes* the processor node from the tree and replaces itself with
 nodes (or it can insert nodes elsewhere in the tree, or do nothing I suppose).
