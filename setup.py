@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
         name="StrangeCase",
-        version="v4.0.3",
+        version="v4.0.4",
         author="Colin Thomas-Arnold",
         author_email="colinta.com",
         url="https://github.com/colinta/StrangeCase",
@@ -25,6 +25,7 @@ setup(
 
         packages=[
             "strange_case",
+            "strange_case.configurators",
             "strange_case.extensions",
             "strange_case.nodes",
             "strange_case.support",
