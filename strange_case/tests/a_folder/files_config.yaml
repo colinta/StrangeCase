@@ -1,0 +1,4 @@
+files:
+  a_file.txt: { is_a_file: true }
+  a_file.bin: { is_a_file: true }
+  page.j2: { is_a_file: false }
