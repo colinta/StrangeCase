@@ -286,7 +286,7 @@ while I would *also* love it if everyone studied all this documentation, I
 understand that this is a lot to read, and by now you probably already have a
 good, pointed question.  Hit me up in the #strangecase room on freenode.
 
-`strangecase`_
+`strangecase <irc://irc.freenode.net/strangecase>`_
 
 --------------------
 STRANGECASE OVERVIEW
@@ -937,10 +937,9 @@ All rights reserved.
 
 See LICENSE_ for more details (it's a simplified BSD license).
 
-.. _jekyll:  https://github.com/mojombo/jekyll
-.. _hyde:    http://ringce.com/hyde
-.. _Jinja2:  http://jinja.pocoo.org/
-.. _LICENSE: https://github.com/colinta/StrangeCase/blob/master/LICENSE
-.. _PIL:     http://www.pythonware.com/products/pil/
-.. _webby:   http://webby.rubyforge.org/
-.. _strangecase: irc://irc.freenode.net/strangecase
+.. _jekyll:       https://github.com/mojombo/jekyll
+.. _hyde:         http://ringce.com/hyde
+.. _Jinja2:       http://jinja.pocoo.org/
+.. _LICENSE:      https://github.com/colinta/StrangeCase/blob/master/LICENSE
+.. _PIL:          http://www.pythonware.com/products/pil/
+.. _webby:        http://webby.rubyforge.org/
