@@ -1,4 +1,5 @@
 import os
+import datetime
 
 from strange_case.configurators import provides
 
@@ -7,7 +8,8 @@ from strange_case.configurators import provides
 def file_ctime(source_file, config):
     try:
         f = os.path.abspath(source_file)
-        config['file_ctime'] = os.path.getctime(f)
+        ctime = os.path.getctime(f)
+        config['file_ctime'] = datetime.datetime.fromtimestamp(ctime)
     except OSError:
         pass
     return config
@@ -17,7 +19,8 @@ def file_ctime(source_file, config):
 def file_mtime(source_file, config):
     try:
         f = os.path.abspath(source_file)
-        config['file_mtime'] = os.path.getmtime(f)
+        mtime = os.path.getmtime(f)
+        config['file_mtime'] = datetime.datetime.fromtimestamp(mtime)
     except OSError:
         pass
     return config

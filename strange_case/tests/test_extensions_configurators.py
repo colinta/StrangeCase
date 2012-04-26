@@ -101,3 +101,12 @@ def test_title_from_name():
     config = setdefault_name(source_file, config)
     config = title_from_name(source_file, config)
     assert config['title'] == 'The File Is a File the File'
+
+
+def test_file_stats():
+    source_file = get_test_file('a_folder/a_file.txt')
+    config = {}
+    config = file_ctime(source_file, config)
+    config = file_mtime(source_file, config)
+    assert isinstance(config['file_ctime'], datetime.datetime)
+    assert isinstance(config['file_mtime'], datetime.datetime)
