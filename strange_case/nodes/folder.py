@@ -26,8 +26,7 @@ class FolderNode(Node):
     ##|                        |##
     @property
     def url(self):
-        url = super(FolderNode, self).url
-        return url + '/'
+        return super(FolderNode, self).url + '/'
 
     @property
     @check_config_first

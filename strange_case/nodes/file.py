@@ -1,5 +1,4 @@
 import os
-import urllib
 from strange_case.nodes import Node, check_config_first
 
 
@@ -27,18 +26,6 @@ class FileNode(Node):
     ##|                        |##
     ##|  "special" properties  |##
     ##|                        |##
-    @property
-    def url(self):
-        if self.config.get('is_index'):
-            url = ''
-        else:
-            url = self.config.get('url', self.target_name)
-
-        if self.parent:
-            url = self.parent.url + url
-
-        return urllib.quote(url)
-
     @property
     @check_config_first
     def is_asset(self):

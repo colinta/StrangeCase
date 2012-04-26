@@ -1,4 +1,5 @@
 import urllib
+
 from strange_case.config_dict import config_copy
 from strange_case.registry import Registry
 
@@ -135,10 +136,7 @@ class Node(object):
         current = self
         ret = [self]
         while current.parent:
-            for page in current.parent.all():
-                if page.config.get('is_index') and page != self:
-                    ret.insert(0, page)
-                    break
+            ret.insert(0, current.parent)
             current = current.parent
 
         return ret
@@ -193,19 +191,14 @@ class Node(object):
     ##|                        |##
     @property
     def url(self):
-        url = self.config.get('url', self.target_name)
         if self.parent:
-            url = self.parent.url + url  # you might be tempted to add a '/' here, but you'd be wrong!  (folders add a slash to themselves)
-        return urllib.quote(url)
+            prefix = self.parent.url
+        else:
+            prefix = '/'
 
-    @property
-    @check_config_first
-    def iterable(self):
-        # if this file is an index file, it will not be included in the pages iterator.
-        # all other pages and assets are iterable.
-        if not self.config.get('is_index'):
-            return True
-        return False
+        url = self.config.get('url', urllib.quote(self.target_name))
+
+        return prefix + url
 
     @property
     @check_config_first

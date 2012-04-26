@@ -99,6 +99,7 @@ def test_title_from_name():
         'name': 'the_file_is_a_file_the_file'
     }
     config = setdefault_name(source_file, config)
+    config = setdefault_target_name(source_file, config)
     config = title_from_name(source_file, config)
     assert config['title'] == 'The File Is a File the File'
 

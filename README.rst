@@ -621,9 +621,8 @@ is because *everything it does* can be controlled using the config. ::
       '.jinja2': '.html'
       '.jinja': '.html',
       '.md': '.html',
-    index.html: index.html                    # determines which file is the index file
+    index.html: index.html                    # determines which file is the index file, which in turn determines "iterability" (index pages are not iterable)
     html_extension: '.html'                   # files with this extension are html files (`page.is_page` => `True`)
-    is_index: false                           # any file whose target_name matches this name will not be iterable
 
     # PROTECTED
     # these can only be assigned in the root config file, otherwise they will

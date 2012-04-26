@@ -8,6 +8,7 @@ class TestParentNode(Node):
             'test_it': 'test_it',
             'target_name': name,
             'name': name,
+            'iterable': True,
         }
         super(TestParentNode, self).__init__(config=config,
                                   target_folder='target')
@@ -32,6 +33,7 @@ class TestPageNode(PageNode):
         config = {
             'target_name': name,
             'name': name,
+            'iterable': True,
         }
         super(TestPageNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/a_file.txt'),
@@ -41,9 +43,10 @@ class TestPageNode(PageNode):
 class TestIndexNode(PageNode):
     def __init__(self, name):
         config = {
-            'is_index': True,
+            'url': '',
             'target_name': name,
             'name': name,
+            'iterable': False,
         }
         super(TestIndexNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/a_file.txt'),
@@ -58,7 +61,6 @@ def test_check_config_first():
 
 def test_node_defaults():
     n = TestParentNode()
-    assert n.config == {'test_it': 'test_it', 'target_name': 'test', 'name': 'test'}
     assert n.parent == None
     assert n.children == []
 
@@ -140,7 +142,7 @@ def test_siblings():
     assert c4.parent == p2
     assert c5.parent == p2
 
-    print c1.ancestors
+    print c1.siblings
     assert c1.siblings == [c1, c2, c3, p2]
     assert c1.next == c2
     assert c2.next == c3
@@ -151,7 +153,7 @@ def test_siblings():
     assert c3.prev == c2
     assert p2.prev == c3
 
-    print c4.ancestors
+    print c4.siblings
     assert c4.siblings == [c4]
 
 
@@ -174,7 +176,7 @@ def test_ancestors():
     p2.extend([i2, p3])
     p3.append(c)
     print c.ancestors
-    assert c.ancestors == [i1, i2, c]
+    assert c.ancestors == [p1, p2, p3, c]
 
 
 def test_config_copy():
@@ -225,10 +227,37 @@ def test_getitem_and_getattr():
 
 
 def test_url():
+    config = {}
+    root = RootFolderNode(config, '', '')
+
     config = {
         'name': 'parent',
         'target_name': 'parent',
-        'type': 'folder',
+    }
+    parent = FolderNode(config, 'parent', 'parent')
+    root.append(parent)
+
+    config = {
+        'name': 'bob',
+        'target_name': 'bob.html',
+    }
+    bob = JinjaNode(config, get_test_file('a_folder/page.j2'), '')
+
+    config = {
+        'name': 'jane',
+        'target_name': 'jane.html',
+    }
+    jane = JinjaNode(config, get_test_file('a_folder/page.j2'), '')
+
+    parent.extend([bob, jane])
+
+    assert bob.url == '/parent/bob.html'
+    assert jane.url == '/parent/jane.html'
+
+
+def test_url_override():
+    config = {
+        'url': '/foo/'
     }
     root = RootFolderNode(config, '', '')
 
@@ -243,17 +272,18 @@ def test_url():
     config = {
         'name': 'bob',
         'target_name': 'bob.html',
+        'url': 'bob',
     }
-    bob = Node(config, 'bob.html')
+    bob = JinjaNode(config, get_test_file('a_folder/page.j2'), '')
 
     config = {
-        'name': 'joe',
-        'target_name': 'joe.html',
-        'url': 'joe',
+        'name': 'jane',
+        'target_name': 'jane.xml',
+        'url': 'jane'
     }
-    joe = Node(config, 'joe')
+    jane = AssetNode(config, get_test_file('a_folder/a_file.txt'), '')
 
-    parent.extend([bob, joe])
+    parent.extend([bob, jane])
 
-    assert bob.url == '/parent/bob.html'
-    assert joe.url == '/parent/joe'
+    assert bob.url == '/foo/parent/bob'
+    assert jane.url == '/foo/parent/jane'

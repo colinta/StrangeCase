@@ -254,40 +254,6 @@ def test_setdefault_target_name_dont_rename_extension():
     assert config['target_name'] == 'a_file.txt'
 
 
-def test_setdefault_is_index_true():
-    source_file = get_test_file('a_folder/page.j2')
-    config = {
-        'rename_extensions': {
-            '.j2': '.html',
-        },
-        'index.html': 'page.html'
-    }
-    config = setdefault_target_name(source_file, config)
-    assert config['target_name'] == config['index.html']
-    config = setdefault_is_index(source_file, config)
-    assert config['is_index'] is True
-
-
-def test_setdefault_is_index_dont_override_true():
-    source_file = get_test_file('a_folder/bad_page1.j2')
-    config = {
-        'index.html': 'bad_page1.j2',
-        'is_index': True
-    }
-    config = setdefault_is_index(source_file, config)
-    assert config['is_index'] is True
-
-
-def test_setdefault_is_index_dont_override_false():
-    source_file = get_test_file('a_folder/page.j2')
-    config = {
-        'index.html': 'page.j2',
-        'is_index': False
-    }
-    config = setdefault_is_index(source_file, config)
-    assert config['is_index'] is False
-
-
 def skip_if_not_modified_not_modified():
     source_file = get_test_file('a_folder/a_file.txt')
     mtime = os.stat(source_file).st_mtime
@@ -306,3 +272,87 @@ def skip_if_not_modified_is_modified():
     }
     config = skip_if_not_modified(source_file, config)
     assert config['skip'] is True
+
+
+def test_setdefault_iterable_true():
+    source_file = get_test_file('a_folder/page.j2')
+    config = {
+        'rename_extensions': {
+            '.j2': '.html',
+        },
+        'index.html': 'page.html'
+    }
+    config = setdefault_target_name(source_file, config)
+    assert config['target_name'] == config['index.html']
+    config = setdefault_iterable(source_file, config)
+    assert config['iterable'] is False
+
+
+def test_setdefault_iterable_false():
+    source_file = get_test_file('a_folder/page.j2')
+    config = {
+        'rename_extensions': {
+            '.j2': '.html',
+        },
+        'index.html': 'index.html'
+    }
+    config = setdefault_target_name(source_file, config)
+    assert config['target_name'] != config['index.html']
+    config = setdefault_iterable(source_file, config)
+    assert config['iterable'] is True
+
+
+def test_setdefault_iterable_override_true():
+    source_file = get_test_file('a_folder/bad_page1.j2')
+    config = {
+        'index.html': 'bad_page1.j2',
+        'iterable': True
+    }
+    config = setdefault_iterable(source_file, config)
+    assert config['iterable'] is True
+
+
+def test_setdefault_iterable_override_false():
+    source_file = get_test_file('a_folder/page.j2')
+    config = {
+        'index.html': 'page.j2',
+        'iterable': False
+    }
+    config = setdefault_iterable(source_file, config)
+    assert config['iterable'] is False
+
+
+def test_setdefault_url():
+    source_file = get_test_file('a_folder/page.j2')
+    config = {
+        'rename_extensions': {
+            '.j2': '.html',
+        },
+    }
+    config = setdefault_target_name(source_file, config)
+    config = setdefault_url(source_file, config)
+    assert config['url'] == 'page.html'
+
+
+def test_setdefault_url_index():
+    source_file = get_test_file('a_folder/index.j2')
+    config = {
+        'rename_extensions': {
+            '.j2': '.html',
+        },
+        'index.html': 'index.html'
+    }
+    config = setdefault_target_name(source_file, config)
+    assert config['target_name'] == config['index.html']
+    config = setdefault_url(source_file, config)
+    assert config['url'] == ''
+
+
+def test_setdefault_url_override():
+    source_file = get_test_file('a_folder/bad_page1.j2')
+    config = {
+        'index.html': 'bad_page1.j2',
+        'url': 'bad_page1'
+    }
+    config = setdefault_url(source_file, config)
+    assert config['url'] == 'bad_page1'
