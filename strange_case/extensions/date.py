@@ -10,7 +10,7 @@ def date(value, format='%d %b %Y'):
     elif isinstance(value, basestring):
         value = datetime.datetime.strptime(value, "%Y-%m-%d")
     elif isinstance(value, int) or isinstance(value, float):
-        value = datetime.date.fromtimestamp(value)
+        value = datetime.datetime.fromtimestamp(value)
 
     if isinstance(value, datetime.date):
         return value.strftime(format)
