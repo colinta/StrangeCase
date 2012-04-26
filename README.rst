@@ -33,6 +33,15 @@ INSTALLATION
                      # for changes to source files
 
 
+-----
+HELP!
+-----
+
+Already!?  Geez.
+
+#strangecase @ irc.freenode.net
+
+
 -----------
 QUICK START
 -----------
@@ -275,16 +284,6 @@ pulled out.  I'll add a link to the second project to demonstrate this::
 
 
 This wraps up the tutorial!  Now, I'll explain the inner workings.
-
-
------
-HELP!
------
-
-I would *love* it if everyone who is interested give StrangeCase a try, and
-while I would *also* love it if everyone studied all this documentation, I
-understand that this is a lot to read, and by now you probably already have a
-good, pointed question.  Hit me up in the #strangecase room on freenode.
 
 --------------------
 STRANGECASE OVERVIEW
