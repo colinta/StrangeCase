@@ -9,7 +9,7 @@ except ImportError:
 try:
     import pygments
 except ImportError:
-    from strange_case import require_package
+    from strange_case import recommend_package
     recommend_package('pygments')
 
 
