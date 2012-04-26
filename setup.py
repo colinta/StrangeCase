@@ -1,5 +1,6 @@
 import os
 from setuptools import setup
+from setuptools import find_packages
 
 
 def read(fname):
@@ -23,13 +24,7 @@ setup(
         description="A straightforward python static site generator.",
         long_description=read("README.rst"),
 
-        packages=[
-            "strange_case",
-            "strange_case.configurators",
-            "strange_case.extensions",
-            "strange_case.nodes",
-            "strange_case.support",
-        ],
+        packages=find_packages(),
         keywords="strange_case static site generator",
         platforms="any",
         license="BSD",
