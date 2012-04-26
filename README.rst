@@ -276,6 +276,17 @@ pulled out.  I'll add a link to the second project to demonstrate this::
 
 This wraps up the tutorial!  Now, I'll explain the inner workings.
 
+
+-----
+HELP!
+-----
+
+I would *love* it if everyone who is interested give StrangeCase a try, and
+while I would *also* love it if everyone studied all this documentation, I
+understand that this is a lot to read, and by now you probably already have a
+good, pointed question.  Hit me up in the #strangecase room on freenode
+(@colinta).
+
 --------------------
 STRANGECASE OVERVIEW
 --------------------
@@ -344,7 +355,11 @@ that file, or read about the defaults below.  Next, the project config file is
 merged in.  This is the ``config.yaml`` file that sits at the top of your
 project.  Then command-line arguments are processed.  **Finally**, if a function
 is assigned to ``config_hook``, it will be passed the configuration, and it is
-expected to throw errors or make changes to that object as needed.
+expected to throw errors or make changes to that object as needed.  This is how
+"scaffolding" is accomplished, which is actually just a StrangeCase extension
+and a few handy ``site/`` folders.
+
+When a new node is being built, it starts
 
 There are many ways that configuration can be added to a node during the build
 stage.  The first way is inheritance.  Nodes inherit all the configuration of
@@ -639,6 +654,8 @@ is because *everything it does* can be controlled using the config. ::
       configurators.merge_files_config,       # merges files[filename] with filename
       configurators.setdefault_name,          # if 'name' isn't assigned explicitly, this assigns it based on the file name and extension
       configurators.setdefault_target_name,   # similarly for target_name
+      configurators.setdefault_url,           # Assigns only the "local" part of the URL
+      configurators.setdefault_iterable,      # index files are not iterable
       configurators.folder_config_file,       # processes folder/config.yaml.  If the folder config contains `ignore: true`, the folder is skipped
       configurators.front_matter_config,      # processes YAML front matter.  Again, the file can be ignored using `ignore: true`
       configurators.date_from_name,           # Gets the date from the file name, and strips it from name.
