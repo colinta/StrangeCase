@@ -25,6 +25,7 @@ setup(
 
         packages=[
             "strange_case",
+            "strange_case.configurators",
             "strange_case.extensions",
             "strange_case.nodes",
             "strange_case.support",
