@@ -284,7 +284,7 @@ HELP!
 I would *love* it if everyone who is interested give StrangeCase a try, and
 while I would *also* love it if everyone studied all this documentation, I
 understand that this is a lot to read, and by now you probably already have a
-good, pointed question.  Hit me up in the #strangecase room on freenode
+good, pointed question.  Hit me up in the #`strangecase`_ room on freenode
 (@colinta).
 
 --------------------
@@ -942,3 +942,4 @@ See LICENSE_ for more details (it's a simplified BSD license).
 .. _LICENSE: https://github.com/colinta/StrangeCase/blob/master/LICENSE
 .. _PIL:     http://www.pythonware.com/products/pil/
 .. _webby:   http://webby.rubyforge.org/
+.. _strangecase: irc://irc.freenode.net/strangecase
