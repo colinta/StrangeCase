@@ -192,9 +192,8 @@ class Node(object):
     ##|  "special" properties  |##
     ##|                        |##
     @property
-    @check_config_first
     def url(self):
-        url = self.target_name
+        url = self.config.get('url', self.target_name)
         if self.parent:
             url = self.parent.url + url  # you might be tempted to add a '/' here, but you'd be wrong!  (folders add a slash to themselves)
         return urllib.quote(url)

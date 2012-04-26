@@ -72,7 +72,7 @@ def test_strip_extensions_strip():
     }
     config = setdefault_target_name(source_file, config)
     config = strip_extensions(source_file, config)
-    assert config['target_name'] == 'a_file'
+    assert config['url'] == 'a_file'
 
 
 def test_strip_extensions_strip_default():
@@ -82,7 +82,7 @@ def test_strip_extensions_strip_default():
     }
     config = setdefault_target_name(source_file, config)
     config = strip_extensions(source_file, config)
-    assert config['target_name'] == 'page'
+    assert config['url'] == 'page'
 
 
 def test_strip_extensions_no_strip():
@@ -90,7 +90,7 @@ def test_strip_extensions_no_strip():
     config = {}
     config = setdefault_target_name(source_file, config)
     config = strip_extensions(source_file, config)
-    assert config['target_name'] == 'a_file.txt'
+    assert 'url' not in config
 
 
 def test_title_from_name():

@@ -222,3 +222,38 @@ def test_getitem_and_getattr():
     assert n['bob'] == bob
     assert n.bob == bob
     assert n.friend == joe
+
+
+def test_url():
+    config = {
+        'name': 'parent',
+        'target_name': 'parent',
+        'type': 'folder',
+    }
+    root = RootFolderNode(config, '', '')
+
+    config = {
+        'name': 'parent',
+        'target_name': 'parent',
+        'type': 'folder',
+    }
+    parent = FolderNode(config, 'parent', 'parent')
+    root.append(parent)
+
+    config = {
+        'name': 'bob',
+        'target_name': 'bob.html',
+    }
+    bob = Node(config, 'bob.html')
+
+    config = {
+        'name': 'joe',
+        'target_name': 'joe.html',
+        'url': 'joe',
+    }
+    joe = Node(config, 'joe')
+
+    parent.extend([bob, joe])
+
+    assert bob.url == '/parent/bob.html'
+    assert joe.url == '/parent/joe'
