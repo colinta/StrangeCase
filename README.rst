@@ -926,7 +926,6 @@ LICENSE
 -------
 
 :Author: Colin Thomas-Arnold
-:Version: v2.1.4
 :Copyright: 2012 Colin Thomas-Arnold <http://colinta.com/>
 
 Copyright (c) 2012, Colin Thomas-Arnold
