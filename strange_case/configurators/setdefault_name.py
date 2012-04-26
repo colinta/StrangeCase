@@ -17,7 +17,7 @@ def setdefault_name(source_file, config):
 
     ##|  FIX NAME
     # add the extension if it exists and isn't ".html"
-    if ext and ext != config['html_extension']:
+    if ext and ext != config.get('html_extension'):
         name += '_' + ext[1:]  # pluck off the "." in front
 
     # replace non-word, hyphens, and spaces characters with _
