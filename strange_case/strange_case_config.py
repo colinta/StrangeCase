@@ -23,19 +23,18 @@ CONFIG = ConfigDict({
         # most of these configurators are *very*
         # important, so if you're gonna go messing
         # with them, be warned.
-        file_types,
-        merge_files_config,
-        setdefault_name,
-        setdefault_target_name,
-        setdefault_is_index,
-        folder_config_file,
-        front_matter_config,
-        ignore,
-        date_from_name,
-        order_from_name,
-        date_from_name,  # yup, try again!
-        title_from_name,
-        skip,  # sets 'skip' if mtime is set
+        'strange_case.configurators.file_types',
+        'strange_case.configurators.merge_files_config',
+        'strange_case.configurators.setdefault_name',
+        'strange_case.configurators.setdefault_target_name',
+        'strange_case.configurators.setdefault_is_index',
+        'strange_case.configurators.folder_config_file',
+        'strange_case.configurators.front_matter_config',
+        'strange_case.configurators.ignore',
+        'strange_case.configurators.skip_if_not_modified',  # sets 'skip' if mtime is new
+        'strange_case.extensions.configurators.order_from_name',
+        'strange_case.extensions.configurators.created_at_from_name',
+        'strange_case.extensions.configurators.title_from_name',
     ],
     'dont_inherit': [
         'type',
