@@ -286,10 +286,6 @@ while I would *also* love it if everyone studied all this documentation, I
 understand that this is a lot to read, and by now you probably already have a
 good, pointed question.  Hit me up in the #strangecase room on freenode.
 
-I can't seem to link to this using reStructuredText:
-
-irc://irc.freenode.net/strangecase
-
 --------------------
 STRANGECASE OVERVIEW
 --------------------
