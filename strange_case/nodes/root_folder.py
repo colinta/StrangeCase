@@ -12,7 +12,8 @@ class RootFolderNode(FolderNode):
 
     def generate(self):
         """
-        This is the only Node.generate method that doesn't require the 'site' argument.  it *is* the site arqument!
+        This is the only Node.generate method that doesn't require the 'site'
+        argument.  It *is* the site arqument!
         """
         folder = self.target_folder
         if not os.path.isdir(folder):

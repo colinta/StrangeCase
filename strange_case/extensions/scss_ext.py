@@ -7,7 +7,7 @@ except ImportError:
     require_package('PySCSS')
 
 from strange_case.registry import Registry
-from strange_case.nodes import FileNode
+from strange_case.nodes import AssetNode
 
 
 scss_compiler = Scss().compile
@@ -36,7 +36,7 @@ class ScssExtension(jinja2.ext.Extension):
         return scss_compiler(caller()).strip()
 
 
-class ScssNode(FileNode):
+class ScssNode(AssetNode):
     """
     Converts a .scss file into css
     """

@@ -6,11 +6,11 @@ except ImportError:
     from strange_case import require_package
     require_package('PIL')
 
-from strange_case.nodes import FileNode
+from strange_case.nodes import AssetNode
 from strange_case.registry import Registry
 
 
-class ImageNode(FileNode):
+class ImageNode(AssetNode):
     """
     Copies the image, and optionally creates thumbnails for the image.
     The thumbnails are available as image_node.{thumbnail_name}
@@ -39,7 +39,7 @@ class ImageNode(FileNode):
         else:
             if not self['skip']:
                 copy2(source_path, target_path)
-            self.files_tracked.append(source_path)
+        self.files_tracked.append(source_path)
         self.files_written.append(target_path)
 
 

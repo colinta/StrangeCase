@@ -41,11 +41,10 @@ class FileNode(Node):
 
     @property
     @check_config_first
-    def is_page(self):
-        _, ext = os.path.splitext(self.target_name)
-        return True if ext == self.html_extension else False
+    def is_asset(self):
+        return not self.is_page
 
     @property
     @check_config_first
-    def is_asset(self):
-        return not self.is_page
+    def is_page(self):
+        return False

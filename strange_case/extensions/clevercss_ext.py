@@ -7,7 +7,7 @@ except ImportError:
     require_package('CleverCSS')
 
 from strange_case.registry import Registry
-from strange_case.nodes import FileNode
+from strange_case.nodes import AssetNode
 
 clevercss_compiler = clevercss.convert
 
@@ -35,7 +35,7 @@ class CleverCssExtension(jinja2.ext.Extension):
         return clevercss_compiler(caller()).strip()
 
 
-class CleverCssNode(FileNode):
+class CleverCssNode(AssetNode):
     """
     Converts a .ccss file into css
     """

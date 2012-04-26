@@ -130,8 +130,6 @@ class Node(object):
         ret = [self]
         while current.parent:
             for page in current.parent.all():
-                if 'is_index' not in page.config:
-                    print page.config
                 if page.config['is_index'] and page != self:
                     ret.insert(0, page)
                     break
@@ -269,7 +267,7 @@ class Node(object):
             except AttributeError:
                 pass
 
-        raise AttributeError
+        raise AttributeError(key)
 
     def __len__(self):
         return len([child for child in self.children if child.iterable])
