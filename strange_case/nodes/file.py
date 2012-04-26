@@ -32,7 +32,7 @@ class FileNode(Node):
         if self.config.get('is_index'):
             url = ''
         else:
-            url = self.target_name
+            url = self.config.get('url', self.target_name)
 
         if self.parent:
             url = self.parent.url + url
