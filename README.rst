@@ -895,6 +895,15 @@ These two get associated with ``.scss`` and ``.clevercss`` files and compile the
         - strange_case.extensions.scss_processor
         - strange_case.extensions.clevercss_processor
 
+-------
+TESTING
+-------
+
+I am currently (as of version 4.0.2) including tests::
+
+    > pip install pytest
+    > py.test
+
 ----
 TODO
 ----
