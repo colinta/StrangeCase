@@ -2,10 +2,6 @@
 The Strange Case of...
 ======================
 
-:Author: Colin Thomas-Arnold
-:Version: v2.1.4
-:Copyright: 2012 Colin Thomas-Arnold <http://colinta.com/>
-
 It's yet another static site generator.  Have you seen `jekyll`_?
 `hyde`_?  Yup.  Like those.
 
@@ -37,9 +33,9 @@ INSTALLATION
 HELP!
 -----
 
-Already!?  Geez.
+Already!?  Geez::
 
-#strangecase @ irc.freenode.net
+    #strangecase @ irc.freenode.net
 
 
 -----------
@@ -928,6 +924,10 @@ TODO
 -------
 LICENSE
 -------
+
+:Author: Colin Thomas-Arnold
+:Version: v2.1.4
+:Copyright: 2012 Colin Thomas-Arnold <http://colinta.com/>
 
 Copyright (c) 2012, Colin Thomas-Arnold
 All rights reserved.
