@@ -21,7 +21,7 @@ def title_from_name(source_file, config):
     Title-cases the name and stores it in config['title']
     """
     if is_index(config) and hasattr(config, 'parent'):
-        title = config.parent.name
+        title = config.parent['name']
     else:
         title = config['name']
     title = titlecase(title)

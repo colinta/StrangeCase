@@ -173,13 +173,7 @@ class Node(object):
     ##|  CONFIG COPY
     ##|
     def config_copy(self, all=False, **kwargs):
-        node_config = config_copy(self.config, self)
-
-        # not merged
-        if not all:
-            for key in node_config['dont_inherit']:
-                if key in node_config:
-                    del node_config[key]
+        node_config = config_copy(self.config, self, all=all)
 
         if kwargs:
             node_config.update(kwargs)

@@ -9,11 +9,8 @@ class ConfigDict(dict):
     def update(self, other):
         super(ConfigDict, self).update(other)
 
-    def copy(self):
-        ret = ConfigDict({}, self)
-        for key in self.keys():
-            ret[key] = copy.deepcopy(self[key])
-        return ret
+    def copy(self, all=False):
+        return config_copy(source=self, parent=self, all=all)
 
     def __setitem__(self, key, value):
         if key.endswith(' ->'):
@@ -24,8 +21,14 @@ class ConfigDict(dict):
         return super(ConfigDict, self).__setitem__(key, value)
 
 
-def config_copy(source, parent=None):
+def config_copy(source, parent=None, all=False):
     ret = ConfigDict({}, parent)
     for key in source.keys():
         ret[key] = copy.deepcopy(source[key])
+
+    # not merged
+    if not all:
+        for key in source['dont_inherit']:
+            if key in ret:
+                del ret[key]
     return ret
