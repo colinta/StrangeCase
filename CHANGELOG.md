@@ -1,11 +1,26 @@
 TODO
 ====
 
+* add scaffolding, especially to help create a useful config.yaml file (which
+  is, at this point, pretty much a necessity)
+
 * merge YAML/config using a DSL that allows arrays to be extended instead of replaced
 
 * add CSS/JS compressor/minification/combinator support, probably as a tag.
 
 * table of contents
+
+2012_04_27 - v4.0.10
+====================
+
+* The configurators have been totally broken up into components, with some of
+  them being relegated to "extension" status (`setdefault_title`,
+  `order_from_name`, `created_at_from_name`) and added some new ones
+  (`file_mtime`, `file_ctime`, `strip_extensions`).
+* Opened up the #strangecase chat room on irc.freenode.com.  Join us! :-)
+* Moved `url` and `iterable` "detection" into configuration.  *However*, there
+  **is** still a `url` method on `Node`, which attaches the parent's url.
+* Tests!  Finally added a test framework, using py.test.
 
 2012_03_13 - v3.0.3
 ===================
