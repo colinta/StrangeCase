@@ -8,7 +8,7 @@ class RootFolderNode(FolderNode):
     """
     @property
     def url(self):
-        return self.config.get('url', '/')
+        return '/'
 
     def generate(self):
         """
