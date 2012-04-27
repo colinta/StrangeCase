@@ -22,3 +22,14 @@ def file_types(source_file, config):
             return None
         config['type'] = config['default_type']
         return config
+
+file_types.defaults = {
+    'file_types': [
+        ('page', ('*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt')),
+    ],
+    'default_type': 'asset',
+}
+
+file_types.require_after = [
+    'type',
+]

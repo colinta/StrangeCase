@@ -145,6 +145,15 @@ def run():
         del CONFIG['processors']
 
     configurators = []
+    # load built-in pre configurators
+    for configurator in CONFIG['__configurators_pre__']:
+        if isinstance(configurator, basestring):
+            configurator = fancy_import(configurator)
+        configurators.append(configurator)
+        Registry.add_configurator(configurator)
+    del CONFIG['__configurators_pre__']
+
+    # load user configurators
     if 'configurators' in CONFIG:
         for configurator in CONFIG['configurators']:
             if isinstance(configurator, basestring):
@@ -153,8 +162,23 @@ def run():
             Registry.add_configurator(configurator)
         del CONFIG['configurators']
 
+    # load built-in post configurators
+    for configurator in CONFIG['__configurators_post__']:
+        if isinstance(configurator, basestring):
+            configurator = fancy_import(configurator)
+        configurators.append(configurator)
+        Registry.add_configurator(configurator)
+    del CONFIG['__configurators_post__']
+
     # additional configurators, in addition to the all-important defaults
     if 'configurators +' in CONFIG:
+        sys.error.write('''Built-in Configurators are now considered "protected",
+so the "configurators +" hack is no longer needed.
+
+However, you will probably want to make sure to include the defaults:
+- order_from_name
+- created_at_from_name
+- title_from_name''')
         for configurator in CONFIG['configurators +']:
             if isinstance(configurator, basestring):
                 configurator = fancy_import(configurator)

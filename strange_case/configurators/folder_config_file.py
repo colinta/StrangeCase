@@ -17,3 +17,7 @@ def folder_config_file(source_file, config):
         if config.get('ignore') is True:
             return
     return config
+
+folder_config_file.defaults = {
+    'config_file': 'config.yaml',
+}

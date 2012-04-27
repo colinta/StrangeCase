@@ -8,6 +8,7 @@ except ImportError:
 
 from strange_case.nodes import AssetNode
 from strange_case.registry import Registry
+from strange_case.configurators import configurate
 
 
 class ImageNode(AssetNode):
@@ -82,7 +83,7 @@ def processor(config, source_path, target_path):
         thumb_config['is_thumbnail'] = True
         thumb_config['skip'] = config['skip']
 
-        Registry.configurate(os.path.join(source_path, target_name), thumb_config)
+        configurate(os.path.join(source_path, target_name), thumb_config)
         thumbnail_node = ImageNode(thumb_config, source_path, target_path)
         image_node.config[thumbnail] = thumbnail_node
         thumbs.append(thumbnail_node)

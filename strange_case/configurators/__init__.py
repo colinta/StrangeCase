@@ -1,5 +1,7 @@
 from functools import wraps
 
+from strange_case.registry import Registry
+
 
 def provides(conf):
     def decorator(function):
@@ -14,6 +16,54 @@ def provides(conf):
 
 def is_index(conf):
     return conf['target_name'] == conf.get('index.html', 'index.html')
+
+
+def configurate(source_file, config):
+    configurators = Registry.configurators
+    # Run the config through each configurator.
+    # If a configurator returns a falsey
+    # value, the node will be ignored.
+    for configurator in configurators:
+        config = configurator(source_file, config)
+        if not config:
+            return
+    return config
+
+
+def meta_before(source_file, config):
+    configurators = Registry.configurators
+    for configurator in configurators:
+        if hasattr(configurator, 'defaults'):
+            for key, value in configurator.defaults.iteritems():
+                if key not in config:
+                    config[key] = value
+
+        if hasattr(configurator, 'dont_inherit'):
+            for dont_inherit in configurator.dont_inherit:
+                if dont_inherit not in config:
+                    config['dont_inherit'].append(dont_inherit)
+
+        if hasattr(configurator, 'require_before'):
+            for required in configurator.require_before:
+                if required not in config:
+                    raise TypeError('Missing required config["{required}"] '
+                        'from {configurator.__name__}.require_before'.format(**locals()))
+    return config
+
+meta_before.defaults = {
+    'dont_inherit': [],
+}
+
+
+def meta_after(source_file, config):
+    configurators = Registry.configurators
+    for configurator in configurators:
+        if hasattr(configurator, 'require_after'):
+            for required in configurator.require_after:
+                if required not in config:
+                    raise TypeError('Missing required config["{required}"] '
+                        'from {configurator.__name__}.require_after'.format(**locals()))
+    return config
 
 
 from file_types import file_types

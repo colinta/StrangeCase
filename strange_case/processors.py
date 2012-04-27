@@ -16,12 +16,13 @@ All files will be parsed for front matter unless `dont_process` is `true`.
 import os
 from strange_case.nodes import FolderNode, RootFolderNode, AssetNode, JinjaNode
 from strange_case.registry import Registry
+from strange_case.configurators import configurate
 
 
 def build_node(config, source_path, target_path, file_name):
     source_file = os.path.join(source_path, file_name)
 
-    config = Registry.configurate(source_file, config)
+    config = configurate(source_file, config)
     if not config:
         return
 

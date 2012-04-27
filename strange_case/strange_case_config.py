@@ -19,10 +19,13 @@ CONFIG = ConfigDict({
     'extensions': [],
     'filters': {},
     'processors': [],
-    'configurators': [
-        # most of these configurators are *very*
-        # important, so if you're gonna go messing
-        # with them, be warned.
+    # most of these configurators are *very*
+    # important, so if you're gonna go messing
+    # with them, be warned.
+    #
+    # these are ensured to be loaded first
+    '__configurators_pre__': [
+        'strange_case.configurators.meta_before',
         'strange_case.configurators.file_types',
         'strange_case.configurators.merge_files_config',
         'strange_case.configurators.folder_config_file',
@@ -33,9 +36,16 @@ CONFIG = ConfigDict({
         'strange_case.configurators.setdefault_url',
         'strange_case.configurators.ignore',
         'strange_case.configurators.skip_if_not_modified',  # sets 'skip' if mtime is new
+    ],
+    # these are the defaults
+    'configurators': [
         'strange_case.extensions.configurators.order_from_name',
         'strange_case.extensions.configurators.created_at_from_name',
         'strange_case.extensions.configurators.title_from_name',
+    ],
+    # these are ensured to be loaded last
+    '__configurators_post__': [
+        'strange_case.configurators.meta_after',
     ],
     'dont_inherit': [
         'type',
@@ -49,10 +59,6 @@ CONFIG = ConfigDict({
         'skip',
     ],
     'file_mtimes': {},
-    'file_types': [
-        ('page', ('*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt')),
-    ],
-    'default_type': 'asset',
     'host': u'http://localhost:8000',
     'index.html': u'index.html',
     'rename_extensions': {
