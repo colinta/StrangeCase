@@ -1,10 +1,12 @@
-from strange_case.configurators import provides
+import urllib
 
 
-@provides('url')
 def strip_extensions(source_file, config):
+    if 'url' not in config:
+        config['url'] = urllib.quote(config['target_name'])
+
     for extension in config.get('strip_extensions', ['.html', '.xml']):
-        if config['target_name'].endswith(extension):
-            config['url'] = config['target_name'].rstrip(extension)
+        if config['url'].endswith(extension):
+            config['url'] = config['url'].rstrip(extension)
             break
     return config

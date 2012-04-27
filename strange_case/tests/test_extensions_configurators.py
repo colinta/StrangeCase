@@ -71,6 +71,18 @@ def test_strip_extensions_strip():
         'strip_extensions': ['.txt']
     }
     config = setdefault_target_name(source_file, config)
+    config = setdefault_url(source_file, config)
+    config = strip_extensions(source_file, config)
+    assert config['url'] == 'a_file'
+
+
+def test_strip_extensions_strip_url_already_set():
+    source_file = get_test_file('a_folder/a_file.txt')
+    config = {
+        'strip_extensions': ['.txt'],
+        'url': 'a_file.txt'
+    }
+    config = setdefault_target_name(source_file, config)
     config = strip_extensions(source_file, config)
     assert config['url'] == 'a_file'
 
@@ -90,7 +102,7 @@ def test_strip_extensions_no_strip():
     config = {}
     config = setdefault_target_name(source_file, config)
     config = strip_extensions(source_file, config)
-    assert 'url' not in config
+    assert config['url'] == 'a_file.txt'
 
 
 def test_title_from_name():
