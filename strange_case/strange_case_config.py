@@ -25,12 +25,12 @@ CONFIG = ConfigDict({
         # with them, be warned.
         'strange_case.configurators.file_types',
         'strange_case.configurators.merge_files_config',
+        'strange_case.configurators.folder_config_file',
+        'strange_case.configurators.front_matter_config',
         'strange_case.configurators.setdefault_name',
         'strange_case.configurators.setdefault_target_name',
         'strange_case.configurators.setdefault_iterable',
         'strange_case.configurators.setdefault_url',
-        'strange_case.configurators.folder_config_file',
-        'strange_case.configurators.front_matter_config',
         'strange_case.configurators.ignore',
         'strange_case.configurators.skip_if_not_modified',  # sets 'skip' if mtime is new
         'strange_case.extensions.configurators.order_from_name',

@@ -257,7 +257,7 @@ def test_url():
 
 def test_url_override():
     config = {
-        'url': '/foo/'
+        'url': '/'
     }
     root = RootFolderNode(config, '', '')
 
@@ -285,5 +285,5 @@ def test_url_override():
 
     parent.extend([bob, jane])
 
-    assert bob.url == '/foo/parent/bob'
-    assert jane.url == '/foo/parent/jane'
+    assert bob.url == '/parent/bob'
+    assert jane.url == '/parent/jane'

@@ -111,3 +111,25 @@ def test_file_stats():
     config = file_mtime(source_file, config)
     assert isinstance(config['file_ctime'], datetime.datetime)
     assert isinstance(config['file_mtime'], datetime.datetime)
+
+
+def test_target_name_changes_url():
+    source_file = get_test_file('a_folder/2012_01_01_file.txt')
+    config = {
+        'file_types': [
+            ('page', ('*.txt',)),
+        ],
+        'type': 'page',
+        'rename_extensions': {
+            '.j2': '.html',
+        },
+        'target_name': 'a_file.txt'
+    }
+    config = file_types(source_file, config)
+    config = front_matter_config(source_file, config)
+    config = setdefault_target_name(source_file, config)
+    config = setdefault_name(source_file, config)
+    config = setdefault_url(source_file, config)
+    config = created_at_from_name(source_file, config)
+    assert config['target_name'] == 'a_file.txt'
+    assert config['url'] == 'a_file.txt'
