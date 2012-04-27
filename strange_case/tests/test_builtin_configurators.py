@@ -103,9 +103,11 @@ def test_front_matter_config_success():
     source_file = get_test_file('a_folder/page.j2')
     config = {
         'type': 'page',
+        'override': 'wrong',
     }
     config = front_matter_config(source_file, config)
     assert config['front'] == 'matter'
+    assert config['override'] == 'overridden'
 
 
 def test_front_matter_config_ticks():
