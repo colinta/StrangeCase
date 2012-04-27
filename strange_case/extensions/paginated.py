@@ -216,7 +216,7 @@ def paginated_processor(config, source_path, target_path):
             page_config.setdefault('title', "%s %i" % (page_title, page_index))
             page_config.setdefault('page', page)
             page_config.setdefault('iterable', False)
-            Registry.configurate(page_config, source_path)
+            Registry.configurate(source_path, page_config)
             more_page_config = self.config.get('pages', {}).get(page_index, None)
             if more_page_config:
                 page_config.update(more_page_config)

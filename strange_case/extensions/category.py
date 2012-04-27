@@ -60,7 +60,7 @@ class CategoryFolderProcesser(Processor):
                 target_name = re.sub(r'[\W -]+', '_', page.category, re.UNICODE)
                 config['name'] = target_name
                 config['target_name'] = target_name + config['html_extension']
-                Registry.configurate(config, CategoryDetail.source_path)
+                Registry.configurate(CategoryDetail.source_path, config)
                 categories[page.category] = CategoryDetail(config, self.target_folder, page.category)
 
             categories[page.category].count += 1
@@ -73,19 +73,21 @@ class CategoryFolderProcesser(Processor):
 
 
 def processor(config, source_path, target_path):
+    Registry.configurate(source_path, config)
     categories_name = config.get('name', 'categories')
 
     folder_config = config.copy()
     folder_config['target_name'] = categories_name
     folder_config['name'] = categories_name
-    Registry.configurate(folder_config, source_path)
+    Registry.configurate(source_path, folder_config)
     folder = FolderNode(folder_config, None, target_path)
     categories_folder_target_path = os.path.join(target_path, categories_name)
 
+    config['dont_inherit'] = [key for key in config['dont_inherit'] if key != 'title']
     index_config = config.copy()
     index_config['target_name'] = config['index.html']
     index_config['name'] = 'index'
-    Registry.configurate(index_config, os.path.join(source_path, index_config['target_name']))
+    Registry.configurate(os.path.join(source_path, index_config['target_name']), index_config)
     index_node = JinjaNode(index_config, source_path, categories_folder_target_path)
     folder.append(index_node)
     CategoryDetail.index_node = index_node

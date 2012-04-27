@@ -82,7 +82,7 @@ def processor(config, source_path, target_path):
         thumb_config['is_thumbnail'] = True
         thumb_config['skip'] = config['skip']
 
-        Registry.configurate(thumb_config, os.path.join(source_path, target_name))
+        Registry.configurate(os.path.join(source_path, target_name), thumb_config)
         thumbnail_node = ImageNode(thumb_config, source_path, target_path)
         image_node.config[thumbnail] = thumbnail_node
         thumbs.append(thumbnail_node)

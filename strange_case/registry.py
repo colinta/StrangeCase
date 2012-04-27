@@ -64,7 +64,7 @@ class Registry(object):
         cls.configurators.append(configurator)
 
     @classmethod
-    def configurate(cls, config, source_file):
+    def configurate(cls, source_file, config):
         configurators = Registry.configurators
         # Run the config through each configurator.
         # If a configurator returns a falsey

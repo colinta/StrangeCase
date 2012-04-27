@@ -21,7 +21,7 @@ from strange_case.registry import Registry
 def build_node(config, source_path, target_path, file_name):
     source_file = os.path.join(source_path, file_name)
 
-    config = Registry.configurate(config, source_file)
+    config = Registry.configurate(source_file, config)
     if not config:
         return
 
