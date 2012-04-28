@@ -1,10 +1,7 @@
-import os
-
 from strange_case.config_dict import ConfigDict
 from strange_case.configurators import *
 
 CONFIG = ConfigDict({
-    'project_path': os.getcwd(),
     'site_path': u'site/',
     'deploy_path': u'public/',
     'remove_stale_files': True,
