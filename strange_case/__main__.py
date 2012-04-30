@@ -185,13 +185,6 @@ However, you will probably want to make sure to include the defaults:
             Registry.add_configurator(configurator)
         del CONFIG['configurators +']
 
-    # additional file_types
-    for entry in Registry.file_types:
-        CONFIG['file_types'].append(entry)
-
-    if 'file_types +' in CONFIG:
-        CONFIG['file_types'].extend(CONFIG['file_types +'])
-
     # read timestamps file
     timestamps_file = os.path.join(CONFIG['project_path'], '.timestamps')
     if os.path.exists(timestamps_file):
