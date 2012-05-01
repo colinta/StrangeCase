@@ -74,7 +74,7 @@ def strange_case(config):
     if os.path.isdir(deploy_path):
         existing_files = __scan(deploy_path)
     else:
-        os.makedirs(deploy_path, 0755)
+        os.makedirs(deploy_path)
     root_node.generate()
 
     # create timestamps file

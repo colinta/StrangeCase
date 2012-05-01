@@ -17,7 +17,7 @@ class RootFolderNode(FolderNode):
         """
         folder = self.target_folder
         if not os.path.isdir(folder):
-            os.mkdir(folder, 0755)
+            os.mkdir(folder)
         self.files_tracked.append(self.source_path)
         self.files_written.append(folder)
 
