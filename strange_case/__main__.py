@@ -1,3 +1,4 @@
+import imp
 import os
 import sys
 import yaml
@@ -24,9 +25,6 @@ def run():
     import logging
     logging.basicConfig()
 
-    # so that strange_case.py can be executed from any project folder, add CWD to the import paths
-    sys.path.insert(0, os.getcwd())
-
     import argparse
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument('-w', '--watch', dest='watch', action='store_const',
@@ -49,50 +47,57 @@ def run():
     parser.add_argument('configs', nargs='*')
 
     # config section catches assertion errors and prints them as error messages
-    try:
-        if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
-            from config import CONFIG
+    CONFIG = None
+    if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
+        config_module = imp.load_source('config', os.path.join(os.getcwd(), 'config.py'))
+        try:
+            CONFIG = config_module.CONFIG
             if not isinstance(CONFIG, ConfigDict):
                 CONFIG = ConfigDict(CONFIG)
+        except AttributeError:
+            sys.stderr.write("Could not load CONFIG from config.py\n")
+            sys.exit(1)
+
+    if CONFIG is None:
+        from strange_case.strange_case_config import CONFIG
+
+    # normalize paths
+    for conf in ['project_path', 'site_path', 'deploy_path']:
+        if CONFIG[conf][0] == '~':
+            CONFIG[conf] = os.path.expanduser(CONFIG[conf])
+        elif CONFIG[conf][0] == '.':
+            CONFIG[conf] = os.path.abspath(CONFIG[conf])
+
+    # now we can look for the app config
+    config_path = os.path.join(CONFIG['project_path'], CONFIG['config_file'])
+
+    if os.path.isfile(config_path):
+        with open(config_path, 'r') as config_file:
+            yaml_config = yaml.load(config_file)
+        if yaml_config:
+            CONFIG.update(yaml_config)
+
+    args = parser.parse_args()
+    for conf in conf_overrides:
+        if getattr(args, conf) is not None:
+            CONFIG[conf] = getattr(args, conf)
+
+    assign = None
+    for confs in args.configs:
+        if assign:
+            CONFIG[assign] = confs
+            assign = None
+        elif ':' in confs:
+            key, val = confs.split(':', 1)
+            CONFIG[key] = val
         else:
-            from strange_case.strange_case_config import CONFIG
+            assign = confs
 
-        # normalize paths
-        for conf in ['project_path', 'site_path', 'deploy_path']:
-            if CONFIG[conf][0] == '~':
-                CONFIG[conf] = os.path.expanduser(CONFIG[conf])
-            elif CONFIG[conf][0] == '.':
-                CONFIG[conf] = os.path.abspath(CONFIG[conf])
+    if CONFIG['config_hook']:
+        CONFIG['config_hook'](CONFIG)
+        del CONFIG['config_hook']
 
-        # now we can look for the app config
-        config_path = os.path.join(CONFIG['project_path'], CONFIG['config_file'])
-
-        if os.path.isfile(config_path):
-            with open(config_path, 'r') as config_file:
-                yaml_config = yaml.load(config_file)
-            if yaml_config:
-                CONFIG.update(yaml_config)
-
-        args = parser.parse_args()
-        for conf in conf_overrides:
-            if getattr(args, conf) is not None:
-                CONFIG[conf] = getattr(args, conf)
-
-        assign = None
-        for confs in args.configs:
-            if assign:
-                CONFIG[assign] = confs
-                assign = None
-            elif ':' in confs:
-                key, val = confs.split(':', 1)
-                CONFIG[key] = val
-            else:
-                assign = confs
-
-        if CONFIG['config_hook']:
-            CONFIG['config_hook'](CONFIG)
-            del CONFIG['config_hook']
-
+    try:
         assert CONFIG['project_path'], "project_path is required"
         assert CONFIG['site_path'], "site_path is required"
         assert CONFIG['deploy_path'], "deploy_path is required"

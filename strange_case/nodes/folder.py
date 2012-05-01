@@ -13,7 +13,7 @@ class FolderNode(Node):
     def generate(self, site):
         folder = os.path.join(self.target_folder, self.target_name)
         if not os.path.isdir(folder):
-            os.mkdir(folder, 0755)
+            os.mkdir(folder)
 
         # folders can be 'virtual', like the category folder
         if self.source_path:
