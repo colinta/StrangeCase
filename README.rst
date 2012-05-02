@@ -921,7 +921,7 @@ is specified it is printer in YYYY-MM-DD notation.
    <p>The date is {{ 'now'|date }}.</p>
 
 
-strange_case.extensions.date.uuid.uuid
+strange_case.extensions.uuid.uuid
 --------------------------------------
 
 This filter generates a UUID based on the provided input. The UUID is
@@ -938,7 +938,7 @@ identifier. The available namespaces are:
    <id>{{ 'http://myhost.com/articles'|uuid('url') }}</id>
 
 
-strange_case.extensions.date.uuid.urn
+strange_case.extensions.uuid.urn
 --------------------------------------
 
 This filter generates a UUID URN based on the provided input. This is often
