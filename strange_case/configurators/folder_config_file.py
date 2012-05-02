@@ -13,9 +13,6 @@ def folder_config_file(source_file, config):
 
             if yaml_config:
                 config.update(yaml_config)
-        # if { ignore: true }, the entire directory is ignored
-        if config.get('ignore') is True:
-            return
     return config
 
 folder_config_file.defaults = {
