@@ -227,9 +227,16 @@ class Node(object):
 
     def __getitem__(self, key):
         try:
+            return self.__getattribute__(key)
+        except AttributeError:
+            pass
+
+        try:
             return self.__getattr__(key)
         except AttributeError:
-            return None
+            pass
+
+        return None
 
     def __getattr__(self, key):
         if key == 'config':
