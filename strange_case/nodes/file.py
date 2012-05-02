@@ -17,7 +17,6 @@ class FileNode(Node):
     def generate(self, site):
         target_path = os.path.join(self.target_folder, self.target_name)
         self.generate_file(site, self.source_path, target_path)
-        os.chmod(target_path, 0755)
         super(FileNode, self).generate(site)
 
     def generate_file(self, site, source_path, target_path):

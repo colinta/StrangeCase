@@ -1,3 +1,4 @@
+import imp
 import os
 import sys
 import yaml
@@ -58,47 +59,54 @@ def run():
     sys.path.insert(0, project_path)
 
     # config section catches assertion errors and prints them as error messages
+    from strange_case.strange_case_config import CONFIG
+    CONFIG['project_path'] = project_path
+
+    # normalize paths
+    for conf in ['site_path', 'deploy_path']:
+        if CONFIG[conf][0] == '~':
+            CONFIG[conf] = os.path.expanduser(CONFIG[conf])
+        elif CONFIG[conf][0] == '.':
+            CONFIG[conf] = os.path.abspath(CONFIG[conf])
+
+    # now we can look for the app config
+    if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
+        config_module = imp.load_source('config', os.path.join(os.getcwd(), 'config.py'))
+        try:
+            CONFIG = config_module.CONFIG
+            if not isinstance(CONFIG, ConfigDict):
+                CONFIG = ConfigDict(CONFIG)
+        except AttributeError:
+            sys.stderr.write("Could not load CONFIG from config.py\n")
+            sys.exit(1)
+    config_path = os.path.join(project_path, CONFIG['config_file'])
+
+    if os.path.isfile(config_path):
+        with open(config_path, 'r') as config_file:
+            yaml_config = yaml.load(config_file)
+        if yaml_config:
+            CONFIG.update(yaml_config)
+
+    for conf in conf_overrides:
+        if getattr(args, conf) is not None:
+            CONFIG[conf] = getattr(args, conf)
+
+    assign = None
+    for confs in args.configs:
+        if assign:
+            CONFIG[assign] = confs
+            assign = None
+        elif ':' in confs:
+            key, val = confs.split(':', 1)
+            CONFIG[key] = val
+        else:
+            assign = confs
+
+    if CONFIG['config_hook']:
+        CONFIG['config_hook'](CONFIG)
+        del CONFIG['config_hook']
+
     try:
-        from strange_case.strange_case_config import CONFIG
-        CONFIG['project_path'] = project_path
-
-        # normalize paths
-        for conf in ['site_path', 'deploy_path']:
-            if CONFIG[conf][0] == '~':
-                CONFIG[conf] = os.path.expanduser(CONFIG[conf])
-            elif CONFIG[conf][0] == '.':
-                CONFIG[conf] = os.path.abspath(CONFIG[conf])
-
-        # now we can look for the app config
-        if os.path.isfile(os.path.join(project_path, 'config.py')):
-            from config import CONFIG
-        config_path = os.path.join(project_path, CONFIG['config_file'])
-
-        if os.path.isfile(config_path):
-            with open(config_path, 'r') as config_file:
-                yaml_config = yaml.load(config_file)
-            if yaml_config:
-                CONFIG.update(yaml_config)
-
-        for conf in conf_overrides:
-            if getattr(args, conf) is not None:
-                CONFIG[conf] = getattr(args, conf)
-
-        assign = None
-        for confs in args.configs:
-            if assign:
-                CONFIG[assign] = confs
-                assign = None
-            elif ':' in confs:
-                key, val = confs.split(':', 1)
-                CONFIG[key] = val
-            else:
-                assign = confs
-
-        if CONFIG['config_hook']:
-            CONFIG['config_hook'](CONFIG)
-            del CONFIG['config_hook']
-
         assert CONFIG['project_path'], "project_path is required"
         assert CONFIG['site_path'], "site_path is required"
         assert CONFIG['deploy_path'], "deploy_path is required"
@@ -190,13 +198,6 @@ However, you will probably want to make sure to include the defaults:
             configurators.append(configurator)
             Registry.add_configurator(configurator)
         del CONFIG['configurators +']
-
-    # additional file_types
-    for entry in Registry.file_types:
-        CONFIG['file_types'].append(entry)
-
-    if 'file_types +' in CONFIG:
-        CONFIG['file_types'].extend(CONFIG['file_types +'])
 
     # read timestamps file
     timestamps_file = os.path.join(CONFIG['project_path'], '.timestamps')

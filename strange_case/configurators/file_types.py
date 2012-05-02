@@ -2,6 +2,7 @@ import os
 from fnmatch import fnmatch
 
 from strange_case.configurators import provides
+from strange_case.registry import Registry
 
 
 @provides('type')
@@ -10,6 +11,11 @@ def file_types(source_file, config):
         config['type'] = 'folder'
         return config
     else:
+        types = config.get('file_types', [])
+        # built-in file_types
+        for entry in Registry.file_types:
+            types.append(entry)
+
         file_name = os.path.basename(source_file)
         for node_type, globs in config.get('file_types', []):
             if isinstance(globs, basestring):
