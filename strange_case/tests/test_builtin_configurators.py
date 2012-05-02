@@ -324,7 +324,7 @@ def test_setdefault_iterable_override_false():
     assert config['iterable'] is False
 
 
-def test_setdefault_url():
+def test_set_url():
     source_file = get_test_file('a_folder/page.j2')
     config = {
         'rename_extensions': {
@@ -332,11 +332,11 @@ def test_setdefault_url():
         },
     }
     config = setdefault_target_name(source_file, config)
-    config = setdefault_url(source_file, config)
+    config = set_url(source_file, config)
     assert config['url'] == 'page.html'
 
 
-def test_setdefault_url_index():
+def test_set_url_index():
     source_file = get_test_file('a_folder/index.j2')
     config = {
         'rename_extensions': {
@@ -346,15 +346,15 @@ def test_setdefault_url_index():
     }
     config = setdefault_target_name(source_file, config)
     assert config['target_name'] == config['index.html']
-    config = setdefault_url(source_file, config)
+    config = set_url(source_file, config)
     assert config['url'] == ''
 
 
-def test_setdefault_url_override():
+def test_set_url_override():
     source_file = get_test_file('a_folder/bad_page1.j2')
     config = {
         'index.html': 'bad_page1.j2',
         'url': 'bad_page1'
     }
-    config = setdefault_url(source_file, config)
+    config = set_url(source_file, config)
     assert config['url'] == 'bad_page1'

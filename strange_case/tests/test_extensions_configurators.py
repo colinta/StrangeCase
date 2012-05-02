@@ -71,7 +71,7 @@ def test_strip_extensions_strip():
         'strip_extensions': ['.txt']
     }
     config = setdefault_target_name(source_file, config)
-    config = setdefault_url(source_file, config)
+    config = set_url(source_file, config)
     config = strip_extensions(source_file, config)
     assert config['url'] == 'a_file'
 
@@ -141,7 +141,7 @@ def test_target_name_changes_url():
     config = front_matter_config(source_file, config)
     config = setdefault_target_name(source_file, config)
     config = setdefault_name(source_file, config)
-    config = setdefault_url(source_file, config)
+    config = set_url(source_file, config)
     config = created_at_from_name(source_file, config)
     assert config['target_name'] == 'a_file.txt'
     assert config['url'] == 'a_file.txt'

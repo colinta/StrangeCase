@@ -650,7 +650,7 @@ is because *everything it does* can be controlled using the config. ::
       configurators.merge_files_config,       # merges files[filename] with filename
       configurators.setdefault_name,          # if 'name' isn't assigned explicitly, this assigns it based on the file name and extension
       configurators.setdefault_target_name,   # similarly for target_name
-      configurators.setdefault_url,           # Assigns only the "local" part of the URL
+      configurators.set_url,                  # Assigns the "local" part of the URL.  The entire URL is a property of the node object
       configurators.setdefault_iterable,      # index files are not iterable
       configurators.folder_config_file,       # processes folder/config.yaml.  If the folder config contains `ignore: true`, the folder is skipped
       configurators.front_matter_config,      # processes YAML front matter.  Again, the file can be ignored using `ignore: true`

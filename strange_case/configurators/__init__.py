@@ -73,6 +73,6 @@ from ignore import ignore
 from merge_files_config import merge_files_config
 from setdefault_name import setdefault_name
 from setdefault_target_name import setdefault_target_name
-from setdefault_url import setdefault_url
+from set_url import set_url
 from setdefault_iterable import setdefault_iterable
 from skip_if_not_modified import skip_if_not_modified
