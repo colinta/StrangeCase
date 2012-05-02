@@ -17,7 +17,7 @@ def created_at_from_name(source_file, config):
     and you don't have to add `date: ...` using YAML, plus you get a
     python date object.
     """
-    matches = DATE_YMD_RE.match(config['name'])
+    matches = DATE_YMD_RE.search(config['name'])
     if matches:
         year = int(matches.group('year'))
         if matches.group('month') is not None:
@@ -36,9 +36,10 @@ def created_at_from_name(source_file, config):
             day=day,
             )
         config['created_at'] = date
-        config['name'] = matches.group('name')
+        if config['strip_from_name']:
+            config['name'] = matches.group('name')
     else:
-        matches = DATE_YMD_RE.match(config['target_name'])
+        matches = DATE_YMD_RE.search(config['target_name'])
         if matches:
             date = datetime.date(
                 year=int(matches.group('year')),
@@ -47,3 +48,8 @@ def created_at_from_name(source_file, config):
                 )
             config['created_at'] = date
     return config
+
+created_at_from_name.defaults = {
+    'strip_from_name': True,
+    'strip_from_target_name': False,
+}
