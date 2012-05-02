@@ -7,7 +7,6 @@ import pickle
 from strange_case.registry import Registry
 from strange_case.nodes import Node
 from strange_case import strange_case
-from strange_case.config_dict import ConfigDict
 
 
 def fancy_import(import_name):
@@ -77,9 +76,7 @@ def run():
     if os.path.isfile(os.path.join(project_path, 'config.py')):
         config_module = imp.load_source('config', os.path.join(project_path, 'config.py'))
         try:
-            CONFIG = config_module.CONFIG
-            if not isinstance(CONFIG, ConfigDict):
-                CONFIG = ConfigDict(CONFIG)
+            CONFIG.update(config_module.CONFIG)
         except AttributeError:
             sys.stderr.write("Could not load CONFIG from config.py\n")
             sys.exit(1)
