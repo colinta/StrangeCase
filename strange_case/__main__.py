@@ -7,6 +7,7 @@ import pickle
 from strange_case.registry import Registry
 from strange_case.nodes import Node
 from strange_case import strange_case
+from strange_case.config_dict import ConfigDict
 
 
 def fancy_import(import_name):
