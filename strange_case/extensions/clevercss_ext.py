@@ -40,13 +40,13 @@ class CleverCssNode(AssetNode):
     Converts a .ccss file into css
     """
     def generate_file(self, site, source_path, target_path):
-        if self['skip']:
-            print 'Skipping %s' % target_path
         if not self['skip']:
             ccss_content = open(source_path, 'r').read()
             css_content = clevercss_compiler(ccss_content)
             with open(target_path, 'w') as f:
                 f.write(css_content)
+        elif self['verbose']:
+            print 'Skipping %s' % target_path
         self.files_tracked.append(source_path)
         self.files_written.append(target_path)
 

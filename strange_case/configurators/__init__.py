@@ -19,6 +19,7 @@ def is_index(conf):
 
 
 def configurate(source_file, config):
+    verbose = config.get('verbose')
     configurators = Registry.configurators
     # Run the config through each configurator.
     # If a configurator returns a falsey
@@ -26,6 +27,8 @@ def configurate(source_file, config):
     for configurator in configurators:
         config = configurator(source_file, config)
         if not config:
+            if verbose:
+                print 'Ignoring "{}" due to configurator {}'.format(source_file, configurator.__name__)
             return
     return config
 

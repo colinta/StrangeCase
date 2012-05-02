@@ -18,9 +18,7 @@ class ImageNode(AssetNode):
     """
     def generate_file(self, site, source_path, target_path):
         if 'size' in self.config:
-            if self['skip']:
-                print "Skipping %s" % target_path
-            else:
+            if not self['skip']:
                 image = Image.open(source_path)
                 size = self.config['size']
 
@@ -37,6 +35,8 @@ class ImageNode(AssetNode):
                 size[1] = int(size[1])
                 image.thumbnail(size, Image.ANTIALIAS)
                 image.save(target_path)
+            elif self['verbose']:
+                print "Skipping %s" % target_path
         else:
             if not self['skip']:
                 copy2(source_path, target_path)
