@@ -10,5 +10,7 @@ class AssetNode(FileNode):
     def generate_file(self, site, source_path, target_path):
         if not os.path.exists(target_path) or not self['skip']:
             copy2(source_path, target_path)
+        elif self['verbose']:
+            print "Skipping %s" % target_path
         self.files_tracked.append(source_path)
         self.files_written.append(target_path)

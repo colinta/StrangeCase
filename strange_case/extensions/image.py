@@ -40,6 +40,8 @@ class ImageNode(AssetNode):
         else:
             if not self['skip']:
                 copy2(source_path, target_path)
+            elif self['verbose']:
+                print "Skipping %s" % target_path
         self.files_tracked.append(source_path)
         self.files_written.append(target_path)
 
