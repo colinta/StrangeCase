@@ -2,8 +2,6 @@ from strange_case.config_dict import ConfigDict
 from strange_case.configurators import *
 
 CONFIG = ConfigDict({
-    'site_path': u'site/',
-    'deploy_path': u'public/',
     'remove_stale_files': True,
     'dont_remove': ['.*'],
     'config_file': u'config.yaml',

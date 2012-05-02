@@ -56,12 +56,15 @@ def run():
     else:
         project_path = os.getcwd()
 
-    # so that strange_case.py can be executed from any project folder, add CWD to the import paths
-    sys.path.insert(0, project_path)
-
     # config section catches assertion errors and prints them as error messages
     from strange_case.strange_case_config import CONFIG
     CONFIG['project_path'] = project_path
+
+    if 'site_path' not in CONFIG:
+        CONFIG['site_path'] = os.path.join(project_path, u'site/')
+
+    if 'deploy_path' not in CONFIG:
+        CONFIG['deploy_path'] = os.path.join(project_path, u'public/')
 
     # normalize paths
     for conf in ['site_path', 'deploy_path']:
@@ -71,8 +74,8 @@ def run():
             CONFIG[conf] = os.path.abspath(CONFIG[conf])
 
     # now we can look for the app config
-    if os.path.isfile(os.path.join(os.getcwd(), 'config.py')):
-        config_module = imp.load_source('config', os.path.join(os.getcwd(), 'config.py'))
+    if os.path.isfile(os.path.join(project_path, 'config.py')):
+        config_module = imp.load_source('config', os.path.join(project_path, 'config.py'))
         try:
             CONFIG = config_module.CONFIG
             if not isinstance(CONFIG, ConfigDict):
