@@ -34,3 +34,11 @@ class FileNode(Node):
     @check_config_first
     def is_page(self):
         return False
+
+    @property
+    def skip(self):
+        """
+        Override config to return False if target_path does not exist.
+        """
+        target_path = os.path.join(self.target_folder, self.target_name)
+        return self.config.get('skip') and os.path.exists(target_path)
