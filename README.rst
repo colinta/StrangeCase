@@ -614,7 +614,6 @@ You should study this to learn a lot about how StrangeCase works.  The reason I 
 is because *everything it does* can be controlled using the config. ::
 
     config_file: 'config.yaml'                # name of file that contains config
-    host: "http://localhost:8000"             # hostname.  I'm not using this for anything, but it might be import for plugin authors one day
     ignore: ['config.yaml', '.*']             # which files to ignore altogether while building the site
     dont_inherit:                             # nodes will not inherit these properties
       - type
