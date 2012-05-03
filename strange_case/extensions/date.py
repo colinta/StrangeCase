@@ -1,4 +1,12 @@
+import dateutil
 import datetime
+
+
+def to_datetime(value):
+    if isinstance(value, int) or isinstance(value, float):
+        return datetime.datetime.utcfromtimestamp(value)
+    elif isinstance(value, basestring):
+        return dateutil.parser.parse(value)
 
 
 def date(value, format='%d %b %Y'):
@@ -7,10 +15,22 @@ def date(value, format='%d %b %Y'):
 
     if value is "now":
         value = datetime.date.today()
-    elif isinstance(value, basestring):
-        value = datetime.datetime.strptime(value, "%Y-%m-%d")
-    elif isinstance(value, int) or isinstance(value, float):
-        value = datetime.datetime.fromtimestamp(value)
+    else:
+        value = to_datetime(value)
 
-    if isinstance(value, datetime.date):
+    return value.strftime(format)
+
+
+def timestamp(value, format=None):
+    if not value:
+        return ''
+
+    if value is 'now':
+        value = datetime.datetime.utcnow()
+    else:
+        value = to_datetime(value)
+
+    if format is None:
+        return '%sZ' % value.isoformat()
+    else:
         return value.strftime(format)
