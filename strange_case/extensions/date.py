@@ -4,7 +4,7 @@ import datetime
 
 def to_datetime(value):
     if isinstance(value, int) or isinstance(value, float):
-        return datetime.datetime.fromtimestamp(value)
+        return datetime.datetime.utcfromtimestamp(value)
     elif isinstance(value, basestring):
         return dateutil.parser.parse(value)
 
@@ -27,10 +27,8 @@ def timestamp(value, format=None):
 
     if value is 'now':
         value = datetime.datetime.utcnow()
-    elif isinstance(value, int) or isinstance(value, float):
-        value = datetime.datetime.fromtimestamp(value)
     else:
-        value = dateutil.parser.parse(value)
+        value = to_datetime(value)
 
     if format is None:
         return '%sZ' % value.isoformat()
