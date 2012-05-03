@@ -5,7 +5,6 @@ CONFIG = ConfigDict({
     'remove_stale_files': True,
     'dont_remove': ['.*'],
     'config_file': u'config.yaml',
-    'html_extension': u'.html',
 
     ##|  HOOKS
     'config_hook': None,
@@ -56,12 +55,6 @@ CONFIG = ConfigDict({
     'file_mtimes': {},
     'host': u'http://localhost:8000',
     'index.html': u'index.html',
-    'rename_extensions': {
-        '.j2': u'.html',
-        '.jinja2': u'.html',
-        '.jinja': u'.html',
-        '.md': u'.html',
-    },
     'ignore': [
         u'.*',
         u'config.yaml',

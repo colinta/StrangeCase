@@ -176,7 +176,7 @@ def test_ancestors():
     p2.extend([i2, p3])
     p3.append(c)
     print c.ancestors
-    assert c.ancestors == [p1, p2, p3, c]
+    assert c.ancestors == [p1, p2, p3]
 
 
 def test_config_copy():

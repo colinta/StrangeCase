@@ -15,7 +15,10 @@ def provides(conf):
 
 
 def is_index(conf):
-    return conf['target_name'] == conf.get('index.html', 'index.html')
+    return conf['target_name'] == conf['index.html']
+
+
+is_index.defaults = {'index.html': 'index.html'}
 
 
 def configurate(source_file, config):

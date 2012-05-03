@@ -27,3 +27,7 @@ def title_from_name(source_file, config):
     title = titlecase(title)
     config['title'] = title
     return config
+
+
+title_from_name.defaults = {}
+title_from_name.defaults.update(is_index.defaults)

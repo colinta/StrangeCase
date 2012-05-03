@@ -24,7 +24,7 @@ def file_types(source_file, config):
                 if fnmatch(file_name, pattern):
                     config['type'] = node_type
                     return config
-        if not config.get('default_type', None):
+        if not config.get('default_type'):
             return None
         config['type'] = config['default_type']
         return config

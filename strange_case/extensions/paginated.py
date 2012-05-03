@@ -218,7 +218,7 @@ def paginated_processor(config, source_path, target_path):
             page_config.setdefault('page', page)
             page_config.setdefault('iterable', False)
             configurate(source_path, page_config)
-            more_page_config = self.config.get('pages', {}).get(page_index, None)
+            more_page_config = self.config.get('pages', {}).get(page_index)
             if more_page_config:
                 page_config.update(more_page_config)
             node = JinjaNode(page_config, source_path, target_path)

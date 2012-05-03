@@ -4,7 +4,8 @@ from strange_case.nodes import Node, check_config_first
 
 class FileNode(Node):
     """
-    A FileNode object is an abstract parent class for a "leaf".
+    A FileNode object is an abstract parent class for a file in the site folder
+    that is going to be copied or rendered into the destination folder
     """
     def __init__(self, config, source_path, target_folder):
         super(FileNode, self).__init__(config, target_folder)

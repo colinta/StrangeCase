@@ -10,4 +10,7 @@ def set_url(source_file, config):
         config['url'] = urllib.quote(config['target_name'])
     return config
 
+set_url.defaults = {}
+set_url.defaults.update(is_index.defaults)
+
 set_url.require_after = ['url']

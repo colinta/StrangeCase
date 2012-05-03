@@ -1,4 +1,5 @@
 import os
+from functools import wraps
 
 
 def test_test_setup():
@@ -25,3 +26,18 @@ def test_test_setup():
 
 def get_test_file(source):
     return os.path.join(os.path.dirname(__file__), source)
+
+
+def will_test(*configurators):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper():
+            config = {}
+            for configurator in configurators:
+                try:
+                    config.update(configurator.defaults)
+                except AttributeError:
+                    pass
+            return fn(config)
+        return wrapper
+    return decorator

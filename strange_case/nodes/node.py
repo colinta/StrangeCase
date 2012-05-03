@@ -134,7 +134,7 @@ class Node(object):
         Returns the list of ancestors, top-most first.
         """
         current = self
-        ret = [self]
+        ret = []
         while current.parent:
             ret.insert(0, current.parent)
             current = current.parent

@@ -4,6 +4,28 @@ import yaml
 
 
 def front_matter_config(source_file, config):
+    """
+    There are two types of front matter supported by StrangeCase.
+
+    1. YAML Front Matter.  This is the most common, it is delimited by two sets
+       of equal number of three or more dashes::
+
+           ----
+           yaml: [goes, here]
+           ----
+    2. The second type is executable python code.  Instead of dashes, use
+       backticks.  Again, the number of backticks must match::
+
+           ```
+           python = ['goes', 'here']
+           ```
+
+    YAML is easy enough - it gets merged in with the node config.  The python
+    code is run using ``eval()`` passing the config object in as the local and
+    global arguments, so changes to the local scope (adding, changing, removing
+    variables) will result in changes to the config object.  You do not access
+    the config object within this block.
+    """
     if config['type'] == 'page' and os.path.isfile(source_file):
         with open(source_file, 'r') as f:
             contents = f.read()

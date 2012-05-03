@@ -17,7 +17,7 @@ from jinja2.utils import internalcode
 
 class StrangeCaseEnvironment(Environment):
     def __init__(self, project_path, *args, **kwargs):
-        kwargs['loader'] = YamlFrontMatterLoader(project_path)
+        kwargs['loader'] = YamlFrontMatterLoader([project_path, '/'])  # root is included so that absolute paths are picked up by Jinja2
         self.template_class = StrangeCaseTemplate
         super(StrangeCaseEnvironment, self).__init__(*args, **kwargs)
 
@@ -46,7 +46,7 @@ class YamlFrontMatterLoader(FileSystemLoader):
     dashes or backticks, a newline, YAML content, a newline and then the same
     number of dashes or backticks, and a newline again.
 
-    Examples:
+    Examples::
 
         ----
         yaml: {goes: 'here'}
@@ -54,9 +54,13 @@ class YamlFrontMatterLoader(FileSystemLoader):
         <!-- template -->
 
         ````
-        config['python'] = {'goes': 'here'}
+        python = {'goes': 'here'}
         ````
         <!-- template -->
+
+    When the python code is executed, it is given ``config`` as the local
+    context, so changes to local variables result in changes to the page
+    context.
     """
     def get_source(self, environment, template):
         """
