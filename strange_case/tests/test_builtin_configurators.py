@@ -12,6 +12,7 @@ def test_provides_decorator():
         return config
 
     should_do_nothing(None, a)
+    assert a['dont_change_me'] == 'not changed'
 
     @provides('change_me')
     def should_do_something(source_file, config):
@@ -19,8 +20,6 @@ def test_provides_decorator():
         return config
 
     should_do_something(None, a)
-
-    assert a['dont_change_me'] == 'not changed'
     assert a['change_me'] == 'changed'
 
 
