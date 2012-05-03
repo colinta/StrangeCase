@@ -227,7 +227,9 @@ def test_getitem_and_getattr():
 
 
 def test_url():
-    config = {}
+    config = {
+        'root_url': '/',
+    }
     root = RootFolderNode(config, '', '')
 
     config = {
@@ -257,7 +259,7 @@ def test_url():
 
 def test_url_override():
     config = {
-        'url': '/'
+        'root_url': '/foo/',
     }
     root = RootFolderNode(config, '', '')
 
@@ -285,5 +287,5 @@ def test_url_override():
 
     parent.extend([bob, jane])
 
-    assert bob.url == '/parent/bob'
-    assert jane.url == '/parent/jane'
+    assert bob.url == '/foo/parent/bob'
+    assert jane.url == '/foo/parent/jane'

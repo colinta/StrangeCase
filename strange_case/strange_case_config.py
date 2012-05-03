@@ -2,6 +2,9 @@ from strange_case.config_dict import ConfigDict
 from strange_case.configurators import *
 
 CONFIG = ConfigDict({
+    ##|  ROOT URL
+    'root_url': '/',
+
     ##|  USED TO CLEAN DEPLOY PATH
     'remove_stale_files': True,
     'dont_remove': ['.*'],

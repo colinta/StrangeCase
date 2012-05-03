@@ -13,4 +13,5 @@ def set_url(source_file, config):
 set_url.defaults = {}
 set_url.defaults.update(is_index.defaults)
 
+set_url.require_before = ['root_url']
 set_url.require_after = ['url']
