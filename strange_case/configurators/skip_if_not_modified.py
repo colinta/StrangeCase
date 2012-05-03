@@ -17,3 +17,8 @@ def skip_if_not_modified(source_file, config):
         except OSError:
             pass
     return config
+
+
+skip_if_not_modified.defaults = {
+    'file_mtimes': {},
+}

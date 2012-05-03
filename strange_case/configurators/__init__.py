@@ -44,21 +44,12 @@ def meta_before(source_file, config):
                 if key not in config:
                     config[key] = value
 
-        if hasattr(configurator, 'dont_inherit'):
-            for dont_inherit in configurator.dont_inherit:
-                if dont_inherit not in config:
-                    config['dont_inherit'].append(dont_inherit)
-
         if hasattr(configurator, 'require_before'):
             for required in configurator.require_before:
                 if required not in config:
                     raise TypeError('Missing required config["{required}"] '
                         'from {configurator.__name__}.require_before'.format(**locals()))
     return config
-
-meta_before.defaults = {
-    'dont_inherit': [],
-}
 
 
 def meta_after(source_file, config):
@@ -72,6 +63,7 @@ def meta_after(source_file, config):
     return config
 
 
+from dont_inherit import dont_inherit
 from file_types import file_types
 from folder_config_file import folder_config_file
 from front_matter_config import front_matter_config

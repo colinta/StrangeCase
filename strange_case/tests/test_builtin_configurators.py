@@ -24,6 +24,19 @@ def test_provides_decorator():
     assert a['change_me'] == 'changed'
 
 
+@will_test(dont_inherit)
+def test_dont_inherit(config):
+    source_file = get_test_file('a_folder')
+    dont_inherit_keys = config['dont_inherit']
+    for key in dont_inherit_keys:
+        config[key] = 'gone!'
+    config['safe'] = 'safe'
+    config = dont_inherit(source_file, config)
+    for key in dont_inherit_keys:
+        assert not key in config
+    assert 'safe' in config
+
+
 @will_test(file_types)
 def test_file_types_folder(config):
     source_file = get_test_file('a_folder')

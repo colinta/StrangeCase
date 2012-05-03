@@ -2,9 +2,9 @@ from strange_case.config_dict import ConfigDict
 from strange_case.configurators import *
 
 CONFIG = ConfigDict({
+    ##|  USED TO CLEAN DEPLOY PATH
     'remove_stale_files': True,
     'dont_remove': ['.*'],
-    'config_file': u'config.yaml',
 
     ##|  HOOKS
     'config_hook': None,
@@ -20,6 +20,7 @@ CONFIG = ConfigDict({
     # these are ensured to be loaded first
     '__configurators_pre__': [
         'strange_case.configurators.meta_before',
+        'strange_case.configurators.dont_inherit',
         'strange_case.configurators.file_types',
         'strange_case.configurators.merge_files_config',
         'strange_case.configurators.folder_config_file',
@@ -40,23 +41,5 @@ CONFIG = ConfigDict({
     '__configurators_post__': [
         'strange_case.configurators.set_url',
         'strange_case.configurators.meta_after',
-    ],
-    'dont_inherit': [
-        'type',
-        'name',
-        'target_name',
-        'title',
-        'created_at',
-        'order',
-        'iterable',
-        'url',
-        'skip',
-    ],
-    'file_mtimes': {},
-    'host': u'http://localhost:8000',
-    'index.html': u'index.html',
-    'ignore': [
-        u'.*',
-        u'config.yaml',
     ],
 })

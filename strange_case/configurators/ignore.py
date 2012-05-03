@@ -9,3 +9,11 @@ def ignore(source_file, config):
             config['ignore'] and any(pattern for pattern in config['ignore'] if fnmatch(file_name, pattern)):
         return
     return config
+
+
+ignore.defaults = {
+    'ignore': [
+        u'.*',
+        u'config.yaml',
+    ],
+}
