@@ -2,7 +2,7 @@ from strange_case.tests import get_test_file
 from strange_case.nodes import *
 
 
-class TestParentNode(Node):
+class TestConfigNode(Node):
     def __init__(self, name='test'):
         config = {
             'test_it': 'test_it',
@@ -10,7 +10,7 @@ class TestParentNode(Node):
             'name': name,
             'iterable': True,
         }
-        super(TestParentNode, self).__init__(config=config,
+        super(TestConfigNode, self).__init__(config=config,
                                   target_folder='target')
 
     @property
@@ -24,8 +24,30 @@ class TestParentNode(Node):
         return 'RIGHT'
 
 
-class TestChildNode(TestParentNode):
-    pass
+class TestRootNode(RootFolderNode):
+    def __init__(self, name='test'):
+        config = {
+            'target_name': name,
+            'name': name,
+            'iterable': True,
+            'root_url': '/',
+        }
+        super(TestRootNode, self).__init__(config=config,
+                                  source_path=get_test_file('a_folder/'),
+                                  target_folder='target')
+
+
+class TestFolderNode(FolderNode):
+    def __init__(self, name='test'):
+        config = {
+            'test_it': 'test_it',
+            'target_name': name,
+            'name': name,
+            'iterable': True,
+        }
+        super(TestFolderNode, self).__init__(config=config,
+                                  source_path=get_test_file('a_folder/'),
+                                  target_folder='target')
 
 
 class TestPageNode(PageNode):
@@ -55,20 +77,20 @@ class TestIndexNode(PageNode):
 
 
 def test_check_config_first():
-    n = TestParentNode()
+    n = TestConfigNode()
     assert n.test_it == 'test_it'
     assert n.test_another == 'RIGHT'
 
 
 def test_node_defaults():
-    n = TestParentNode()
+    n = TestRootNode()
     assert n.parent == None
     assert n.children == []
 
 
 def test_parent_child_relationship():
-    p = TestParentNode()
-    c = TestChildNode()
+    p = TestRootNode()
+    c = TestPageNode('c')
     p.append(c)
     assert len(p.children) == 1
     assert c.parent == p
@@ -76,31 +98,31 @@ def test_parent_child_relationship():
     assert len(p.children) == 0
     assert c.parent == None
 
-    p = TestParentNode()
-    c1 = TestChildNode()
-    c2 = TestChildNode()
+    p = TestRootNode()
+    c1 = TestPageNode('c1')
+    c2 = TestPageNode('c2')
     p.extend([c1, c2])
     assert len(p.children) == 2
     assert c1.parent == p
     assert c2.parent == p
-    c3 = TestChildNode()
+    c3 = TestPageNode('c3')
     p.insert(0, c3)
     assert p.children == [c3, c1, c2]
     assert c3.parent == p
-    c4 = TestChildNode()
-    c5 = TestChildNode()
+    c4 = TestPageNode('c4')
+    c5 = TestPageNode('c5')
     p.insert(1, [c4, c5])
     assert p.children == [c3, c4, c5, c1, c2]
     assert c4.parent == p
 
 
 def test_contains_and_len_and_iter():
-    p = TestParentNode('p')
+    p = TestRootNode('p')
 
     index = TestIndexNode('index')  # not iterable
-    c1 = TestChildNode('c1')
-    c2 = TestChildNode('c2')
-    c3 = TestChildNode('c3')
+    c1 = TestPageNode('c1')
+    c2 = TestPageNode('c2')
+    c3 = TestPageNode('c3')
     p.extend([index, c1, c2, c3])
 
     assert list(n for n in p) == [c1, c2, c3]
@@ -121,15 +143,15 @@ def test_siblings():
         - c4
         - c5 (is_index: true, not iterable)
     """
-    p1 = TestParentNode('p1')
-    p2 = TestParentNode('p2')
+    p1 = TestRootNode('p1')
+    p2 = TestRootNode('p2')
 
-    c1 = TestChildNode('c1')
-    c2 = TestChildNode('c2')
-    c3 = TestChildNode('c3')
+    c1 = TestPageNode('c1')
+    c2 = TestPageNode('c2')
+    c3 = TestPageNode('c3')
     p1.extend([c1, c2, c3, p2])
 
-    c4 = TestChildNode('c4')
+    c4 = TestPageNode('c4')
     c5 = TestIndexNode('c5')
     p2.extend([c4, c5])
 
@@ -167,17 +189,58 @@ def test_ancestors():
         - p3
           - c
     """
-    p1 = TestParentNode('p1')
-    p2 = TestParentNode('p2')
-    p3 = TestParentNode('p3')
+    p1 = TestRootNode('p1')
+    p2 = TestFolderNode('p2')
+    p3 = TestFolderNode('p3')
     i1 = TestIndexNode('i1')
     i2 = TestIndexNode('i2')
-    c = TestChildNode('c')
+    c = TestPageNode('c')
     p1.extend([i1, p2])
     p2.extend([i2, p3])
     p3.append(c)
     print c.ancestors
+    assert c.ancestors == [i1, i2, p3]
+
+
+def test_ancestors_no_index():
+    """
+    - p1
+      - i1 (is_index: true, not iterable)
+      - p2
+        - i2 (is_index: true, not iterable)
+        - p3
+          - c
+    """
+    p1 = TestRootNode('p1')
+    p2 = TestFolderNode('p2')
+    p3 = TestFolderNode('p3')
+    c = TestPageNode('c')
+    p1.extend([p2])
+    p2.extend([p3])
+    p3.append(c)
+    print c.ancestors
     assert c.ancestors == [p1, p2, p3]
+
+
+def test_ancestors_some_index():
+    """
+    - p1
+      - i1 (is_index: true, not iterable)
+      - p2
+        - i2 (is_index: true, not iterable)
+        - p3
+          - c
+    """
+    p1 = TestRootNode('p1')
+    i1 = TestIndexNode('i1')
+    p2 = TestFolderNode('p2')
+    p3 = TestFolderNode('p3')
+    c = TestPageNode('c')
+    p1.extend([i1, p2])
+    p2.extend([p3])
+    p3.append(c)
+    print c.ancestors
+    assert c.ancestors == [i1, p2, p3]
 
 
 def test_config_copy():

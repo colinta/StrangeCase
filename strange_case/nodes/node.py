@@ -136,7 +136,10 @@ class Node(object):
         current = self
         ret = []
         while current.parent:
-            ret.insert(0, current.parent)
+            try:
+                ret.insert(0, current.parent.index)
+            except AttributeError:
+                ret.insert(0, current.parent)
             current = current.parent
 
         return ret
@@ -193,6 +196,18 @@ class Node(object):
         url = self.config.get('url', urllib.quote(self.target_name))
 
         return prefix + url
+
+    @property
+    @check_config_first
+    def index(self):
+        """
+        If the node contains a child that `is_index`, this method returns that
+        page.
+        """
+        for page in self.children:
+            if page.config.get('is_index'):
+                return page
+        raise AttributeError('index')
 
     @property
     @check_config_first
