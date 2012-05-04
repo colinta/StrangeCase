@@ -262,8 +262,8 @@ class Node(object):
 
         child_by_name = [child for child in self.children if child.name == key]
         if len(child_by_name) > 1:
-            raise KeyError('There are multiple results for the node named "{}" '
-                'in folder "{}"'.format(key, self.name))
+            raise KeyError('There are multiple results for the node named "{0}" '
+                'in folder "{1}"'.format(key, self.name))
         elif child_by_name:
             return child_by_name[0]
 
