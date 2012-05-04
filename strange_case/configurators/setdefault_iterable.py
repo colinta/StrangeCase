@@ -1,10 +1,7 @@
-from strange_case.configurators import provides, is_index
+from strange_case.configurators import provides
 
 
 @provides('iterable')
 def setdefault_iterable(source_file, config):
-    config['iterable'] = not is_index(config)
+    config['iterable'] = not config['is_index']
     return config
-
-setdefault_iterable.defaults = {}
-setdefault_iterable.defaults.update(is_index.defaults)

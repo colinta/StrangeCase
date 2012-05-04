@@ -14,13 +14,6 @@ def provides(conf):
     return decorator
 
 
-def is_index(conf):
-    return conf['target_name'] == conf['index.html']
-
-
-is_index.defaults = {'index.html': 'index.html'}
-
-
 def configurate(source_file, config):
     verbose = config.get('verbose')
     configurators = Registry.configurators
@@ -68,6 +61,7 @@ from file_types import file_types
 from folder_config_file import folder_config_file
 from front_matter_config import front_matter_config
 from ignore import ignore
+from is_index import is_index
 from merge_files_config import merge_files_config
 from setdefault_name import setdefault_name
 from setdefault_target_name import setdefault_target_name

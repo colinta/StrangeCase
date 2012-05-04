@@ -318,7 +318,7 @@ def test_skip_if_not_modified_is_modified(config):
     assert config['skip'] is False
 
 
-@will_test(setdefault_iterable)
+@will_test(is_index, setdefault_target_name, setdefault_iterable)
 def test_setdefault_iterable_true(config):
     source_file = get_test_file('a_folder/page.j2')
     config.update({
@@ -328,12 +328,13 @@ def test_setdefault_iterable_true(config):
         'index.html': 'page.html'
     })
     config = setdefault_target_name(source_file, config)
+    config = is_index(source_file, config)
     assert config['target_name'] == config['index.html']
     config = setdefault_iterable(source_file, config)
     assert config['iterable'] is False
 
 
-@will_test(setdefault_target_name, setdefault_iterable)
+@will_test(is_index, setdefault_target_name, setdefault_iterable)
 def test_setdefault_iterable_false(config):
     source_file = get_test_file('a_folder/page.j2')
     config.update({
@@ -343,6 +344,7 @@ def test_setdefault_iterable_false(config):
         'index.html': 'index.html'
     })
     config = setdefault_target_name(source_file, config)
+    config = is_index(source_file, config)
     assert config['target_name'] != config['index.html']
     config = setdefault_iterable(source_file, config)
     assert config['iterable'] is True
@@ -370,7 +372,7 @@ def test_setdefault_iterable_override_false(config):
     assert config['iterable'] is False
 
 
-@will_test(setdefault_name, setdefault_target_name, set_url)
+@will_test(setdefault_name, setdefault_target_name, is_index, set_url)
 def test_set_url(config):
     source_file = get_test_file('a_folder/page.j2')
     config.update({
@@ -379,11 +381,12 @@ def test_set_url(config):
         },
     })
     config = setdefault_target_name(source_file, config)
+    config = is_index(source_file, config)
     config = set_url(source_file, config)
     assert config['url'] == 'page.html'
 
 
-@will_test(setdefault_name, setdefault_target_name, set_url)
+@will_test(setdefault_name, setdefault_target_name, is_index, set_url)
 def test_set_url_index(config):
     source_file = get_test_file('a_folder/index.j2')
     config.update({
@@ -394,12 +397,13 @@ def test_set_url_index(config):
     })
     config = setdefault_name(source_file, config)
     config = setdefault_target_name(source_file, config)
+    config = is_index(source_file, config)
     assert config['target_name'] == config['index.html']
     config = set_url(source_file, config)
     assert config['url'] == ''
 
 
-@will_test(setdefault_name, setdefault_target_name, set_url)
+@will_test(setdefault_name, setdefault_target_name, is_index, set_url)
 def test_set_url_cant_override(config):
     source_file = get_test_file('a_folder/bad_page1.j2')
     config.update({
@@ -407,5 +411,6 @@ def test_set_url_cant_override(config):
     })
     config = setdefault_name(source_file, config)
     config = setdefault_target_name(source_file, config)
+    config = is_index(source_file, config)
     config = set_url(source_file, config)
     assert config['url'] == 'bad_page1.html'

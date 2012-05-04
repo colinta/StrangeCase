@@ -67,13 +67,14 @@ def test_order_from_name_no_match(config):
     assert 'order' not in config
 
 
-@will_test(setdefault_target_name, set_url, strip_extensions)
+@will_test(setdefault_target_name, is_index, set_url, strip_extensions)
 def test_strip_extensions_strip(config):
     config.update({
         'strip_extensions': ['.txt']
     })
     source_file = get_test_file('a_folder/a_file.txt')
     config = setdefault_target_name(source_file, config)
+    config = is_index(source_file, config)
     config = set_url(source_file, config)
     config = strip_extensions(source_file, config)
     assert config['url'] == 'a_file'
@@ -111,7 +112,7 @@ def test_strip_extensions_no_strip(config):
     assert config['url'] == 'a_file.txt'
 
 
-@will_test(setdefault_name, setdefault_target_name, title_from_name)
+@will_test(setdefault_name, setdefault_target_name, is_index, title_from_name)
 def test_title_from_name(config):
     config.update({
         'name': 'the_file_is_a_file_the_file'
@@ -119,6 +120,7 @@ def test_title_from_name(config):
     source_file = get_test_file('a_folder/a_file.txt')
     config = setdefault_name(source_file, config)
     config = setdefault_target_name(source_file, config)
+    config = is_index(source_file, config)
     config = title_from_name(source_file, config)
     assert config['title'] == 'The File Is a File the File'
 
@@ -133,7 +135,7 @@ def test_file_stats(config):
 
 
 @will_test(file_types, front_matter_config, setdefault_target_name,
-           setdefault_name, set_url, created_at_from_name)
+           setdefault_name, is_index, set_url, created_at_from_name)
 def test_target_name_changes_url(config):
     source_file = get_test_file('a_folder/2012_01_01_file.txt')
     config.update({
@@ -150,6 +152,7 @@ def test_target_name_changes_url(config):
     config = front_matter_config(source_file, config)
     config = setdefault_target_name(source_file, config)
     config = setdefault_name(source_file, config)
+    config = is_index(source_file, config)
     config = set_url(source_file, config)
     config = created_at_from_name(source_file, config)
     assert config['target_name'] == 'a_file.txt'

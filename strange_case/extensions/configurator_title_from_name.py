@@ -1,6 +1,6 @@
 import re
 
-from strange_case.configurators import provides, is_index
+from strange_case.configurators import provides
 
 
 def titlecase(s):
@@ -20,14 +20,10 @@ def title_from_name(source_file, config):
     """
     Title-cases the name and stores it in config['title']
     """
-    if is_index(config) and hasattr(config, 'parent'):
+    if config['is_index'] and hasattr(config, 'parent'):
         title = config.parent['name']
     else:
         title = config['name']
     title = titlecase(title)
     config['title'] = title
     return config
-
-
-title_from_name.defaults = {}
-title_from_name.defaults.update(is_index.defaults)

@@ -30,6 +30,7 @@ CONFIG = ConfigDict({
         'strange_case.configurators.front_matter_config',
         'strange_case.configurators.setdefault_name',
         'strange_case.configurators.setdefault_target_name',
+        'strange_case.configurators.is_index',
         'strange_case.configurators.setdefault_iterable',
         'strange_case.configurators.ignore',
         'strange_case.configurators.skip_if_not_modified',  # sets 'skip' if mtime is new

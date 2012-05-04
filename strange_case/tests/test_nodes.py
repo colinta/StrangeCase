@@ -47,6 +47,7 @@ class TestIndexNode(PageNode):
             'target_name': name,
             'name': name,
             'iterable': False,
+            'is_index': True,
         }
         super(TestIndexNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/a_file.txt'),
