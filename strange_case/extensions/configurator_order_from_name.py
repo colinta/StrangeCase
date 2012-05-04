@@ -4,15 +4,15 @@ from strange_case.configurators import provides
 
 
 ORDER_RE = re.compile(r'''
-    (?P<order>[0]\d+)
+    ^(?P<order>[0]\d+)
     [-_]
     (?P<name>.*)
 ''', re.VERBOSE)
-STRIP_ORDER_RE = re.compile(r'(?P<order>[0]\d+)[-_]')
 
 
 def strip_order_from(order, name):
-    match = STRIP_ORDER_RE.match(name)
+    strip_order_re = re.compile(r'^0+{order}[-_]'.format(**locals()))
+    match = strip_order_re.search(name)
     if match:
         return name[len(match.group(0)):]
     return name
@@ -24,12 +24,12 @@ def order_from_name(source_file, config):
     Adds ordering to a file name (when dates aren't quite enough).  The first digit
     *must* be a "0", to distinguish it from a date.
     """
-    matches = ORDER_RE.match(config['name'])
+    matches = ORDER_RE.search(config['name'])
     order = None
     if matches:
         order = int(matches.group('order'))
     else:
-        matches = ORDER_RE.match(config['target_name'])
+        matches = ORDER_RE.search(config['target_name'])
         if matches:
             order = matches.group('order')
 

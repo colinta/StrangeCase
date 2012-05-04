@@ -67,6 +67,32 @@ def test_order_from_name_no_match(config):
     assert 'order' not in config
 
 
+@will_test(setdefault_target_name, setdefault_name, order_from_name,
+           created_at_from_name)
+def test_order_and_created_at_from_name_match(config):
+    source_file = get_test_file('a_folder/001_2012_05_04.txt')
+    config = setdefault_target_name(source_file, config)
+    config = setdefault_name(source_file, config)
+    config = order_from_name(source_file, config)
+    config = created_at_from_name(source_file, config)
+    assert config['order'] == 1
+    assert config['created_at'] == datetime.date(2012, 5, 4)
+
+
+@will_test(setdefault_target_name, setdefault_name, order_from_name,
+           created_at_from_name)
+def test_order_and_created_at_from_name_strip_target_name(config):
+    config['strip_metadata_from_target_name'] = True
+    source_file = get_test_file('a_folder/001_2012_05_04_file.txt')
+    config = setdefault_target_name(source_file, config)
+    config = setdefault_name(source_file, config)
+    config = order_from_name(source_file, config)
+    config = created_at_from_name(source_file, config)
+    assert config['order'] == 1
+    assert config['created_at'] == datetime.date(2012, 5, 4)
+    assert config['target_name'] == 'file.txt'
+
+
 @will_test(setdefault_target_name, is_index, set_url, strip_extensions)
 def test_strip_extensions_strip(config):
     config.update({

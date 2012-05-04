@@ -5,7 +5,7 @@ from strange_case.configurators import provides
 
 
 CREATED_AT_RE = re.compile(r'''
-    (?P<created_at>
+    ^(?P<created_at>
         (?P<year>[1-9]\d{3})
         (?:
             [-_](?P<month>\d{2})
@@ -13,26 +13,13 @@ CREATED_AT_RE = re.compile(r'''
                 [-_](?P<day>\d{2})
             )?
         )?
-        [-_]
-    )
+    )[-_]
     (?P<name>.*)''', re.VERBOSE)
-
-STRIP_CREATED_AT_RE = re.compile(r'''
-    (?P<created_at>
-        (?P<year>[1-9]\d{3})
-        (?:
-            [-_](?P<month>\d{2})
-            (?:
-                [-_](?P<day>\d{2})
-            )?
-        )?
-        [-_]
-    )
-    ''', re.VERBOSE)
 
 
 def strip_created_at_from(created_at, name):
-    match = STRIP_CREATED_AT_RE.match(name)
+    strip_created_at_re = re.compile(r'^{created_at}[-_]'.format(**locals()))
+    match = strip_created_at_re.search(name)
     if match:
         return name[len(match.group(0)):]
     return name
@@ -45,9 +32,9 @@ def created_at_from_name(source_file, config):
     and you don't have to add `date: ...` using YAML, plus you get a
     python date object.
     """
-    matches = CREATED_AT_RE.match(config['name'])
+    matches = CREATED_AT_RE.search(config['name'])
     if not matches:
-        matches = CREATED_AT_RE.match(config['target_name'])
+        matches = CREATED_AT_RE.search(config['target_name'])
 
     if matches:
         created_at = matches.group('created_at')
