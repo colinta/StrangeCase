@@ -622,6 +622,9 @@ is because *everything it does* can be controlled using the config. ::
       - title
       - created_at
       - order
+      - iterable
+      - url
+      - skip
     file_types:                                 # how files should be processed.  some processors add to this list, like to associate images
         - [page, ['*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt']],   # with the image processor
     default_type: asset                       # if this is falsey, unassociated nodes will be ignored.
