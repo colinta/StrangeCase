@@ -8,7 +8,10 @@ from strange_case.registry import Registry
 @provides('type')
 def file_types(source_file, config):
     if os.path.isdir(source_file):
-        config['type'] = config['default_folder_type']
+        if source_file == config['site_path']:
+            config['type'] = config['default_root_type']
+        else:
+            config['type'] = config['default_folder_type']
         return config
     else:
         types = config.get('file_types', [])
@@ -34,6 +37,7 @@ file_types.defaults = {
         ('page', ('*.j2', '*.jinja2', '*.jinja', '*.txt', '*.html', '*.xml')),
     ],
     'default_type': 'asset',
+    'default_root_type': 'root',
     'default_folder_type': 'folder',
 }
 
