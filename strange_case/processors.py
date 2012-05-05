@@ -20,7 +20,7 @@ from strange_case.configurators import configurate
 
 
 def build_node(config, source_path, target_path, file_name):
-    source_file = os.path.join(source_path, file_name)
+    source_file = os.path.abspath(os.path.join(source_path, file_name))
 
     config = configurate(source_file, config)
     if not config:
