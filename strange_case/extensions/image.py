@@ -1,3 +1,4 @@
+import sys
 import os
 from shutil import copy2
 try:
@@ -36,12 +37,12 @@ class ImageNode(AssetNode):
                 image.thumbnail(size, Image.ANTIALIAS)
                 image.save(target_path)
             elif self['verbose']:
-                print "Skipping %s" % target_path
+                sys.stderr.write("Skipping %s\n" % target_path)
         else:
             if not self['skip']:
                 copy2(source_path, target_path)
             elif self['verbose']:
-                print "Skipping %s" % target_path
+                sys.stderr.write("Skipping %s\n" % target_path)
         self.files_tracked.append(source_path)
         self.files_written.append(target_path)
 

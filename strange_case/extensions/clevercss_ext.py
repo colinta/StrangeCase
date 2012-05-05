@@ -1,3 +1,4 @@
+import sys
 import jinja2
 import jinja2.ext
 try:
@@ -46,7 +47,7 @@ class CleverCssNode(AssetNode):
             with open(target_path, 'w') as f:
                 f.write(css_content)
         elif self['verbose']:
-            print 'Skipping %s' % target_path
+            sys.stderr.write("Skipping %s\n" % target_path)
         self.files_tracked.append(source_path)
         self.files_written.append(target_path)
 
