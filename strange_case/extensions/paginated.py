@@ -53,7 +53,7 @@ to use in your template:
 You can output a str representation of a page object and it will
 look something like this:
 
-    Page n of N, item(s) a to b
+    n of N, item(s) a to b
 
 If you need to configure the page nodes that get created,
 you can add a `pages` dictionary to the first page.  For every
@@ -90,12 +90,11 @@ from strange_case.configurators import configurate
 import types
 
 
-def bind(object, name=None):
-    def dec(function):
+def bind(bind_to, name=None):
+    def descriptor(function):
         my_name = name or function.__name__
-
-        setattr(object, my_name, types.MethodType(function, object))
-    return dec
+        setattr(bind_to, my_name, types.MethodType(function, bind_to))
+    return descriptor
 
 
 class Page(object):
@@ -154,7 +153,12 @@ class Page(object):
         return self.items.__len__()
 
     def __str__(self):
-        return "Page %i of %i, item%s %i to %i" % (self.page, self.pages, (self.from_index < self.to_index and 's' or ''), self.from_index, self.to_index)
+        ret = "Page %i of %i, " % (self.page, self.pages)
+        if self.from_index < self.to_index:
+            ret += 'items %i to %i' % (self.from_index, self.to_index)
+        else:
+            ret += 'item %i' % self.from_index
+        return ret
 
 
 def paginate(all_items, limit):
@@ -193,7 +197,7 @@ def paginated_processor(config, source_path, target_path):
     @bind(paginated_processor)
     def populate(self, site):
         ret = []
-        nodes = [node for node in self.parent if node.is_page]
+        nodes = [node for node in self.siblings if node.is_page]
         if page_order.upper() == 'DESC':
             nodes.reverse()
         pages = paginate(nodes, page_limit)

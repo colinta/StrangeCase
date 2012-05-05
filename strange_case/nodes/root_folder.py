@@ -28,7 +28,7 @@ class RootFolderNode(FolderNode):
         while len(processors):
             for child in processors:
                 ret = child.populate(self)
-                if ret:
+                if ret is not None:
                     child.replace_with(ret)
 
             processors = self.processors(recursive=True)

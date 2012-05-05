@@ -1,8 +1,13 @@
+# -*- encoding: utf-8 -*-
 import os
+from os.path import join
+import re
+import shutil
 from functools import wraps
+from strange_case.strange_case_config import CONFIG
 
 
-def test_test_setup():
+def test_setup():
     assert True == os.path.isdir(get_test_file('a_folder'))
 
     assert True == os.path.exists(get_test_file('a_folder/2012_01_01_file.txt'))
@@ -25,14 +30,18 @@ def test_test_setup():
 
 
 def get_test_file(source):
-    return os.path.join(os.path.dirname(__file__), source)
+    return join(os.path.dirname(__file__), source)
 
 
 def will_test(*configurators):
     def decorator(fn):
         @wraps(fn)
         def wrapper():
-            config = {}
+            config = {
+                'project_path': os.path.dirname(__file__),
+                'site_path': get_test_file('a_site'),
+                'deploy_path': get_test_file('a_public'),
+            }
             for configurator in configurators:
                 try:
                     config.update(configurator.defaults)
@@ -41,3 +50,105 @@ def will_test(*configurators):
             return fn(config)
         return wrapper
     return decorator
+
+
+def will_generate(_deploy_path):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper():
+            deploy_path = get_test_file(_deploy_path)
+            if os.path.exists(deploy_path):
+                shutil.rmtree(deploy_path)
+            config = CONFIG.copy(all=True)
+            return fn(config)
+        return wrapper
+    return decorator
+
+
+def check_path_contents(path, path_contents):
+    """
+    Checks contents and file structure.  Any files not in path_contents that
+    exist in path will raise an assertion error, and any content in
+    path_contents that is not in path will raise an assertion error.
+    """
+    check_existing_files(path, path_contents)
+
+    for filename, contents in path_contents.iteritems():
+        assert os.path.exists(join(path, filename))
+        if isinstance(contents, dict):
+            check_path_contents(join(path, filename), contents)
+        elif isinstance(contents, list):
+            for content in contents:
+                check_file_contents(join(path, filename), content)
+        else:
+            check_file_contents(join(path, filename), contents)
+
+
+def check_existing_files(path, should_exist):
+    folders = [k for k in should_exist.keys() if isinstance(should_exist[k], dict)]
+    files = [k for k in should_exist.keys() if not isinstance(should_exist[k], dict)]
+    for filename in os.listdir(path):
+        file = join(path, filename)
+        if os.path.isfile(file):
+            assert filename in files, "{filename} is not in {files}".format(**locals())
+            del files[files.index(filename)]
+        if os.path.isdir(file):
+            assert filename in folders, "{filename} is not in {folders}".format(**locals())
+            del folders[folders.index(filename)]
+            check_existing_files(file, should_exist[filename])
+    assert len(folders) == 0, 'folders contains "{folders!r}", but should be empty'.format(**locals())
+    assert len(files) == 0, 'files contains "{files!r}", but should be empty'.format(**locals())
+
+
+RegexType = type(re.compile(''))
+
+
+def check_file_contents(file_name, search):
+    with open(file_name) as f:
+        content = f.read()
+
+    if search is True:
+        assert True
+    elif isinstance(search, RegexType):
+        file_name = os.path.basename(file_name)
+        assert search.search(content), '{file_name} does not match {search.pattern}'.format(**locals())
+    else:
+        file_name = os.path.basename(file_name)
+        assert search in content, '{file_name} does not contain {search}'.format(**locals())
+
+
+def count_slashes(string):
+    return len(filter(lambda c: c == '/', [c for c in string]))
+
+
+LEFT_T = '|-- '  # u'\u251c\u2500\u2500'
+LAST_T = '+-- '  # u'\u2514\u2500\u2500'
+NEXT_T = '|   '  # u'\u2502\xa0\xa0'
+NONE_T = '    '  # u'\u2502\xa0\xa0'
+
+
+def tree(path, rel_to, indent=None):
+    import sys
+    from blessings import Terminal
+    t = Terminal()
+
+    # available in locals()
+    left_t = LEFT_T
+    last_t = LAST_T
+    next_t = NEXT_T
+    none_t = NONE_T
+
+    if indent is None:
+        sys.stdout.write(t.bold_blue(os.path.relpath(path, rel_to)) + "\n")
+        indent = []
+
+    last_index = len(os.listdir(path)) - 1
+    for index, entry in enumerate(os.listdir(path)):
+        is_last = index == last_index
+        sys.stdout.write(u"{indent}{pre}{entry}\n".format(indent=''.join(indent), pre=is_last and last_t or left_t, entry=entry))
+        file = join(path, entry)
+        if os.path.isdir(file):
+            if is_last:
+                tree(file, rel_to, indent + [none_t])
+            else:
+                tree(file, rel_to, indent + [next_t])

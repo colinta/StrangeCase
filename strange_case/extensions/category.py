@@ -30,6 +30,7 @@ import re
 from strange_case.nodes import JinjaNode, Processor, FolderNode
 from strange_case.registry import Registry
 from strange_case.configurators import configurate
+from strange_case.processors import build_node
 
 
 class CategoryDetail(JinjaNode):
@@ -43,9 +44,6 @@ class CategoryDetail(JinjaNode):
 
     def __init__(self, config, target_path, category):
         config['title'] = category
-        if CategoryDetail.source_path is None:
-            raise TypeError('CategoryDetail.source_path is not assigned.  '
-                            'Create a node of type "category_detail"')
         super(CategoryDetail, self).__init__(config, CategoryDetail.source_path, target_path)
         self.count = 0
         self.pages = []
@@ -53,6 +51,10 @@ class CategoryDetail(JinjaNode):
 
 class CategoryFolderProcesser(Processor):
     def populate(self, site):
+        if CategoryDetail.source_path is None:
+            raise TypeError('CategoryDetail.source_path is not assigned. '
+                            'Create a node of type "category_detail"')
+
         pages = site.pages(recursive=True)
         categories = {}
         for page in pages:
@@ -79,21 +81,21 @@ class CategoryFolderProcesser(Processor):
 
 
 def processor(config, source_path, target_path):
-    configurate(source_path, config)
+    config = configurate(source_path, config)
     categories_name = config.get('name', 'categories')
 
     folder_config = config.copy()
     folder_config['target_name'] = categories_name
     folder_config['name'] = categories_name
-    configurate(source_path, folder_config)
-    folder = FolderNode(folder_config, None, target_path)
+    folder_config['type'] = config['default_folder_type']
+    folder = build_node(folder_config, os.path.dirname(source_path), target_path, categories_name)[0]
     categories_folder_target_path = os.path.join(target_path, categories_name)
 
     config['dont_inherit'] = [key for key in config['dont_inherit'] if key != 'title']
     index_config = config.copy()
     index_config['target_name'] = config['index.html']
     index_config['name'] = 'index'
-    configurate(os.path.join(source_path, index_config['target_name']), index_config)
+    configurate(os.path.join(source_path, config['index.html']), index_config)
     index_node = JinjaNode(index_config, source_path, categories_folder_target_path)
     folder.append(index_node)
     CategoryDetail.index_node = index_node

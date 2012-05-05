@@ -31,6 +31,13 @@ def test_file_types_folder(config):
 
 
 @will_test(file_types)
+def test_file_types_root(config):
+    source_file = config['site_path']
+    config = file_types(source_file, config)
+    assert config['type'] == 'root'
+
+
+@will_test(file_types)
 def test_file_types_from_glob1(config):
     config.update({
         'file_types': [

@@ -1,0 +1,28 @@
+---
+type: paginated
+paginated:
+    limit: 2
+    name: 'pagina'
+    title: 'Página'
+---
+{% extends "layouts/base.j2" %}
+
+
+{% block content %}{% markdown %}
+My blogs:
+
+{% for page in my.page -%}
+- [{{ page.title }}]({{ page.url }})
+{% endfor %}
+
+{% if my.page.prev %}&lsaquo; [{{ my.page.prev.title }}]({{ my.page.prev.url }})
+{% else %}&lsaquo; First
+{% endif %}
+
+{{ my.page }}
+
+{% if my.page.next %}[{{ my.page.next.title }}]({{ my.page.next.url }}) &rsaquo;
+{% else %}&rsaquo; Last
+{% endif %}
+
+{% endmarkdown %}{% endblock %}

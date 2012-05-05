@@ -16,7 +16,7 @@ class FolderNode(Node):
             os.mkdir(folder)
 
         # folders can be 'virtual', like the category folder
-        if self.source_path:
+        if self.source_path and os.path.exists(self.source_path):
             self.files_tracked.append(self.source_path)
         self.files_written.append(folder)
         super(FolderNode, self).generate(site)

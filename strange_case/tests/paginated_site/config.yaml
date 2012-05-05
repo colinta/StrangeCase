@@ -1,0 +1,4 @@
+extensions:
+  - strange_case.extensions.markdown.MarkdownExtension
+processors:
+  - strange_case.extensions.paginated
