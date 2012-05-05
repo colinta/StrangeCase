@@ -25,6 +25,9 @@ def front_matter_config(source_file, config):
     global arguments, so changes to the local scope (adding, changing, removing
     variables) will result in changes to the config object.  You do not access
     the config object within this block.
+
+    This is the last time that the 'type' is checked.  It is often set in the
+    front matter to use categories, pagination or other extensions.
     """
     if config['type'] == 'page' and os.path.isfile(source_file):
         with open(source_file, 'r') as f:
