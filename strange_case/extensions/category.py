@@ -43,6 +43,9 @@ class CategoryDetail(JinjaNode):
 
     def __init__(self, config, target_path, category):
         config['title'] = category
+        if CategoryDetail.source_path is None:
+            raise TypeError('CategoryDetail.source_path is not assigned.  '
+                            'Create a node of type "category_detail"')
         super(CategoryDetail, self).__init__(config, CategoryDetail.source_path, target_path)
         self.count = 0
         self.pages = []
@@ -53,19 +56,21 @@ class CategoryFolderProcesser(Processor):
         pages = site.pages(recursive=True)
         categories = {}
         for page in pages:
-            if not page['category']:
+            try:
+                category = page.category
+            except AttributeError:
                 continue
 
-            if page.category not in categories:
+            if category not in categories:
                 config = self.config_copy()
-                target_name = re.sub(r'[\W -]+', '_', page.category, re.UNICODE)
+                target_name = re.sub(r'[\W -]+', '_', category, re.UNICODE)
                 config['name'] = target_name
                 config['target_name'] = target_name + config['html_extension']
                 configurate(CategoryDetail.source_path, config)
-                categories[page.category] = CategoryDetail(config, self.target_folder, page.category)
+                categories[category] = CategoryDetail(config, self.target_folder, category)
 
-            categories[page.category].count += 1
-            categories[page.category].pages.append(page)
+            categories[category].count += 1
+            categories[category].pages.append(page)
 
         # assign categories list to the category index page
         if CategoryDetail.index_node:
