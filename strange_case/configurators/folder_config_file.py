@@ -14,7 +14,3 @@ def folder_config_file(source_file, config):
             if yaml_config:
                 config.update(yaml_config)
     return config
-
-folder_config_file.defaults = {
-    'config_file': 'config.yaml',
-}

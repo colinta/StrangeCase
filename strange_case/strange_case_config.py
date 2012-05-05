@@ -4,6 +4,7 @@ from strange_case.configurators import *
 CONFIG = ConfigDict({
     ##|  ROOT URL
     'root_url': '/',
+    'config_file': 'config.yaml',
 
     ##|  USED TO CLEAN DEPLOY PATH
     'remove_stale_files': True,
