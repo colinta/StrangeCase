@@ -57,7 +57,6 @@ def meta_after(source_file, config):
     return config
 
 
-from dont_inherit import dont_inherit
 from file_types import file_types
 from folder_config_file import folder_config_file
 from front_matter_config import front_matter_config
