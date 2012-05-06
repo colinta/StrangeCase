@@ -162,7 +162,7 @@ A little shorter than our original ``index.j2``.  Notice I've left out the YAML
 front matter, and yet I am using the variables `title`, `order`, and
 `created_at`.  Where do they get their value from?
 
-The file name!
+The file name, and configurators.
 
 ::
 
@@ -176,11 +176,11 @@ The file name!
      +-order
 
 In this way, you get some variables for free just by naming your files with a
-date and/or order prefix. Later, you'll be able to write your own function that
-does this — and more!  We are looking at the by-product of “configurators”, and
-they can access and modify the entire config for the node.
+date and/or order prefix.  We are looking at the by-product of “configurators”.
+They are passed the source file name and the config dictionary.  There are some
+that *have* to run, and some that are optional but enabled by default.
 
-BUT, if you tried to run StrangeCase right now, you would get the following
+Anyway, if you tried to run StrangeCase right now, you would get the following
 error::
 
     $ scase
@@ -255,19 +255,20 @@ Add ``index.j2`` to ``site/projects/`` ::
 
 Iterating over folders is a very easy thing to do in StrangeCase.  It's how you
 do things like create an index page, as we saw here, or create a photo blog
-(``for photo in site.images.my_fun_trip``).  It is what I found very
-frustrating in ``jekyll`` and ``hyde`` (especially ``jekyll``), and so it's
-what is *very easy* in ``StrangeCase``.
+(``for photo in site.images.my_fun_trip``).  It is the thing that I wanted to be
+*really* easy, because I couldn't figure out, at a glance, how to do it in
+jekyll or hyde (it is possible in hyde, I think).
 
-Notice that when we iterate over the ``site.projects`` folder, it does *not*
+Notice that when we iterate over the ``site.projects`` folder, it doesn't
 include the ``index.html`` file.  Makes sense, though, right?  The index page
 is considered to be the same "page" as the folder.  Even though they are
 seperate nodes, they have the same URL.
 
 To wrap things up, let's make a link to the project page from the home page.
 Every node has a ``url`` property, and you can access pages by their name.
-"name" is whatever is "leftover" after the created_at date and order have been
-pulled out.  I'll add a link to the second project to demonstrate this::
+"name" is whatever is "leftover" after the created_at date, order and extension
+have been pulled out.  I'll add a link to the second project to demonstrate
+this::
 
     ---
     title: My first StrangeCase site
@@ -907,14 +908,14 @@ configuration. For example to enable the date filter you must add::
     filters:
       date: strange_case.extensions.date.date
 
-This will register a filter named *date* which is implemented by by
-``strange_case.extensions.date.date``.
+This will register a filter named *date* which is implemented by the function
+`date` in the module ``strange_case.extensions.date``.
 
 strange_case.extensions.date.date
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This filter formats a date. The input must either be a date in YYYY-MM-DD
-notation, or the string *now* to always use the current date. If no date
+notation, or the string ``"now"`` for the current date. If no date
 is specified it is printer in YYYY-MM-DD notation.
 
 ::

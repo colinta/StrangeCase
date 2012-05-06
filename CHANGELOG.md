@@ -1,14 +1,35 @@
 TODO
 ====
 
+* create a generic Extension mechanism, something that brings `filters` and
+  `processors` and `configurators` all under one roof.
+
 * add scaffolding, especially to help create a useful config.yaml file (which
   is, at this point, pretty much a necessity)
 
-* merge YAML/config using a DSL that allows arrays to be extended instead of replaced
-
 * add CSS/JS compressor/minification/combinator support, probably as a tag.
 
-* table of contents
+* **CANCELED** merge YAML/config using a DSL that allows arrays to be extended
+  instead of replaced
+
+* **TABLED** table of contents
+
+2012_05_06 - v4.1.6
+===================
+
+* Lots more tests, including entire site building tests.
+* Lots of fixes - thanks, tests!
+* configurator methods can now offer some special properties that are picked up
+  in the `strange_case` function, `meta_before` and `meta_after`:
+  1. defaults - a dictionary of configuration key/values
+  2. require_before - a list of config keys that must be present when
+     configuration starts
+  3. require_after - a list of config keys that must be present when
+     configuration ends
+  4. on_start - a function that is called before the root node is created, it is
+     passed the config dict
+  5. on_finish - a function that is called after the site is generater, also
+     handed the config dict
 
 2012_04_27 - v4.0.10
 ====================
