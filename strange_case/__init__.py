@@ -1,6 +1,5 @@
 from fnmatch import fnmatch
 import sys
-import pickle
 
 from strange_case.registry import Registry
 from strange_case.extensions import *
@@ -134,10 +133,14 @@ def strange_case(config):
     for configurator in get_configurators(config):
         Registry.add_configurator(configurator)
 
-    # read timestamps file
-    timestamps_file = os.path.join(config['project_path'], '.timestamps')
-    if os.path.exists(timestamps_file):
-        config['file_mtimes'] = pickle.load(open(timestamps_file))
+    # configurators can respond to the 'on_start' hook
+    # currently, only the skip_if_not_modified configurator uses this, to
+    # read in the .timestamps file.
+    for configurator in Registry.configurators:
+        try:
+            configurators.on_start(config)
+        except AttributeError:
+            pass
 
     # each node class should add files to these properties, so that watchdog and
     # stale-file-removal work.
@@ -160,13 +163,12 @@ def strange_case(config):
     Registry.set('root', root_node)
     root_node.generate()
 
-    # create timestamps file
-    timestamps = {}
-    for file_tracked in Node.files_tracked:
-        f = os.path.abspath(file_tracked)
-        timestamps[f] = os.stat(file_tracked).st_mtime
-    timestamps_file = os.path.join(config['project_path'], '.timestamps')
-    pickle.dump(timestamps, open(timestamps_file, 'w'))
+    # configurators can respond to the 'on_finish' hook
+    for configurator in Registry.configurators:
+        try:
+            configurators.on_finish(config)
+        except AttributeError:
+            pass
 
     if remove_stale_files and existing_files:
         paths = []
