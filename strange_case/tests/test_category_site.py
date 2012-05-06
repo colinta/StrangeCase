@@ -1,5 +1,4 @@
 import os
-import re
 from os.path import join
 import yaml
 from strange_case import strange_case
