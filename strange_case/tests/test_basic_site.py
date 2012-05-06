@@ -77,10 +77,8 @@ def test_basic_site_remove_existing(config):
     try:
         strange_case(config)
     except Exception:
-        min_indent = count_slashes(config['site_path'])
-        for entry in os.walk(config['site_path'], topdown=False):
-            indent = count_slashes(entry[0]) - min_indent
-            print indent
+        tree(config['site_path'], config['project_path'])
+        tree(config['deploy_path'], config['project_path'])
         raise
 
     path_contents = {

@@ -47,6 +47,11 @@ def will_test(*configurators):
                     config.update(configurator.defaults)
                 except AttributeError:
                     pass
+            for configurator in configurators:
+                try:
+                    config.on_start(config)
+                except AttributeError:
+                    pass
             return fn(config)
         return wrapper
     return decorator
@@ -60,7 +65,9 @@ def will_generate(_deploy_path):
             if os.path.exists(deploy_path):
                 shutil.rmtree(deploy_path)
             config = CONFIG.copy(all=True)
-            return fn(config)
+            ret = fn(config)
+            shutil.rmtree(deploy_path)
+            return ret
         return wrapper
     return decorator
 
@@ -115,10 +122,6 @@ def check_file_contents(file_name, search):
     else:
         file_name = os.path.basename(file_name)
         assert search in content, '{file_name} does not contain {search}'.format(**locals())
-
-
-def count_slashes(string):
-    return len(filter(lambda c: c == '/', [c for c in string]))
 
 
 LEFT_T = '|-- '  # u'\u251c\u2500\u2500'

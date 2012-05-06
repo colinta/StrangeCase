@@ -138,7 +138,7 @@ def strange_case(config):
     # read in the .timestamps file.
     for configurator in Registry.configurators:
         try:
-            configurators.on_start(config)
+            configurator.on_start(config)
         except AttributeError:
             pass
 
