@@ -26,11 +26,11 @@ def test_category_site(config):
                 '2012_01_01_post1.html': True,
                 '2012_01_02_post2.html': True,
             },
-            'categories': {
+            'zee_categories': {
                 'index.html': [
                     'Categories (2)',
-                    '<a href="/categories/good.html">good</a>',
-                    '<a href="/categories/bad.html">bad</a>'
+                    '<a href="/zee_categories/good.html">good</a>',
+                    '<a href="/zee_categories/bad.html">bad</a>'
                 ],
                 'good.html': ['Category: good'],
                 'bad.html': ['Category: bad'],

@@ -27,7 +27,7 @@ In the end, we will be creating:
 import os
 import re
 
-from strange_case.nodes import JinjaNode, Processor, FolderNode
+from strange_case.nodes import JinjaNode, Processor
 from strange_case.registry import Registry
 from strange_case.configurators import configurate
 from strange_case.processors import build_node
@@ -82,7 +82,7 @@ class CategoryFolderProcesser(Processor):
 
 def processor(config, source_path, target_path):
     config = configurate(source_path, config)
-    categories_name = config.get('name', 'categories')
+    categories_name = config['name']
 
     folder_config = config.copy()
     folder_config['target_name'] = categories_name
