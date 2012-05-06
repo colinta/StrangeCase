@@ -33,7 +33,7 @@ def test_paginated_site(config):
                 'pagina2.html': [
                     '<li><a href="/blogs/2012_01_03_post3.html">Post3</a></li>',
                     '<li><a href="/blogs/2012_01_04_post4.html">Post4</a></li>',
-                    '<p>&lsaquo; <a href="/blogs/index.html">Index</a></p>',
+                    '<p>&lsaquo; <a href="/blogs/">Blogs</a></p>',
                     '<p>Page 2 of 3, items 3 to 4</p>',
                     '<a href="/blogs/pagina3.html">Página 3</a> &rsaquo;'
                 ],

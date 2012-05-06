@@ -47,3 +47,7 @@ order_from_name.defaults = {
     'strip_metadata_from_name': True,
     'strip_metadata_from_target_name': False,
 }
+
+order_from_name.dont_inherit = [
+    'order'
+]

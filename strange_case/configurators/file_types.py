@@ -44,3 +44,7 @@ file_types.defaults = {
 file_types.require_after = [
     'type',
 ]
+
+file_types.dont_inherit = [
+    'type'
+]

@@ -67,3 +67,7 @@ created_at_from_name.defaults = {
     'strip_metadata_from_name': True,
     'strip_metadata_from_target_name': False,
 }
+
+created_at_from_name.dont_inherit = [
+    'created_at'
+]

@@ -46,16 +46,4 @@ CONFIG = ConfigDict({
         'strange_case.configurators.set_url',
         'strange_case.configurators.meta_after',
     ],
-    'dont_inherit': [
-        'type',
-        'name',
-        'target_name',
-        'title',
-        'created_at',
-        'order',
-        'iterable',
-        'is_index',
-        'url',
-        'skip',
-    ]
 })

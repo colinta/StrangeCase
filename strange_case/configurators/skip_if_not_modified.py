@@ -14,6 +14,10 @@ class SkipIfNotModified(object):
         '.timestamps': '.timestamps',
     }
 
+    dont_inherit = [
+        'skip'
+    ]
+
     def on_start(self, config):
         if not config['.timestamps']:
             return

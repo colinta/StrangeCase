@@ -34,7 +34,6 @@ def test_basic_site(config):
 <ol>
 <li><p><a href="/blogs/2012_01_01_post1.html">Post1</a></p></li>
 <li><p><a href="/blogs/2012_01_02_post2.html">Post2</a></p></li>
-<li><p><a href="/blogs/index.html">Index</a></p></li>
 </ol>
 <p>Hi!</p>
 

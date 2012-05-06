@@ -10,3 +10,7 @@ def is_index(source_file, config):
 is_index.defaults = {
     'index.html': 'index.html'
 }
+
+is_index.dont_inherit = [
+    'is_index'
+]

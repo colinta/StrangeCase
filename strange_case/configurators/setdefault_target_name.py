@@ -28,3 +28,7 @@ def setdefault_target_name(source_file, config):
     ### your business.  Or maybe I'll add something to the upcoming "renamers"
     config['target_name'] = target_name
     return config
+
+setdefault_target_name.dont_inherit = [
+    'target_name'
+]

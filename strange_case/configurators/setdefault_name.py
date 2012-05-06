@@ -35,3 +35,7 @@ setdefault_name.defaults = {
     },
     'html_extension': '.html'
 }
+
+setdefault_name.dont_inherit = [
+    'name'
+]

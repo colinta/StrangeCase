@@ -30,20 +30,31 @@ def configurate(source_file, config):
     return config
 
 
-def meta_before(source_file, config):
-    configurators = Registry.configurators
-    for configurator in configurators:
-        if hasattr(configurator, 'defaults'):
-            for key, value in configurator.defaults.iteritems():
-                if key not in config:
-                    config[key] = value
+class MetaBefore(object):
+    def on_start(self, config):
+        configurators = Registry.configurators
+        dont_inherit = []
+        for configurator in configurators:
+            if hasattr(configurator, 'dont_inherit'):
+                dont_inherit.extend(configurator.dont_inherit)
+        config['dont_inherit'] = dont_inherit
 
-        if hasattr(configurator, 'require_before'):
-            for required in configurator.require_before:
-                if required not in config:
-                    raise TypeError('Missing required config["{required}"] '
-                        'from {configurator.__name__}.require_before'.format(**locals()))
-    return config
+    def __call__(self, source_file, config):
+        configurators = Registry.configurators
+        for configurator in configurators:
+            if hasattr(configurator, 'defaults'):
+                for key, value in configurator.defaults.iteritems():
+                    if key not in config:
+                        config[key] = value
+
+            if hasattr(configurator, 'require_before'):
+                for required in configurator.require_before:
+                    if required not in config:
+                        raise TypeError('Missing required config["{required}"] '
+                            'from {configurator.__name__}.require_before'.format(**locals()))
+        return config
+
+meta_before = MetaBefore()
 
 
 def meta_after(source_file, config):
