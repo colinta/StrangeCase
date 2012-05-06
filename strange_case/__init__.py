@@ -64,8 +64,8 @@ def find_files(folder):
 
 def strange_case(config):
     # pull out important values.
-    site_path = config['site_path']
-    deploy_path = config['deploy_path']
+    config['site_path'] = site_path = os.path.abspath(config['site_path'])
+    config['deploy_path'] = deploy_path = os.path.abspath(config['deploy_path'])
 
     # check for site/ folder (required)
     if not os.path.isdir(site_path):
