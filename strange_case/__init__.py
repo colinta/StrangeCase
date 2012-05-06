@@ -68,15 +68,20 @@ def strange_case(config):
     site_path = config['site_path']
     deploy_path = config['deploy_path']
 
-    # look for files in content/
+    # check for site/ folder (required)
     if not os.path.isdir(site_path):
         raise IOError('Could not find site_path folder "%s"' % site_path)
 
+    # create the public/ folder
     if not os.path.isdir(config['deploy_path']):
         os.mkdir(config['deploy_path'])
 
     from strange_case.support.jinja import StrangeCaseEnvironment
 
+    ##|
+    ##|  EXTENSIONS
+    ##|  these are Jinja2 extensions that get loaded into the Environment object
+    ##|
     extensions = []
     if 'extensions' in config:
         for extension in config['extensions']:
@@ -95,6 +100,11 @@ def strange_case(config):
     else:
         jinja_environment = Registry.get('jinja_environment')
 
+    ##|
+    ##|  FILTERS
+    ##|  Jinja2 filter functions (`{{ var|filter }}`).  These are inserted into
+    ##|  the Environment object's `filter` property.
+    ##|
     if 'filters' in config:
         for filter_name, method in config['filters'].iteritems():
             if isinstance(method, basestring):
@@ -106,6 +116,11 @@ def strange_case(config):
             jinja_environment.filters[filter_name] = method
         del config['filters']
 
+    ##|
+    ##|  PROCESSORS
+    ##|  A processors function registers itself using `Registry.register`, so
+    ##|  all that is needed here is to load the module.
+    ##|
     if 'processors' in config:
         for processor in config['processors']:
             try:
@@ -115,7 +130,7 @@ def strange_case(config):
                 raise
         del config['processors']
 
-    # register configurators
+    # register configurators - I broke this out into a separate function (below)
     for configurator in get_configurators(config):
         Registry.add_configurator(configurator)
 
@@ -124,13 +139,13 @@ def strange_case(config):
     if os.path.exists(timestamps_file):
         config['file_mtimes'] = pickle.load(open(timestamps_file))
 
-    # this is the one folder that *doesn't* get processed by processors.build_page_tree,
-    # so it needs special handling here.
+    # each node class should add files to these properties, so that watchdog and
+    # stale-file-removal work.
     Node.files_written = []
-    root_node = build_node(config, site_path, deploy_path, '')[0]
-    assert root_node.type == 'root'
-    Registry.set('root', root_node)
+    Node.files_tracked = []
 
+    # create the list of existing files.  files that aren't generated will be
+    # removed (unless dont_remove config is True)
     remove_stale_files = config['remove_stale_files']
     dont_remove = config['dont_remove']
     existing_files = []
@@ -138,6 +153,11 @@ def strange_case(config):
         existing_files = find_files(deploy_path)
     else:
         os.makedirs(deploy_path)
+
+    # this is the one folder that *doesn't* get processed by
+    # processors.build_page_tree - it needs special handling here.
+    root_node = build_node(config, site_path, deploy_path, '')[0]
+    Registry.set('root', root_node)
     root_node.generate()
 
     # create timestamps file

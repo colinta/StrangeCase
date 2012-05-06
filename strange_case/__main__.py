@@ -1,3 +1,24 @@
+"""Builds a strange case, or starts a new strange case project
+    scase [options] [config:value [config:value ...]]
+    scase --scaffold name project_name
+
+-w --watch                Watch the site_path for changes
+--exclude=paths           Exclude files or folders from the --watch command
+-n --no-remove            Do not remove "stale" files in the deploy path
+-p=path --project=path    Specify the project path [default: os.getcwd()]
+-s=path --site=path       Specify the site path [default: site/]
+-d=path --deploy=path     Specify the deploy path [default: public/]
+-c=file --config=file     Specify a different config.yaml file [default: config.yaml]
+-v --verbose              Output warnings and debug messages
+
+Any other arguments will be parsed as configuration values, e.g.:
+
+    scase seo.title:'My new title'
+
+Will assign "My new title" to config['meta']['title'].  All argument overrides
+happen just after config.yaml and config.py are processed, so these act as
+project-level overrides.
+"""
 import imp
 import os
 import sys
@@ -11,10 +32,10 @@ def run():
     logging.basicConfig()
 
     import argparse
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-w', '--watch', dest='watch', action='store_const',
                        const=True, default=False,
-                       help='watch the site_path for changes (default: find the max)')
+                       help='watch the site_path for changes')
     conf_overrides = [
         'project_path',
         'site_path',
