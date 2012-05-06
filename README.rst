@@ -331,7 +331,7 @@ First a root node is created::
 The ``build_node`` method **configures** and **processes** the node.
 **configures** means that it passes the ``source_path`` and ``config`` to each
 of the ``configurators`` (we saw these working in the tutorial above:
-``date_from_name``, ``order_from_name``, and ``title_from_name`` in
+``created_at_from_name``, ``order_from_name``, and ``title_from_name`` in
 particular).  **processes** means that one or more nodes are instantiated and
 added to the node tree.  The ``root_node`` sits at the top, and in your
 templates you access it using ``{{ site }}``.
@@ -342,9 +342,10 @@ This process continues recursively for every file and folder in site (except
 1.a - Configuration
 ~~~~~~~~~~~~~~~~~~~
 
-When you run StrangeCase, it immediately starts building a config object. This
-object will be used throughout the generation of your site, so it is important
-to understand what it does, and how you control it.
+When you run StrangeCase, it starts building a config object, a dictionary
+(actually an instance of ``ConfigDict``, which extends ``dict``). This object
+(and clones of it) will be used throughout the generation of your site, so it is
+important to understand what it does, and how you control it.
 
 First, ``strange_case_config.py`` establishes the initial defaults.  Look at
 that file, or read about the defaults below.  Next, the project config file is
@@ -355,18 +356,22 @@ expected to throw errors or make changes to that object as needed.  This is how
 "scaffolding" is accomplished, which is actually just a StrangeCase extension
 and a few handy ``site/`` folders.
 
-When a new node is being built, it starts
+When a new node is being built, it is given a copy of the config dictionary and
+passed through the configurators.  These add properties to the config dict that
+are specific to the node that is going to be built, including specifying *what
+type* of node will be built.  The default list of configurators is in
+``strange_case_config.py``.
 
-There are many ways that configuration can be added to a node during the build
-stage.  The first way is inheritance.  Nodes inherit all the configuration of
-the parent node except for the keys that are in ``dont_inherit`` (name,
-target_name, type, and most of the config options that are assigned by
-configurators).
+Nodes inherit all the configuration of the parent node except for the keys that
+are in ``dont_inherit`` (``name``, ``target_name``, ``type``, and most of the
+properties that are assigned by configurators).
 
 If the node is a folder, the special file config.yaml will be merged into that
 node if it exists.  If it is a file node, the parent folder's config is checked
 for a ``files`` entry, and if the current file is in there, that config is
-merged in.  ``page`` types can have YAML front matter.
+merged in.
+
+``page`` types can have YAML front matter, which we've read all about already.
 
 See the section below that outlines the default config, and how those options
 affect processing.  Know this: everything is controlled using config.  If you're
@@ -389,19 +394,23 @@ config.yaml file (using the ``files:`` dictionary)::
     # or, if you want to only process a couple files:
         - [page, ['special.js', 'special-2.js']]
 
-    # or just assign the 'page' processor
+    # or assign the 'page' processor
     files:
       special.js: { type: page }
 
 ``type`` is not inherited, but ``file_types`` is, so you can set a whole folder
 of assets to become page nodes using this config.
 
+Processors are kind of tricky to build, because they need to have a firm
+understanding of the build process.  If you're feeling industrious, there are
+plenty of existing extensions (category and pagination) that can push you in the
+right direction.
 
 2 - Populating
 ~~~~~~~~~~~~~~
 
 If you are using the category processor this stage is important.  If you're not,
-it won't matter.
+it won't matter so much.
 
 Some nodes can't know what content they will generate until the entire site is
 scanned.  Like categories!  We need to know *all* the pages in the site before
@@ -412,25 +421,30 @@ on, I'm not ready yet...".  They must implement a ``populate`` method, which
 when called *removes* the processor node from the tree and replaces itself with
 nodes (or it can insert nodes elsewhere in the tree, or do nothing I suppose).
 
-If you are writing your own processor, and need to access a node's config, use
-the item-index operators, ``[]``.  If the configuration is not set, you'll get
-``None`` instead of an ``AttributeError``.
+If you are writing your own processor, and need to access a node's config, you
+might want to use the item-index operators, ``[]``.  If the configuration is not
+set, you'll get ``None`` instead of an ``AttributeError``.
 
     node.thingy     # => AttributeError
     node['thingy']  # => None
 
+After the tree is populated, the site is ready to generate.  You will have a
+tree of nodes, with the root node at the top, and it is always named ``"site"``.
+
 3 - Generating
 ~~~~~~~~~~~~~~
 
-All the nodes are instantiated and are arranged in a tree structure, with the root node at the top.  The ``generate``
-method is called on the root node, and recursively on all the children.  This is where folders are created, pages are generated, and
-assets are copied over.  If you are using the image processor, you might also have thumbnails created using `PIL`_.
+The ``generate`` method is called on the root node, and recursively on all the
+children.  This is where folders are created, pages are generated, and assets
+are copied over.  If you are using the image processor, you might also have
+thumbnails created using `PIL`_.
 
 ---------
 TEMPLATES
 ---------
 
-In your templates, you have access to anything in the inherited config and in per-page metadata:
+In your templates, you have access to anything in the inherited config and in
+per-page metadata:
 
 ``/config.yaml``::
 
@@ -441,7 +455,6 @@ In your templates, you have access to anything in the inherited config and in pe
 ``/site/index.j2``::
 
     ---
-    # YAML front matter
     title: test
     ---
 
@@ -458,10 +471,13 @@ Generates::
 Accessing any node by name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is a common thing to do in StrangeCase.  The ``name``, if it is not explicitly declared, is detemined by the
-file name.  The default configurators will remove ordering (``order_from_name``) and date (``date_from_name``)
-from the front, and then the default name (``setdefault_name``) will be the file name with non-alphanumerics
-replaced with underscores, lowercased, and the html extension is removed.  All other extensions will remain.
+This is a common thing to do in StrangeCase.  The ``name``, if it is not
+explicitly declared, is detemined by the file name.  The default configurators
+will remove ordering (``order_from_name``) and created_at
+(``created_at_from_name``) from the front of the file name, and then the default
+name (``setdefault_name``) will be the file name with non-alphanumerics replaced
+with underscores, lowercased, and the html extension is removed.  All other
+extensions will remain.  Examples:
 
 ``This is a file name - DUH.j2`` becomes ``this_is_a_file_name___duh``
 
@@ -471,10 +487,18 @@ Example of accessing the "Best blog ever" page's URL::
 
     <a href="{{ site.blogs.best_blog_ever.url }}">Best blog ever</a>.
 
-All nodes except the root node (``site`` is the root node, if you haven't noticed) have ``siblings`` nodes, a ``next``
-node, and a ``prev`` node.  If this is the first / last node, ``prev`` / ``next`` returns None.  ``siblings`` always
-returns a list, and at the minimum the current node will be in there (even the root node, but why you would call ``site.siblings``
-is beyond me).
+All nodes except the root node (``site`` is the root node, if you haven't
+noticed) have ``siblings`` nodes, a ``next`` node, and a ``prev`` node.  If this
+is the first / last node, ``prev`` / ``next`` returns None.  ``siblings`` always
+returns a list, and at the minimum the current node will be in there (even the
+root node, but why you would call ``site.siblings`` is beyond me).
+
+There is also an ``ancestors`` property, which returns all the parent pages of
+the node.  BUT, in order to be the most useful, this method looks for a node
+called ``index`` on the parents, so instead of getting a list of folder nodes,
+you will get list of index pages.  If you're building a breadcrumb trail,
+``ancestors`` is your friend, and you'll be glad that the index pages are
+returned instead of folder nodes.
 
 Iterating over folders
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -490,10 +514,10 @@ We've already seen this, but I'll include it again for completeness::
     <p>1. Blog Title</p>
     <p>2. Blog Title</p>
 
-**Note:** Files named ``index.html`` will not be included in this list.  This is a
-very reasonable design decision, but I can imagine a situation where you have a file (think
-``robots.txt``) that *also* doesn't belong in the iterable pages list.  So ``iterable: false`` is
-available as a config setting.
+**Note:** Files named ``index.html`` will not be included in this list.  This is
+a very reasonable design decision, but I can imagine a situation where you have
+a file (think ``robots.txt``) that *also* doesn't belong in the iterable pages
+list.  So ``iterable: false`` is available as a config setting.
 
 Iterate over a folder of images
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -504,18 +528,23 @@ Iterate over a folder of images
     <img src="{{ image.url }}" />
     {% endfor %}
 
-**BAM**, how's that for an image listing!  This might be my favorite thing in StrangeCase: that folders are
-iterable.  It makes things that were weird in jekyll (``site.categories.blablabla``) very easy,
-and intuitive, I think, since you only have to know the folder name of your images/blogs/projects/*whatever*.
+**BAM**, how's that for an image listing!  This might be my favorite thing in
+StrangeCase: that folders are iterable.  It makes things that were weird in
+jekyll (``site.categories.blablabla``) very easy, and intuitive, I think, since
+you only have to know the folder name of your images/blogs/projects/*whatever*.
 
-You might want to check out the image processor, explained below.  It uses `PIL`_ to make thumbnail images.
+You might want to check out the image processor, explained below.  It uses
+`PIL`_ to make thumbnail images.
 
-You can check what kind of node you're working with using the ``type`` property ("page", "folder", "asset") or
-the ``is_page``, ``is_folder``, ``is_asset`` methods.  Internally this is done a lot, I can't think of a reason
-you would need to do this in a template... but there it is!
+You can check what kind of node you're working with using the ``type`` property
+("page", "folder", "asset") or the ``is_page``, ``is_folder``, ``is_asset``
+methods.  Internally ``is_page`` is used a lot, and if you mix your page and
+asset files in the same folders, these are useful for filtering those out in a
+for loop.
 
-Lastly, the ``.all()`` method, and its more specific variants, are very useful.  The ``all()`` method definition
-says it all I think::
+Lastly, the ``.all()`` method, and its more specific variants, are very useful
+if you need to make a sitemap, or to grab the entire node tree at some point.
+The ``all()`` method definition says it all I think::
 
     def all(self, recursive=False, folders=None, pages=None, assets=None, processors=None):
         """
@@ -552,19 +581,23 @@ OK, SO
 
 Mostly random thoughts here.  Most of what you might want to know about StrangeCase *should* be here, so expect some repetition.
 
-* In your project folder (where you execute StrangeCase), you can have ``config.yaml`` and/or ``config.py``, and you *definitely* have a
-  ``site/`` folder, where your site content is stored.  There are probably Jinja2 layouts, includes,
-  and who knows what else in the root folder, too.
+* In your project folder (where you execute StrangeCase), you can have
+  ``config.yaml`` and/or ``config.py``, and you *definitely* have a ``site/``
+  folder, where your site content is stored.  There are probably Jinja2 layouts,
+  includes, and who knows what else in the root folder, too.
 
-* ``site/`` stores site content: templates, assets, folders, and maybe some "special" files like category pages.
-  These are processed, rendered, copied, or ignored, as the case may be (dot-files are ignored, btw!).
+* ``site/`` stores site content: templates, assets, folders, and maybe some
+  "special" files like category pages. These are processed, rendered, copied, or
+  ignored, as the case may be (dot-files are ignored, btw!).
 
 * When StrangeCase is done it places your static site in ``public/``.
 
-* There are only two special folders: site and public. They can be changed in config (``site_path`` and ``dest_path``).
+* There are only two special folders: site and public. They can be changed in
+  config (``site_path`` and ``dest_path``).
 
-* ``config.yaml`` stores context variables.  It is merged with the default config.  Child folders and pages inherit all the
-  config settings of their parent except the variables in ``dont_inherit``:
+* ``config.yaml`` stores context variables.  It is merged with the default
+  config.  Child folders and pages inherit all the config settings of their
+  parent except the variables in ``dont_inherit``:
 
   + ``type``
   + ``name``
@@ -573,46 +606,63 @@ Mostly random thoughts here.  Most of what you might want to know about StrangeC
   + ``created_at``
   + ``order``
 
-* Template files (.html, .txt, .md) can contain YAML front matter.  If the first line is a bunch of dashes (``^[-]{3,}$``),
-  all lines up to the matching dashes will be treated as YAML and added to that files context variables.
+* Template files (.html, .txt, .md) can contain YAML front matter.  If the first
+  line is a bunch of dashes (``^[-]{3,}$``), all lines up to the matching dashes
+  will be treated as YAML and added to that files context variables.
 
-* Binary files can have front matter, too, but since you can't place it *in* the file, it is stored in a special ``files:``
-  setting in the parent folder's config.yaml file.  It should be a dictionary with the key corresponding to the name
-  of the file, and the value is the front matter for that file.  ``files:`` entries in ``config.yaml`` are not inherited.
+* Binary files can have front matter, too, but since you can't place it *in* the
+  file, it is stored in a special ``files:`` setting in the parent folder's
+  config.yaml file.  It should be a dictionary with the key corresponding to the
+  name of the file, and the value is the front matter for that file.  ``files:``
+  entries in ``config.yaml`` are not inherited.
 
-* Everything in ``config.yaml`` and YAML front matter is available as a context variable in your templates.
+* Everything in ``config.yaml`` and YAML front matter is available as a context
+  variable in your templates.
 
 * Templates are rendered using Jinja2_.
 
-* StrangeCase points Jinja to your project folder, so you can use any directories you want in there
-  to store layouts, macros, and partials.
+* StrangeCase points Jinja to your project folder, so you can use any
+  directories you want in there to store layouts, macros, and partials.
   * layouts that are in ``layouts/`` are extended using ``{% extends 'layouts/file.j2' %}``
   * includes in ``anywhere/`` are included using ``{% include 'anywhere/file.j2' %}``
   * I suppose the convention is to have layouts/ and includes/ folders.
 
-* In the project root, ``config.py`` is where you can place runtime things, like...
+* In the project root, ``config.py`` is where you can place runtime things,
+  like...
   * if you need to calculate a value (e.g. ``datetime.time``)
   * fetch some data from a database (*ewww!*)
   * import jinja extensions (or use 'extensions' in config.yaml)
   * import jinja filters (or use 'filters' in config.yaml)
   * register StrangeCase processors (or use 'processors' in config.yaml)
 
-* If you need a page to be processed differently, set ``type`` to the desired file type in the config for that file/folder.
-  For instance, the category index page should be ``type: categories``.
+* If you need a page to be processed differently, set ``type`` to the desired
+  file type in the config for that file/folder. For instance, the category index
+  page should be ``type: categories``.
 
-* You can prefix variables on a page with ``my.`` (e.g. ``my.title`` or ``my.parent``). I think it looks
-  better in some places because it makes it clear where the content comes from (e.g. ``{{ my.title }}`` as
-  opposed to just ``{{ title }}``).  Totally optional.
+* You can prefix variables on a page with ``my.`` (e.g. ``my.title`` or
+  ``my.parent``). I think it looks better in some places because it makes it
+  clear where the content comes from (e.g. ``{{ my.title }}`` as opposed to just
+  ``{{ title }}``).  Totally optional.
 
-* Based on the file name, config.yaml, and YAML front matter, some config settings get changed during the build stage.
-  See ``configurators.py`` for these methods.  See ``strange_case_config.py`` for the order.
+* Based on the file name, config.yaml, and YAML front matter, some config
+  settings get changed during the build stage. See ``configurators.py`` for
+  these methods.  See ``strange_case_config.py`` for the order.
 
 --------------
 DEFAULT CONFIG
 --------------
 
-You should study this to learn a lot about how StrangeCase works.  The reason I boast that StrangeCase is simple
-is because *everything it does* can be controlled using the config. ::
+You should study this to learn a lot about how StrangeCase works.  The reason I
+boast that StrangeCase is simple is because *everything it does* can be
+controlled using the config.
+
+If you go looking in ``strange_case_config`` for these settings, you won't find
+them.  They have been broken up into ``configurators``.  In the early life of
+StrangeCase, all configuration was done in one file.   Now they are broken up
+into a list of configurator functions, and each function can add defaults.  More
+complicated, but more extensible.
+
+::
 
     config_file: 'config.yaml'                # name of file that contains config
     ignore: ['config.yaml', '.*']             # which files to ignore altogether while building the site
@@ -627,8 +677,10 @@ is because *everything it does* can be controlled using the config. ::
       - url
       - skip
     file_types:                                 # how files should be processed.  some processors add to this list, like to associate images
-        - [page, ['*.j2', '*.jinja2', '*.jinja', '*.md', '*.html', '*.txt']],   # with the image processor
+        - [page, ['*.j2', '*.jinja2', '*.jinja', '*.html', '*.txt', '*.xml']],   # with the image processor
     default_type: asset                       # if this is falsey, unassociated nodes will be ignored.
+    default_root_type: root                   # you probably shouldn't change this!
+    default_folder_type: folter               # you probably shouldn't change this!
     rename_extensions:                        # which extensions to rename, and to what
       '.j2': '.html',
       '.jinja2': '.html'
@@ -648,18 +700,21 @@ is because *everything it does* can be controlled using the config. ::
     filters: {}                               # dictionary of `filter_name: filter.method`.
     processors: []                            # additional processors.  Processors register themselves as a certain type.
     configurators: [                          # list of configurators.  The built-ins do very important things, so overriding this does *bad things*
-      configurators.ignore,                   # ignores files based on the 'ignore' setting
-      configurators.merge_files_config,       # merges files[filename] with filename
-      configurators.setdefault_name,          # if 'name' isn't assigned explicitly, this assigns it based on the file name and extension
-      configurators.setdefault_target_name,   # similarly for target_name
-      configurators.set_url,                  # Assigns the "local" part of the URL.  The entire URL is a property of the node object
-      configurators.setdefault_iterable,      # index files are not iterable
-      configurators.folder_config_file,       # processes folder/config.yaml.  If the folder config contains `ignore: true`, the folder is skipped
-      configurators.front_matter_config,      # processes YAML front matter.  Again, the file can be ignored using `ignore: true`
-      configurators.date_from_name,           # Gets the date from the file name, and strips it from name.
+      meta_before,              # assigns defaults from the configurators ``.defaults`` property
+      file_types,               # checks 'file_types' for a pattern that matches the file name
+      merge_files_config,       # merges files[filename] with filename
+      folder_config_file,       # processes folder/config.yaml.  If the folder config contains `ignore: true`, the folder is skipped
+      front_matter_config,      # processes YAML front matter.  Again, the file can be ignored using `ignore: true`
+      setdefault_name,          # if 'name' isn't assigned explicitly, this assigns it based on the file name and extension
+      setdefault_target_name,   # similarly for target_name
+      is_index,                 # compares the file name with the 'index.html' config.  if they are the same, it is an index page.
+      setdefault_iterable,      # index files are not iterable
+      ignore,                   # ignores files based on the 'ignore' setting
+      created_at_from_name,     # Gets the date from the file name, and strips it from name.
+      order_from_name,          # Gets the order from the file name, and strips it from name.
+      title_from_name,          # Assigns the "title" property based on the name.
+      set_url,                  # Assigns the "local" part of the URL.  The entire URL is a property of the node object
     ]
-    configurators +: []                       # to solve the problem changing 'configurators',
-                                              # you can put additional configurators in here.
 
 --------------------
 COMMAND LINE OPTIONS
@@ -679,27 +734,28 @@ Here are all the command line arguments:
 
     -w, --watch:     watch files for changes
 
-You can set/add arbitrary configuration using any number of ``key:value`` arguments:
+You can set/add arbitrary configuration using any number of ``key:value``
+arguments::
 
-    + `key:value`:         any key/value
-    + `key: value`:        these don't have to be "touching"
+    key:value         any key/value pair
 
-I use this to implement a simple code generator for my Sublime Text 2 plugins.  I run
+I use this to implement a simple code generator for my Sublime Text 2 plugins.
+I run::
 
     scase --deploy ../NewProject project:new_project desc:'A great new package'
 
-See `My PackageTemplate <https://github.com/colinta/_SublimePackageTemplate_>`_ for an
-example of how this can be used.
+See `My PackageTemplate <https://github.com/colinta/_SublimePackageTemplate_>`_
+for an example of how this can be used.
 
 ---------------------------
 AND THAT'S (pretty much) IT
 ---------------------------
 
-Jinja2 makes it easy to put pretty complicated logic in templates, which is really the
-only place for them in this static generator context...
+Jinja2 makes it easy to put pretty complicated logic in templates, which is
+really the only place for them in this static generator context...
 
-\...or is it !?  I’m wondering what kind of spaghetti nonsense these templates could end
-up with (it's like PHP all over again!), and how that could be fixed.
+\...or is it !?  I’m wondering what kind of spaghetti nonsense these templates
+could end up with (it's like PHP all over again!), and how that could be fixed.
 
 Which leads right into...
 
@@ -709,7 +765,8 @@ REALLY COMPLICATED STUFF
 
 This relates to the ``config.py`` and ``config.yaml`` files mentioned above.
 
-Take a glance at the colinta.com repository.  It does most things that can be done.
+Take a glance at the colinta.com repository.  It does most things that can be
+done.
 
 You can define ``extensions``, ``filters``, "configurators", and ``processors``.
 
@@ -717,20 +774,18 @@ You can define ``extensions``, ``filters``, "configurators", and ``processors``.
 
 ``extensions`` is a list of ``package.paths``.
 
-If you specify these in config.py, you can import the extension/filter and assign it to the list.  Otherwise, in config.yaml,
-use a dot-separated path, similar to how you would write an ``import`` statement, but include the class name.
+If you specify these in config.py, you can import the extension/filter and
+assign it to the list.  Otherwise, in config.yaml, use a dot-separated path,
+similar to how you would write an ``import`` statement, but include the class
+name.
 
-There are a couple built-in processors that are not imported & registered by default: categories and image.
+There are a couple built-in processors that are not imported & registered by
+default: categories and image.
 
-In config.py, you can add context variables that need the **POWER OF PYTHON**.  Things like datetime.time().
-I might add a way to do this in the YAML, but *probably not* (unless the community argues for its inclusion).
-
+In config.py, you can add context variables that need the **POWER OF PYTHON**.
+Things like ``time.time(), datetime.datetime.now()``.
 
 Example of all this nonsense using ``config.py``::
-
-    # you must provide an initial CONFIG dictionary.
-    # unless you want to do something crazy, it is best to import it from strange_case_config
-    from strange_case_config import CONFIG
 
     # import the processors you want to use.  you don't have to do anything with them,
     # it is enough just to import them.
@@ -738,7 +793,7 @@ Example of all this nonsense using ``config.py``::
 
     # import the extensions and filters.  we still need to add these to CONFIG
     from strange_case.extensions.markdown import MarkdownExtension, markdown
-    from datetime.datetime import time
+    from time import time
 
     CONFIG.update({
         'extensions': [MarkdownExtension],
@@ -759,28 +814,95 @@ Equivalent in the root ``config.yaml``::
       - strange_case.extensions.categories
     # cannot assign time to datetime.time.  DANG.
 
-``extensions/category_ext.py`` has an explanation of how processors work, and how it was written.
-I made it up as I went along, and ended up adding a ``Processor`` class that extends ``Node``,
-and a concept of "populating" the tree after the initial build.  Read more in that file.  I
-think it's a good system, but I'm open to friendly suggestions.
+``extensions/category.py`` has an explanation of how processors work, and how it
+was written. I made it up as I went along, and ended up adding a ``Processor``
+class that extends ``Node``, and a concept of "populating" the tree after the
+initial build.  Read more in that file.  I think it's a good system, but I'm
+open to friendly suggestions.
 
-Last but not least: configurators.  These are really the work horses of StrangeCase.  They
-look at YAML front matter, ignore files, set default processors, and so on.  If you need to
-do the equivalent of a context processor in django, this is where you would do that.
+Last but not least: configurators.  These are really the work horses of
+StrangeCase.  They look at YAML front matter, ignore files, set default
+processors, and so on.  If you need to do the equivalent of a context processor
+in django, this is where you would do that.
 
-Every configurator in ``config['configurators']`` is given the node config.  If it returns nothing,
-the node is ignored.  Otherwise, you can modify the config, or create a whole new one, and return it.
+Every configurator in ``config['configurators']`` is given the node config.  If
+it returns nothing, the node is ignored.  Otherwise, you can modify the config,
+or create a whole new one, and return it.
 
-See ``date_from_name`` for a good example of modifying the config based on the file name.
+See ``created_at_from_name`` for a good example of modifying the config based on
+the file name.
 
+-------------
+JINJA FILTERS
+-------------
+
+StrangeCase includes several Jinja filters that you can use in your templates.
+Remember that in order to use a filter you must first enable it in your
+configuration. For example to enable the date filter you must add::
+
+    filters:
+      date: strange_case.extensions.date.date
+
+This will register a filter named *date* which is implemented by the function
+`date` in the module ``strange_case.extensions.date``.
+
+strange_case.extensions.date.date
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This filter formats a date. The input can be any string readble by the
+`dateutil`_ ``parse()`` method, or the string ``"now"`` for the current date. If
+no format is specified it is printed as '01 Jan 2000'.
+
+::
+
+   <p>The date is {{ 'now'|date }}.</p>
+   <p>The date is 06 May 2012.</p>
+
+
+strange_case.extensions.uuid.uuid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This filter generates a UUID based on the provided input. The UUID is
+generated by taking a SHA1 hash of the input combined with a namespace
+identifier. The available namespaces are:
+
+* ``dns`` for fully-qualified domain names as input
+* ``url`` for URLs (default)
+* ``oid`` for ISO OID input
+* ``X500`` for X.500 DNs in either DER or text format
+
+::
+
+   <id>{{ 'http://myhost.com/articles'|uuid('url') }}</id>
+
+
+strange_case.extensions.uuid.urn
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This filter generates a UUID URN based on the provided input. This is often
+useful when needing to generate unique identifies that must be URIs, for
+example when generating an Atom feed.
+
+The UUID is generated by taking a SHA1 hash of the input combined with a
+namespace identifier. The available namespaces are:
+
+* ``dns`` for fully-qualified domain names as input
+* ``url`` for URLs (default)
+* ``oid`` for ISO OID input
+* ``X500`` for X.500 DNs in either DER or text format
+
+::
+
+   <id>{{ 'http://myhost.com/articles'|uuid('url') }}</id>
 
 ---------------
 IMAGE PROCESSOR
 ---------------
 
-The image processor uses PIL to create thumbnails.  The usual way to do this is to specify
-the thumbnail size in a parent folder config, and then set `type: image` on all the image
-files.  This is done in the image folder's config.yaml file::
+The image processor uses PIL to create thumbnails.  The usual way to do this is
+to specify the thumbnail size in a parent folder config, and then set `type:
+image` on all the image files.  This is done in the image folder's config.yaml
+file::
 
     thumbnails:
         thumb: '480x480'
@@ -792,34 +914,34 @@ files.  This is done in the image folder's config.yaml file::
         img_0002.jpg:
         ...
 
-I've changed file_types so that all images are processed by the image processor, so you
-don't have to write an entry for every file in the folder.
+It registers all images to be processed by the image processor, so you don't
+have to write an entry for every file in the folder.
 
 And of course, enable the image processor in your ``config.yaml``::
 
     processors:
         - strange_case.extensions.image
 
-
 ------------------
 CATEGORY PROCESSOR
 ------------------
 
-This processor scans your site pages, looking for pages that have a "category" property
-in their config.  For every category, it builds a ``category_detail`` page that can list
-the pages, and a ``category_index`` page to list the categories.
+This processor scans your site pages, looking for pages that have a "category"
+property in their config.  For every category, it builds a ``category_detail``
+page that can list the pages, and a ``category_index`` page to list the
+categories.
 
 Enable the category processor in your ``config.yaml``::
 
     processors:
         - strange_case.extensions.category
 
-And build ``categories.j2`` and ``category_detail.j2``.  The ``category_detail`` page
-can be name anything (it will get renamed based on the category), but the ``categories``
-page will keep its name/title/etc, so give it a sensible name.
+And build ``categories.j2`` and ``category_detail.j2``.  The ``category_detail``
+page can be named anything (it will get renamed based on the category), but the
+``categories`` page will keep its name/title/etc, so give it a sensible name.
 
-In categories.j2 you can use the ``categories`` property to
-iterate through the category_detail pages::
+In categories.j2 you can use the ``categories`` property to iterate over the
+category_detail pages::
 
     ---
     type: category_index
@@ -845,14 +967,13 @@ In category_detail.j2 you'll have a ``pages`` property::
     </ul>
     {% endblock %}
 
-
 -------------------
 PAGINATED PROCESSOR
 -------------------
 
-This processor can break up a large folder of pages.  It is designed so that converting
-from an index.j2 file to a paginated file is easy.  Let's say your existing blogs/index.j2
-lookes like this::
+This processor can break up a large folder of pages.  It is designed so that
+converting from an index.j2 file to a paginated file is easy.  Let's say your
+existing blogs/index.j2 lookes like this::
 
     {% extends 'layouts/base.j2' %}
 
@@ -896,69 +1017,6 @@ And change the ``type`` to ``paginated``, and update the HTML to use pagination:
     </div>
     {% endblock content %}
 
-
--------------
-JINJA FILTERS
--------------
-
-StrangeCase includes several Jinja filters that you can use in your templates.
-Remember that in order to use a filter you must first enable it in your
-configuration. For example to enable the date filter you must add::
-
-    filters:
-      date: strange_case.extensions.date.date
-
-This will register a filter named *date* which is implemented by the function
-`date` in the module ``strange_case.extensions.date``.
-
-strange_case.extensions.date.date
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This filter formats a date. The input must either be a date in YYYY-MM-DD
-notation, or the string ``"now"`` for the current date. If no date
-is specified it is printer in YYYY-MM-DD notation.
-
-::
-
-   <p>The date is {{ 'now'|date }}.</p>
-
-
-strange_case.extensions.uuid.uuid
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This filter generates a UUID based on the provided input. The UUID is
-generated by taking a SHA1 hash of the input combined with a namespace
-identifier. The available namespaces are:
-
-* ``dns`` for fully-qualified domain names as input
-* ``url`` for URLs (default)
-* ``oid`` for ISO OID input
-* ``X500`` for X.500 DNs in either DER or text format
-
-::
-
-   <id>{{ 'http://myhost.com/articles'|uuid('url') }}</id>
-
-
-strange_case.extensions.uuid.urn
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This filter generates a UUID URN based on the provided input. This is often
-useful when needing to generate unique identifies that must be URIs, for
-example when generating an Atom feed.
-
-The UUID is generated by taking a SHA1 hash of the input combined with a
-namespace identifier. The available namespaces are:
-
-* ``dns`` for fully-qualified domain names as input
-* ``url`` for URLs (default)
-* ``oid`` for ISO OID input
-* ``X500`` for X.500 DNs in either DER or text format
-
-::
-
-   <id>{{ 'http://myhost.com/articles'|uuid('url') }}</id>
-
 -----------------------------
 SCSS AND CLEVERCSS PROCESSORS
 -----------------------------
@@ -980,13 +1038,6 @@ I am currently (as of version 4.0.2) including tests::
     > pip install pytest
     > py.test
 
-----
-TODO
-----
-
-* Placing entries in ``**/config.yaml`` override parent configs, but i'd like to add a
-  merging syntax to the YAML, as a little DSL.
-
 -------
 LICENSE
 -------
@@ -1005,3 +1056,4 @@ See LICENSE_ for more details (it's a simplified BSD license).
 .. _LICENSE:      https://github.com/colinta/StrangeCase/blob/master/LICENSE
 .. _PIL:          http://www.pythonware.com/products/pil/
 .. _webby:        http://webby.rubyforge.org/
+.. _dateutil:     http://labix.org/python-dateutil
