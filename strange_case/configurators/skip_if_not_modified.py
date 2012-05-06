@@ -11,7 +11,6 @@ from strange_case.nodes import Node
 class SkipIfNotModified(object):
     defaults = {
         'file_mtimes': {},
-        '.timestamps': '.timestamps',
     }
 
     dont_inherit = [
@@ -19,16 +18,18 @@ class SkipIfNotModified(object):
     ]
 
     def on_start(self, config):
-        if not config['.timestamps']:
+        timestamps = config.get('.timestamps', '.timestamps')
+        if not timestamps:
             return
 
         # read timestamps file
-        self.timestamps_file = os.path.join(config['project_path'], config['.timestamps'])
+        self.timestamps_file = os.path.join(config['project_path'], timestamps)
         if os.path.exists(self.timestamps_file):
             config['file_mtimes'] = pickle.load(open(self.timestamps_file))
 
     def on_finish(self, config):
-        if not config['.timestamps']:
+        timestamps = config.get('.timestamps', '.timestamps')
+        if not timestamps:
             return
 
         timestamps = {}
