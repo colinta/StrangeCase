@@ -1,15 +1,17 @@
 from strange_case.tests import get_test_file
 from strange_case.nodes import *
+from strange_case.registry import Registry
 
 
 class TestConfigNode(Node):
-    def __init__(self, name='test'):
+    def __init__(self, name='test', addl_config={}):
         config = {
             'test_it': 'test_it',
             'target_name': name,
             'name': name,
             'iterable': True,
         }
+        config.update(addl_config)
         super(TestConfigNode, self).__init__(config=config,
                                   target_folder='target')
 
@@ -25,52 +27,58 @@ class TestConfigNode(Node):
 
 
 class TestRootNode(RootFolderNode):
-    def __init__(self, name='test'):
+    def __init__(self, name='test', addl_config={}):
         config = {
             'target_name': name,
             'name': name,
             'iterable': True,
             'root_url': '/',
         }
+        config.update(addl_config)
+        Registry.set('root', self)
         super(TestRootNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/'),
                                   target_folder='target')
 
 
 class TestFolderNode(FolderNode):
-    def __init__(self, name='test'):
+    def __init__(self, name='test', addl_config={}):
         config = {
-            'test_it': 'test_it',
             'target_name': name,
             'name': name,
+            'url': name,
             'iterable': True,
         }
+        config.update(addl_config)
         super(TestFolderNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/'),
                                   target_folder='target')
 
 
 class TestPageNode(PageNode):
-    def __init__(self, name):
+    def __init__(self, name, addl_config={}):
         config = {
             'target_name': name,
             'name': name,
+            'url': name,
             'iterable': True,
         }
+        config.update(addl_config)
         super(TestPageNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/a_file.txt'),
                                   target_folder='target')
 
 
 class TestIndexNode(PageNode):
-    def __init__(self, name):
+    def __init__(self, name, addl_config={}):
         config = {
-            'url': '',
             'target_name': name,
             'name': name,
+            'url': '',
             'iterable': False,
             'is_index': True,
         }
+        config.update(addl_config)
         super(TestIndexNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/a_file.txt'),
                                   target_folder='target')
@@ -263,14 +271,20 @@ def test_config_copy():
     }
 
 
+def test_node_pointer():
+    p = TestRootNode(name='site')
+    a = TestPageNode('a')
+    b = TestPageNode('b', {'a ->': 'site.a'})
+    p.extend([a, b])
+    assert b.a == a
+
+
 def test_getitem_and_getattr():
-    from strange_case.registry import Registry
     config = {
         'key': 'value',
         'friend ->': 'site.bob.joe'
     }
-    n = Node(config, 'node')
-    Registry.set('root', n)
+    n = TestRootNode('node', config)
     config = {
         'name': 'bob',
     }
