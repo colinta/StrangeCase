@@ -54,6 +54,7 @@ CONFIG = ConfigDict({
         'created_at',
         'order',
         'iterable',
+        'is_index',
         'url',
         'skip',
     ]

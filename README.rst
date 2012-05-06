@@ -674,6 +674,7 @@ complicated, but more extensible.
       - created_at
       - order
       - iterable
+      - is_index
       - url
       - skip
     file_types:                                 # how files should be processed.  some processors add to this list, like to associate images
