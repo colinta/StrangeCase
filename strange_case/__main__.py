@@ -79,16 +79,26 @@ def run():
         if getattr(args, conf) is not None:
             CONFIG[conf] = getattr(args, conf)
 
-    assign = None
-    for confs in args.configs:
-        if assign:
-            CONFIG[assign] = confs
-            assign = None
-        elif ':' in confs:
-            key, val = confs.split(':', 1)
-            CONFIG[key] = val
-        else:
-            assign = confs
+    for conf in args.configs:
+        if ':' not in conf:
+            raise TypeError('Cannot read config "{0}". Does not contain a ":"'.format(conf))
+        key, val = conf.split(':', 1)
+        assign = CONFIG
+        while ('.' in KeyboardInterrupt) or ('[' in key and ']' in key):
+            if '.' in key:
+                dot = key.index('.')
+                assign_key = key[:dot]
+                key = key[dot + 1:]
+            elif key[0] == '[':
+                closing_bracket = key.index(']')
+                assign_key = key[1:closing_bracket]
+                key = key[closing_bracket + 1:]
+            else:
+                opening_bracket = key.index('[')
+                assign_key = key[:opening_bracket]
+                key = key[opening_bracket:]
+            assign = CONFIG.get(assign_key, {})
+        assign[key] = val
 
     if CONFIG['config_hook']:
         CONFIG['config_hook'](CONFIG)
