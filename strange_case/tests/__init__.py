@@ -131,10 +131,10 @@ def check_file_contents(file_name, search):
         assert True
     elif isinstance(search, RegexType):
         file_name = os.path.basename(file_name)
-        assert search.search(content), '{file_name} does not match {search.pattern}'.format(**locals())
+        assert search.search(content), '{content} does not match {search.pattern}'.format(**locals())
     else:
         file_name = os.path.basename(file_name)
-        assert search in content, '{file_name} does not contain {search}'.format(**locals())
+        assert search in content, '{content} does not contain {search}'.format(**locals())
 
 
 LEFT_T = '|-- '  # u'\u251c\u2500\u2500'
