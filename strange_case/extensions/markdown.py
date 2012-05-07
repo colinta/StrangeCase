@@ -40,4 +40,4 @@ class MarkdownExtension(jinja2.ext.Extension):
         ).set_lineno(lineno)
 
     def markdown(self, caller):
-        return markdowner.convert(caller()).strip()
+        return markdown(caller())
