@@ -1,25 +1,19 @@
 import os
 from os.path import join
-import yaml
 from strange_case import strange_case
 from strange_case.tests import will_generate, check_path_contents, tree
 
 
-@will_generate('basic_site/public')
+@will_generate('basic_site')
 def test_basic_site(config):
-    config['project_path'] = project_path = join(os.path.dirname(__file__), 'basic_site')
-    config_path = join(project_path, 'config.yaml')
-    config['site_path'] = join(project_path, 'site')
-    config['deploy_path'] = join(project_path, 'public')
-
-    with open(config_path, 'r') as config_file:
-        yaml_config = yaml.load(config_file)
-        config.update(yaml_config)
-
     try:
         strange_case(config)
+    except Exception:
+        tree(config['site_path'], config['project_path'])
+        tree(config['deploy_path'], config['project_path'])
+        raise
 
-        path_contents = {
+    path_contents = {
         '001_2012_01_16_file.html': '1. 2012-01-16',
         'index.html': """<doctype html>
 <body>
@@ -47,26 +41,13 @@ def test_basic_site(config):
 <body>
 <p>My second post</p>
 </body>""",
-            },
-        }
-        check_path_contents(config['deploy_path'], path_contents)
-    except Exception:
-        tree(config['site_path'], config['project_path'])
-        tree(config['deploy_path'], config['project_path'])
-        raise
+        },
+    }
+    check_path_contents(config['deploy_path'], path_contents)
 
 
-@will_generate('basic_site/public')
+@will_generate('basic_site')
 def test_basic_site_remove_existing(config):
-    config['project_path'] = project_path = join(os.path.dirname(__file__), 'basic_site')
-    config_path = join(project_path, 'config.yaml')
-    config['site_path'] = join(project_path, 'site')
-    config['deploy_path'] = join(project_path, 'public')
-
-    with open(config_path, 'r') as config_file:
-        yaml_config = yaml.load(config_file)
-        config.update(yaml_config)
-
     # create extra files
     # this file does not exist in path_contents, and so
     # should be removed

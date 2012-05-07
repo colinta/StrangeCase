@@ -1,21 +1,9 @@
-import os
-from os.path import join
-import yaml
 from strange_case import strange_case
 from strange_case.tests import will_generate, check_path_contents, tree
 
 
-@will_generate('category_site/public')
+@will_generate('category_site')
 def test_category_site(config):
-    config['project_path'] = project_path = join(os.path.dirname(__file__), 'category_site')
-    config_path = join(project_path, 'config.yaml')
-    config['site_path'] = join(project_path, 'site')
-    config['deploy_path'] = join(project_path, 'public')
-
-    with open(config_path, 'r') as config_file:
-        yaml_config = yaml.load(config_file)
-        config.update(yaml_config)
-
     try:
         strange_case(config)
 

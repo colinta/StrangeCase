@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import os
+import yaml
 from os.path import join
 import re
 import shutil
@@ -57,14 +58,26 @@ def will_test(*configurators):
     return decorator
 
 
-def will_generate(_deploy_path):
+def will_generate(project_name):
     def decorator(fn):
         @wraps(fn)
         def wrapper():
-            deploy_path = get_test_file(_deploy_path)
+            project_path = get_test_file(project_name)
+            deploy_path = join(project_path, 'public')
+            config_path = join(project_path, 'config.yaml')
+
             if os.path.exists(deploy_path):
                 shutil.rmtree(deploy_path)
             config = CONFIG.copy(all=True)
+
+            config['project_path'] = project_path
+            config['site_path'] = join(project_path, 'site')
+            config['deploy_path'] = join(project_path, 'public')
+
+            with open(config_path, 'r') as config_file:
+                yaml_config = yaml.load(config_file)
+                config.update(yaml_config)
+
             ret = fn(config)
             shutil.rmtree(deploy_path)
             return ret
