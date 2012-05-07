@@ -20,6 +20,7 @@ def test_basic_site(config):
         strange_case(config)
 
         path_contents = {
+        '001_2012_01_16_file.html': '1. 2012-01-16',
         'index.html': """<doctype html>
 <body>
 <h1 id="welcome-to-my-blog">Welcome to my blog!</h1>
@@ -81,6 +82,7 @@ def test_basic_site_remove_existing(config):
         raise
 
     path_contents = {
+        '001_2012_01_16_file.html': True,
         'index.html': True,
         'blogs': {
             'index.html': True,
