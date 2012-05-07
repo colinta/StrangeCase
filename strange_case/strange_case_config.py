@@ -33,6 +33,7 @@ CONFIG = ConfigDict({
         'strange_case.configurators.setdefault_iterable',
         'strange_case.configurators.ignore',
         'strange_case.configurators.skip_if_not_modified',  # sets 'skip' if mtime is new
+        'strange_case.configurators.set_url',
     ],
     # these are the defaults
     'configurators': [
@@ -42,7 +43,6 @@ CONFIG = ConfigDict({
     ],
     # these are ensured to be loaded last
     '__configurators_post__': [
-        'strange_case.configurators.set_url',
         'strange_case.configurators.meta_after',
     ],
 })

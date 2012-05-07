@@ -119,21 +119,25 @@ def test_strip_extensions_strip_url_already_set(config):
     assert config['url'] == 'a_file'
 
 
-@will_test(setdefault_target_name, strip_extensions)
+@will_test(setdefault_target_name, is_index, set_url, strip_extensions)
 def test_strip_extensions_strip_default(config):
     config.update({
         'rename_extensions': {'.j2': '.html'}
     })
     source_file = get_test_file('a_folder/page.j2')
     config = setdefault_target_name(source_file, config)
+    config = is_index(source_file, config)
+    config = set_url(source_file, config)
     config = strip_extensions(source_file, config)
     assert config['url'] == 'page'
 
 
-@will_test(setdefault_target_name, strip_extensions)
+@will_test(setdefault_target_name, is_index, set_url, strip_extensions)
 def test_strip_extensions_no_strip(config):
     source_file = get_test_file('a_folder/a_file.txt')
     config = setdefault_target_name(source_file, config)
+    config = is_index(source_file, config)
+    config = set_url(source_file, config)
     config = strip_extensions(source_file, config)
     assert config['url'] == 'a_file.txt'
 
