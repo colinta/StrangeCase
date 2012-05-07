@@ -14,7 +14,6 @@ ORDER_RE = re.compile(r'''
 def strip_order_from(order, name):
     strip_order_re = re.compile(r'0+{order}[-_]'.format(**locals()))
     match = strip_order_re.search(name)
-    print name, match, strip_order_re.pattern
     if match:
         return name[:match.start()] + name[match.end():]
     return name
