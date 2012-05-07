@@ -1,3 +1,4 @@
+import os
 import re
 import datetime
 
@@ -5,7 +6,7 @@ from strange_case.configurators import provides
 
 
 CREATED_AT_RE = re.compile(r'''
-    ^(?P<created_at>
+    (?P<created_at>
         (?P<year>[1-9]\d{3})
         (?:
             [-_](?P<month>\d{2})
@@ -18,10 +19,10 @@ CREATED_AT_RE = re.compile(r'''
 
 
 def strip_created_at_from(created_at, name):
-    strip_created_at_re = re.compile(r'^{created_at}[-_]'.format(**locals()))
+    strip_created_at_re = re.compile(r'{created_at}[-_]'.format(**locals()))
     match = strip_created_at_re.search(name)
     if match:
-        return name[len(match.group(0)):]
+        return name[:match.start()] + name[match.end():]
     return name
 
 
@@ -32,9 +33,8 @@ def created_at_from_name(source_file, config):
     and you don't have to add `date: ...` using YAML, plus you get a
     python date object.
     """
-    matches = CREATED_AT_RE.search(config['name'])
-    if not matches:
-        matches = CREATED_AT_RE.search(config['target_name'])
+    file_name = os.path.basename(source_file)
+    matches = CREATED_AT_RE.search(file_name)
 
     if matches:
         created_at = matches.group('created_at')
