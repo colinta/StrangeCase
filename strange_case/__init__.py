@@ -131,7 +131,7 @@ def strange_case(config):
         # configurators might be removed (?)
         if configurator in Registry.configurators:
             try:
-                    configurator.on_start(config)
+                configurator.on_start(config)
             except AttributeError:
                 pass
 
