@@ -117,19 +117,23 @@ def strange_case(config):
                 sys.error.write('Error in processors: Could not find "%s"\n' % processor)
                 raise
         del config['processors']
+    configurators = get_configurators(config)
 
     # register configurators - I broke this out into a separate function (below)
-    for configurator in get_configurators(config):
+    Registry.reset_configurators()
+    for configurator in configurators:
         Registry.add_configurator(configurator)
 
     # configurators can respond to the 'on_start' hook
-    # currently, only the skip_if_not_modified configurator uses this, to
-    # read in the .timestamps file.
-    for configurator in Registry.configurators:
-        try:
-            configurator.on_start(config)
-        except AttributeError:
-            pass
+    # skip_if_not_modified configurator uses this to read in the .timestamps
+    # file, and strip_extensions makes sure that set_url is run before itself.
+    for configurator in configurators:
+        # configurators might be removed (?)
+        if configurator in Registry.configurators:
+            try:
+                    configurator.on_start(config)
+            except AttributeError:
+                pass
 
     # each node class should add files to these properties, so that watchdog and
     # stale-file-removal work.
@@ -209,7 +213,6 @@ def get_configurators(config):
         if isinstance(configurator, basestring):
             configurator = fancy_import(configurator)
         configurators.append(configurator)
-    del config['__configurators_pre__']
 
     # load user configurators
     if 'configurators' in config:
@@ -217,7 +220,6 @@ def get_configurators(config):
             if isinstance(configurator, basestring):
                 configurator = fancy_import(configurator)
             configurators.append(configurator)
-        del config['configurators']
 
     # additional configurators, in addition to the all-important defaults
     if 'configurators +' in config:
@@ -232,13 +234,11 @@ However, you will probably want to make sure to include the defaults:
             if isinstance(configurator, basestring):
                 configurator = fancy_import(configurator)
             configurators.append(configurator)
-        del config['configurators +']
 
     # load built-in post configurators
     for configurator in config['__configurators_post__']:
         if isinstance(configurator, basestring):
             configurator = fancy_import(configurator)
         configurators.append(configurator)
-    del config['__configurators_post__']
 
     return configurators
