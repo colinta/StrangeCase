@@ -35,11 +35,11 @@ def test_basic_site(config):
 </body>""",
             '2012_01_01_post1.html': """<doctype html>
 <body>
-<p>My first post</p>
+<p>My first post, on 2012-01-01.</p>
 </body>""",
             '2012_01_02_post2.html': """<doctype html>
 <body>
-<p>My second post</p>
+<p>My second post, on 2012-01-02.</p>
 </body>""",
         },
     }

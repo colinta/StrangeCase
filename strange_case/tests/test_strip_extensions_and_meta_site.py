@@ -3,8 +3,10 @@ from strange_case.tests import will_generate, check_path_contents, tree
 
 
 @will_generate('basic_site')
-def test_strip_extensions_site(config):
+def test_strip_extensions_and_meta_site(config):
     config['configurators'].append('strange_case.extensions.configurators.strip_extensions')
+    config['strip_metadata_from_name'] = True
+    config['strip_metadata_from_target_name'] = True
 
     try:
         strange_case(config)
@@ -14,7 +16,7 @@ def test_strip_extensions_site(config):
         raise
 
     path_contents = {
-        '001_2012_01_16_file.html': '1. 2012-01-16',
+        'file.html': '1. 2012-01-16',
         'index.html': """<doctype html>
 <body>
 <h1 id="welcome-to-my-blog">Welcome to my blog!</h1>
@@ -27,17 +29,17 @@ def test_strip_extensions_site(config):
 <p>My blogs:</p>
 
 <ol>
-<li><p><a href="/blogs/2012_01_01_post1">Post1</a></p></li>
-<li><p><a href="/blogs/2012_01_02_post2">Post2</a></p></li>
+<li><p><a href="/blogs/post1">Post1</a></p></li>
+<li><p><a href="/blogs/post2">Post2</a></p></li>
 </ol>
 <p>Hi!</p>
 
 </body>""",
-            '2012_01_01_post1.html': """<doctype html>
+            'post1.html': """<doctype html>
 <body>
 <p>My first post, on 2012-01-01.</p>
 </body>""",
-            '2012_01_02_post2.html': """<doctype html>
+            'post2.html': """<doctype html>
 <body>
 <p>My second post, on 2012-01-02.</p>
 </body>""",
