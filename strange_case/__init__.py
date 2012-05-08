@@ -4,6 +4,7 @@ import sys
 from strange_case.registry import Registry
 from strange_case.extensions import *
 from strange_case.support import *
+from strange_case.support.fancy_import import fancy_import
 from strange_case.nodes import *
 from strange_case.processors import *
 from strange_case.nodes import Node
@@ -35,18 +36,6 @@ def require_package(pkg):
 
 def recommend_package(pkg):
     output_warning("\033[1m" + pkg + "\033[0m is recommend.\n  > pip install " + pkg)
-
-
-def fancy_import(import_name):
-    """
-    This takes a fully qualified object name, like
-    'strange_case.extensions.markdown', and returns the last
-    object.  equivalent to `from strange_case.extensions import markdown`.
-    """
-
-    import_path, import_me = import_name.rsplit('.', 1)
-    imported = __import__(import_path, globals(), locals(), [import_me], -1)
-    return getattr(imported, import_me)
 
 
 def find_files(folder):
