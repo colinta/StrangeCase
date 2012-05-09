@@ -14,6 +14,11 @@ TODO
 
 * **TABLED** table of contents
 
+2012_05_09 - v4.2.0
+===================
+
+* added `scase --serve` command
+
 2012_05_06 - v4.1.6
 ===================
 

@@ -10,6 +10,7 @@
 -d=path --deploy=path     Specify the deploy path [default: public/]
 -c=file --config=file     Specify a different config.yaml file [default: config.yaml]
 -v --verbose              Output warnings and debug messages
+--serve[=PORT]            Run a simple http server (on PORT) [default: 8000]
 
 Any other arguments will be parsed as configuration values, e.g.:
 
@@ -52,6 +53,7 @@ def run():
     parser.add_argument('-n', '--no-remove', dest='remove_stale_files', action='store_false', default=None)
     parser.add_argument('-c', '--config', dest='config_file')
     parser.add_argument('-v', '--verbose', dest='__verbose', action='store_true', default=False)
+    parser.add_argument('--serve', dest='port', nargs="?", type=int, default=argparse.SUPPRESS, const=8000)
     parser.add_argument('configs', nargs='*')
     args = parser.parse_args()
 
@@ -176,6 +178,21 @@ def run():
         observer.join()
     else:
         strange_case(CONFIG)
+
+    print repr(args.port)
+    if hasattr(args, 'port'):
+        import SimpleHTTPServer
+        import SocketServer
+
+        args.port = args.port
+
+        os.chdir(CONFIG['deploy_path'])
+        Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+
+        httpd = SocketServer.TCPServer(("", args.port), Handler)
+
+        sys.stderr.write("serving at http://localhost:{port}\n".format(port=args.port))
+        httpd.serve_forever()
 
 
 if __name__ == '__main__':
