@@ -42,7 +42,7 @@ def run():
         'deploy_path',
         'remove_stale_files',
         'config_file',
-        'verbose',
+        '__verbose',
     ]
     parser.add_argument('-x', '--exclude', nargs='*', dest='exclude_paths', default=None)
     parser.add_argument('-p', '--project', dest='project_path')
@@ -51,7 +51,7 @@ def run():
     parser.add_argument('-r', '--remove', dest='remove_stale_files', action='store_true', default=None)
     parser.add_argument('-n', '--no-remove', dest='remove_stale_files', action='store_false', default=None)
     parser.add_argument('-c', '--config', dest='config_file')
-    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False)
+    parser.add_argument('-v', '--verbose', dest='__verbose', action='store_true', default=False)
     parser.add_argument('configs', nargs='*')
     args = parser.parse_args()
 
