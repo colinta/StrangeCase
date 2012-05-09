@@ -179,7 +179,6 @@ def run():
     else:
         strange_case(CONFIG)
 
-    print repr(args.port)
     if hasattr(args, 'port'):
         import SimpleHTTPServer
         import SocketServer
