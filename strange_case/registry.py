@@ -57,6 +57,13 @@ class Registry(object):
         return cls.misc.get(key, *args)
 
     @classmethod
+    def reset_configurators(cls):
+        """
+        Adds a configurator callables.
+        """
+        cls.configurators = []
+
+    @classmethod
     def add_configurator(cls, configurator):
         """
         Adds a configurator callables.

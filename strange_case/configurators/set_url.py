@@ -16,7 +16,6 @@ def on_start(config):
     if not root_url.startswith('/'):
         root_url = '/' + root_url
     config['root_url'] = root_url
-    return config
 
 set_url.require_before = ['root_url']
 set_url.require_after = ['url']
