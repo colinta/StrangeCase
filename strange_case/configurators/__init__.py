@@ -16,7 +16,7 @@ def provides(conf):
 
 
 def configurate(source_file, config):
-    verbose = config.get('verbose')
+    verbose = config.get('__verbose')
     configurators = Registry.configurators
     # Run the config through each configurator.
     # If a configurator returns a falsey

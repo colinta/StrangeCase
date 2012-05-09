@@ -46,7 +46,7 @@ class CleverCssNode(AssetNode):
             css_content = clevercss_compiler(ccss_content)
             with open(target_path, 'w') as f:
                 f.write(css_content)
-        elif self['verbose']:
+        elif self['__verbose']:
             sys.stderr.write("Skipping %s\n" % target_path)
         self.files_tracked.append(source_path)
         self.files_written.append(target_path)
