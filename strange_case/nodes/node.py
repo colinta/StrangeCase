@@ -241,15 +241,18 @@ class Node(object):
         return True
 
     def __getitem__(self, key):
-        try:
-            return self.__getattribute__(key)
-        except AttributeError:
-            pass
+        if isinstance(key, int):
+            return [child for child in self.children if child.iterable][key]
+        else:
+            try:
+                return self.__getattribute__(key)
+            except AttributeError:
+                pass
 
-        try:
-            return self.__getattr__(key)
-        except AttributeError:
-            pass
+            try:
+                return self.__getattr__(key)
+            except AttributeError:
+                pass
 
         return None
 
