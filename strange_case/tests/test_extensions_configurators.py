@@ -93,6 +93,24 @@ def test_order_and_created_at_from_name_strip_target_name(config):
     assert config['target_name'] == 'file.txt'
 
 
+@will_test(setdefault_target_name, setdefault_name, order_from_name,
+           front_matter_config, created_at_from_name)
+def test_order_and_created_at_from_name_with_yaml_strip_target_name(config):
+    config['type'] = 'page'
+    config['strip_metadata_from_name'] = True
+    config['strip_metadata_from_target_name'] = True
+    source_file = get_test_file('a_folder/001_2012_05_04_page_with_created_at.j2')
+    config = setdefault_target_name(source_file, config)
+    config = setdefault_name(source_file, config)
+    config = front_matter_config(source_file, config)
+    config = order_from_name(source_file, config)
+    config = created_at_from_name(source_file, config)
+    assert config['order'] == 1
+    assert config['created_at'] == datetime.date(2012, 5, 4)
+    assert config['name'] == 'page_with_created_at'
+    assert config['target_name'] == 'page_with_created_at.html'
+
+
 @will_test(setdefault_target_name, is_index, set_url, strip_extensions)
 def test_strip_extensions_strip(config):
     config.update({

@@ -2,8 +2,6 @@ import os
 import re
 import datetime
 
-from strange_case.configurators import provides
-
 
 CREATED_AT_RE = re.compile(r'''
     (?P<created_at>
@@ -19,6 +17,7 @@ CREATED_AT_RE = re.compile(r'''
 
 
 def strip_created_at_from(created_at, name):
+    created_at = re.sub(r'[-_]', '[-_]', created_at)
     strip_created_at_re = re.compile(r'{created_at}[-_]'.format(**locals()))
     match = strip_created_at_re.search(name)
     if match:
@@ -26,7 +25,6 @@ def strip_created_at_from(created_at, name):
     return name
 
 
-@provides('created_at')
 def created_at_from_name(source_file, config):
     """
     Matches a date in the name or target_name.  Makes it easy to sort a blog
@@ -38,23 +36,24 @@ def created_at_from_name(source_file, config):
 
     if matches:
         created_at = matches.group('created_at')
-        year = int(matches.group('year'))
-        if matches.group('month') is not None:
-            month = int(matches.group('month'))
-        else:
-            month = 1
+        if 'created_at' not in config:
+            year = int(matches.group('year'))
+            if matches.group('month') is not None:
+                month = int(matches.group('month'))
+            else:
+                month = 1
 
-        if matches.group('day') is not None:
-            day = int(matches.group('day'))
-        else:
-            day = 1
+            if matches.group('day') is not None:
+                day = int(matches.group('day'))
+            else:
+                day = 1
 
-        date = datetime.date(
-            year=year,
-            month=month,
-            day=day,
-            )
-        config['created_at'] = date
+            date = datetime.date(
+                year=year,
+                month=month,
+                day=day,
+                )
+            config['created_at'] = date
 
         if config['strip_metadata_from_name']:
             config['name'] = strip_created_at_from(created_at, config['name'])
