@@ -11,11 +11,10 @@ def strip_extensions(source_file, config):
 
 
 def on_start(config):
-    # move set_url configurator to *just* before strip_extensions
-    Registry.configurators.remove(set_url)
-    my_index = Registry.configurators.index(strip_extensions)
-    Registry.configurators.insert(my_index, set_url)
-    return config
+    # move strip_extensions configurator to after set_url
+    Registry.configurators.remove(strip_extensions)
+    my_index = Registry.configurators.index(set_url)
+    Registry.configurators.insert(my_index + 1, strip_extensions)
 
 
 strip_extensions.on_start = on_start
