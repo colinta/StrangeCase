@@ -316,7 +316,7 @@ Here are some quick little neat things.
    try and iterate over the folder.  If you ``{% for page in site.folder %}``,
    you will end up with *both* types of file.  If you *really* want to mix them,
    you can iterate over just the pages (and exclude index.html files) using
-   ``iter_pages``, introduced in v4.2.0.
+   ``iter_pages``, introduced in v4.3.0.
 
 4. You can assign "pointers" in your YAML front matter.  They look like this::
 

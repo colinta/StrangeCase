@@ -149,8 +149,12 @@ def run():
 
                 if alert:
                     sys.stderr.write("Change detected.  Running StrangeCase\n")
-                strange_case(CONFIG)
-                sys.stderr.write("StrangeCase generated at %i\n" % int(time.time()))
+                try:
+                    strange_case(CONFIG)
+                except Exception as e:
+                    sys.stderr.write("Error (%s): %s\n" % (type(e).__name__, e.message))
+                else:
+                    sys.stderr.write("StrangeCase generated at %i\n" % int(time.time()))
                 self.last_run = time.time()
 
         exclude_paths = [
