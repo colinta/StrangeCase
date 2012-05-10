@@ -67,6 +67,15 @@ class Node(object):
                 ret.extend(child.all(recursive, folders, pages, assets, processors))
         return ret
 
+    def iter_pages(self, recursive=False):
+        return iter([child for child in self.children if child.iterable and child.is_page])
+
+    def iter_folders(self, recursive=False):
+        return iter([child for child in self.children if child.iterable and child.is_folder])
+
+    def iter_assets(self, recursive=False):
+        return iter([child for child in self.children if child.iterable and child.is_asset])
+
     def pages(self, recursive=False):
         return self.all(recursive=recursive, pages=True)
 
