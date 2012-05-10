@@ -283,11 +283,93 @@ this::
 
 This wraps up the tutorial!  Now, I'll explain the inner workings.
 
+---------------
+TIPS AND TRICKS
+---------------
+
+Here are some quick little neat things.
+
+1. You'll need a good, solid config.yaml.  Just copy and paste this when you
+   start a new site::
+
+       extensions:
+         - strange_case.extensions.markdown.MarkdownExtension
+       filters:
+         date: strange_case.extensions.date.date
+         markdown: strange_case.extensions.markdown.markdown
+         json: json.dumps
+         sha: strange_case.extensions.sha.sha
+       processors:
+         - strange_case.extensions.image
+         - strange_case.extensions.category
+         - strange_case.extensions.paginated
+         - strange_case.extensions.scss_ext
+
+2. Iterate over a folder of pages, or a folder of assets, using
+   ``{% for page in site.folder.subfolder %}``.  There is no "easy" way to
+   iterate over a folder that contains folders - what you really want there is
+   to get the index file of the folder, it will contain the meta data (title,
+   created_at, etc) that you probably want to display in the listing.  I will
+   try and fix this, but probably won't until someone asks for it.
+
+3. Do not mix pages and assets.  You *can* do it, but things get goofy when you
+   try and iterate over the folder.  If you ``{% for page in site.folder %}``,
+   you will end up with *both* types of file.  If you *really* want to mix them,
+   you can iterate over just the pages (and exclude index.html files) using
+   ``iter_pages``, introduced in v4.2.0.
+
+4. You can assign "pointers" in your YAML front matter.  They look like this::
+
+       page ->: site.other.page
+
+   If your asset folders are getting unwieldy
+   (``site.static.images.posts.pics_of.kittens``), use this trick to shorten it
+   down in your template.  In this case you *must* prefix the pointer with
+   ``my.``, because jinja will not know how to lookup "page ->" when you say
+   only "page", and I have not devised a workaround yet.
+
+       ---
+       pics ->: site.static.images.posts.pics_of.kittens
+       ---
+       {% for pic in my.pics %}
+         <img src="{{ pic.url }}">
+       {% endfor %}
+
+5. Page content is simply not available during template generation.  For that, I
+   can't help you.  That would introduce page dependencies, which would suck.
+
+   If you want a "blurb" or "summary" of a page's content, you'll just have to
+   add it to the page front matter::
+
+       ---
+       title: my post
+       summary: |
+         I think this post is great.  It's all about code:
+
+             print "like this"
+       ---
+
+   Back in your listing, you can run that summary through markdown using a
+   filter::
+
+       {% for post in site.posts %}
+       <h3>{{ post.title }}</h3>
+       {% if post.summary -%}
+       <div class="summary">
+         Summary:<br />
+         {{ post.summary|markdown }}
+       </div>
+       {% endif %}
+
+6. ??? I'll try and add to this list as needed.
+
 --------------------
 STRANGECASE OVERVIEW
 --------------------
 
-StrangeCase parses all the files and directories in ``site/``.
+StrangeCase parses all the files and directories in ``site/`` and builds a tree
+of nodes.  At its big, squishy heart, that's what StrangeCase does.  Then it
+runs ``generate`` on every node.
 
 * Files/Folders that match ``ignore`` are not processed at all.
 * Folders become ``FolderNode`` objects (``site/``, though, is a ``RootNode``)
@@ -296,7 +378,8 @@ StrangeCase parses all the files and directories in ``site/``.
 * Assets (javascript, css, images) become ``AssetNode(FileNode)`` objects.
 * These can be overridden using the ``type`` config.
 * Additional nodes can be created by including the appropriate processor and
-  setting the node's ``type`` to use that processor.
+  setting the node's ``type`` to use that processor.  These are things like
+  pagination, tags, images, and categories.
 
 The nodes are placed in a tree::
 
@@ -315,10 +398,8 @@ The nodes are placed in a tree::
       + test2 (test2.j2 => test2.html)  # PageNode
 
 -------------------
-HUH? WHA' HAPPENED?
+SOO? WHA' HAPPENED?
 -------------------
-
-Here is a more thorough 1-2-3 of what StrangeCase does when you run it.
 
 1 - Build stage
 ~~~~~~~~~~~~~~~
