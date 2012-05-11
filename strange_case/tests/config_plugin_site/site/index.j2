@@ -1,0 +1,11 @@
+---
+great: great
+---
+{% extends "layouts/base.j2" %}
+
+
+{% block content %}{% markdown %}
+# Welcome to my blog!
+
+It is pretty {{ great|uglify }}.
+{% endmarkdown %}{% endblock %}

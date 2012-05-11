@@ -123,7 +123,7 @@ def processor(config, source_path, target_path):
 
 def register_category_page(category, source_path):
     if category in CategoryDetail.source_paths:
-        raise TypeError('Duplicate CategoryDetail page registered for "%s"' % category)
+        raise TypeError('Duplicate CategoryDetail page registered for "%s"' % (category or '(default category page)'))
     CategoryDetail.source_paths[category] = source_path
 
 

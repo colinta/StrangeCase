@@ -361,7 +361,24 @@ Here are some quick little neat things.
        </div>
        {% endif %}
 
-6. ??? I'll try and add to this list as needed.
+6. As of v4.5.0, you do not have to have a ``CONFIG`` dict in your config.py
+   file.  Instead, you can create or import functions into that file, and then
+   reference them from your project's config.yaml.  For instance, to add a
+   ``pluralize`` filter to your project::
+
+       # config.py
+       import inflect ; inflect = inflect.engine()
+
+       pluralize = inflect.plural
+
+       # config.yaml
+       filters:
+         pluralize: config.pluralize
+
+   Interestingly, this was a complete accident.  But I've added a test for it,
+   so it's here to stay! :-)
+
+7. ??? I'll add to this list as needed.
 
 --------------------
 STRANGECASE OVERVIEW

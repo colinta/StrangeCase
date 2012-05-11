@@ -85,11 +85,9 @@ def run():
     # now we can look for the app config
     if os.path.isfile(os.path.join(project_path, 'config.py')):
         config_module = imp.load_source('config', os.path.join(project_path, 'config.py'))
-        try:
+        if hasattr(config_module, 'CONFIG'):
             CONFIG.update(config_module.CONFIG)
-        except AttributeError:
-            sys.stderr.write("Could not load CONFIG from config.py\n")
-            sys.exit(1)
+
     config_path = os.path.join(project_path, CONFIG['config_file'])
 
     if os.path.isfile(config_path):

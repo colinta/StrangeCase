@@ -1,0 +1,5 @@
+extensions:
+  - strange_case.extensions.markdown.MarkdownExtension
+filters:
+  putabirdonit: config.put_a_bird_on_it
+  uglify: config.uglify

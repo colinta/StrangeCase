@@ -1,17 +1,12 @@
 import os
 from os.path import join
 from strange_case import strange_case
-from strange_case.tests import will_generate, check_path_contents, tree
+from strange_case.tests import will_generate, check_path_contents
 
 
 @will_generate('basic_site')
 def test_basic_site(config):
-    try:
-        strange_case(config)
-    except Exception:
-        tree(config['site_path'], config['project_path'])
-        tree(config['deploy_path'], config['project_path'])
-        raise
+    strange_case(config)
 
     path_contents = {
         '001_2012_01_16_file.html': '1. 2012-01-16',
@@ -55,12 +50,7 @@ def test_basic_site_remove_existing(config):
     with open(join(config['deploy_path'], 'rm_this'), 'w') as f:
         f.write('blablabla')
 
-    try:
-        strange_case(config)
-    except Exception:
-        tree(config['site_path'], config['project_path'])
-        tree(config['deploy_path'], config['project_path'])
-        raise
+    strange_case(config)
 
     path_contents = {
         '001_2012_01_16_file.html': True,

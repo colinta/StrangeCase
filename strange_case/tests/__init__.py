@@ -78,7 +78,13 @@ def will_generate(project_name):
                 yaml_config = yaml.load(config_file)
                 config.update(yaml_config)
 
-            ret = fn(config)
+            try:
+                os.chdir(project_path)
+                ret = fn(config)
+            except Exception:
+                tree(config['site_path'], config['project_path'])
+                tree(config['deploy_path'], config['project_path'])
+                raise
             shutil.rmtree(deploy_path)
             return ret
         return wrapper

@@ -1,5 +1,5 @@
 from strange_case import strange_case
-from strange_case.tests import will_generate, check_path_contents, tree
+from strange_case.tests import will_generate, check_path_contents
 
 
 @will_generate('basic_site')
@@ -8,12 +8,7 @@ def test_strip_extensions_and_meta_site(config):
     config['strip_metadata_from_name'] = True
     config['strip_metadata_from_target_name'] = True
 
-    try:
-        strange_case(config)
-    except Exception:
-        tree(config['site_path'], config['project_path'])
-        tree(config['deploy_path'], config['project_path'])
-        raise
+    strange_case(config)
 
     path_contents = {
         'file.html': '1. 2012-01-16',
