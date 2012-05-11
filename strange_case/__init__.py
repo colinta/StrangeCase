@@ -77,7 +77,7 @@ def strange_case(config):
                 try:
                     extension = fancy_import(extension)
                 except ImportError:
-                    sys.error.write('Error in processors: Could not find "%s"\n' % extension)
+                    sys.stderr.write('Error in processors: Could not find "%s"\n' % extension)
                     raise
             extensions.append(extension)
         del config['extensions']
@@ -99,7 +99,7 @@ def strange_case(config):
                 try:
                     method = fancy_import(method)
                 except ImportError:
-                    sys.error.write('Error in filters: Could not find "%s"\n' % method)
+                    sys.stderr.write('Error in filters: Could not find "%s"\n' % method)
                     raise
             jinja_environment.filters[filter_name] = method
         del config['filters']
@@ -114,7 +114,7 @@ def strange_case(config):
             try:
                 fancy_import(processor)
             except ImportError:
-                sys.error.write('Error in processors: Could not find "%s"\n' % processor)
+                sys.stderr.write('Error in processors: Could not find "%s"\n' % processor)
                 raise
         del config['processors']
     configurators = get_configurators(config)
@@ -223,7 +223,7 @@ def get_configurators(config):
 
     # additional configurators, in addition to the all-important defaults
     if 'configurators +' in config:
-        sys.error.write('''Built-in Configurators are now considered "protected",
+        sys.stderr.write('''Built-in Configurators are now considered "protected",
 so the "configurators +" hack is no longer needed.
 
 However, you will probably want to make sure to include the defaults:
