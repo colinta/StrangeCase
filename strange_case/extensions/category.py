@@ -10,19 +10,23 @@ In the end, we will be creating:
 *   ....
 *   - category n
 
-1)  Build your category_index and category_detail pages.  The location of category_index
-    will determine what pages it looks in.  It will search all pages and folders that
-    are in the same folder (e.g. self.parent.pages(recursive=True) ).  The category_detail
-    page should be in the same folder.
+1)  Build your category_index and category_detail pages.  The location of
+    category_index will determine what pages it looks in.  It will search all
+    pages and folders that are in the same folder (e.g.
+    self.parent.pages(recursive=True) ).  The category_detail page should be in
+    the same folder.
 
 2)  The category_index should register its processor as 'category_index'
     and the category page registers as 'category_detail'.  The 'category_detail'
-    processor returns no children during the build phase (they are not known), and the
-    category_index node returns a plain-old PageNode along with an instance of
-    CategoryFolderNode.
+    processor returns no children during the build phase (they are not known),
+    and the category_index node returns a plain-old PageNode along with an
+    instance of CategoryFolderNode.
 
-3)  The CategoryFolderNode generates a page for each category found in
-    the site *using* the category_index page.
+3)  The CategoryFolderNode generates a page for each category found in the site
+    *using* the category_index page.
+
+4)  If you want to customize category pages on a per-category, specify a
+    'category' or 'categories' config in the category_detail page front matter.
 """
 import os
 import re
@@ -36,23 +40,27 @@ from strange_case.processors import build_node
 class CategoryDetail(JinjaNode):
     """
     Gets created by the CategoryFolderProcesser during populate.
-    CategoryDetail.source_path is assigned during initial build
-    by the category_detail_processor.
+    CategoryDetail.source_paths is assigned during initial build by the
+    category_detail_processor.  If the page specifies a 'category', that page
+    will only bu used for that category.  If it specifies 'categories', it will
+    be used for that list of categories.  So each category can have its own
+    page!  StrangeCase is all about customization :-)
+
+    The special key ``None`` refers to the default CategoryDetail template.
     """
-    source_path = None
+    source_paths = {}
     index_node = None
 
-    def __init__(self, config, target_path, category):
-        config['title'] = category
-        super(CategoryDetail, self).__init__(config, CategoryDetail.source_path, target_path)
+    def __init__(self, config, source_path, target_path):
+        super(CategoryDetail, self).__init__(config, source_path, target_path)
         self.count = 0
         self.pages = []
 
 
 class CategoryFolderProcesser(Processor):
     def populate(self, site):
-        if CategoryDetail.source_path is None:
-            raise TypeError('CategoryDetail.source_path is not assigned. '
+        if not CategoryDetail.source_paths:
+            raise NotImplementedError('No CategoryDetail.source_paths were not assigned. '
                             'Create a node of type "category_detail"')
 
         pages = site.pages(recursive=True)
@@ -68,8 +76,15 @@ class CategoryFolderProcesser(Processor):
                 target_name = re.sub(r'[\W -]+', '_', category, re.UNICODE)
                 config['name'] = target_name
                 config['target_name'] = target_name + config['html_extension']
-                configurate(CategoryDetail.source_path, config)
-                categories[category] = CategoryDetail(config, self.target_folder, category)
+                config['title'] = category
+
+                source_path = CategoryDetail.source_paths.get(category, CategoryDetail.source_paths.get(None))
+                if not source_path:
+                    raise NotImplementedError('No CategoryDetail page has been '
+                        'registered for the "%s" category, and there is no '
+                        'default page either' % category)
+                configurate(source_path, config)
+                categories[category] = CategoryDetail(config, source_path, self.target_folder)
 
             categories[category].count += 1
             categories[category].pages.append(page)
@@ -106,10 +121,24 @@ def processor(config, source_path, target_path):
     return (folder, )
 
 
+def register_category_page(category, source_path):
+    if category in CategoryDetail.source_paths:
+        raise TypeError('Duplicate CategoryDetail page registered for "%s"' % category)
+    CategoryDetail.source_paths[category] = source_path
+
+
 def detail_processor(config, source_path, target_path):
     # just store the source path - when the detail pages get created, they
     # will use this path.
-    CategoryDetail.source_path = source_path
+    config = configurate(source_path, config)
+
+    if 'category' in config:
+        register_category_page(config['category'], source_path)
+    elif 'categories' in config:
+        for category in config['categories']:
+            register_category_page(category, source_path)
+    else:
+        register_category_page(None, source_path)
     return ()
 
 

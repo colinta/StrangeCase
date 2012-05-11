@@ -1,0 +1,12 @@
+{% extends "layouts/base.j2" %}
+
+
+{% block content %}{% markdown %}
+My blogs:
+
+{% for blog in site.blogs %}
+{{ loop.index }}. [{{ blog.title }}]({{ blog.url }})
+{% endfor %}
+{% endmarkdown %}
+{% include "includes/hi.j2" %}
+{% endblock %}

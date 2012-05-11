@@ -1,0 +1,13 @@
+----
+type: category_index
+----
+{% extends "layouts/base.j2" %}
+
+
+{% block content %}{% markdown %}
+Categories ({{ my.categories|length }}):
+
+{% for category in my.categories %}
+{{ loop.index }}. [{{ category.title }}]({{ category.url }}) ({{ category.count }})
+{% endfor %}
+{% endmarkdown %}{% endblock %}

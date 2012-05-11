@@ -1,3 +1,4 @@
+import pytest
 from strange_case import strange_case
 from strange_case.tests import will_generate, check_path_contents, tree
 
@@ -20,8 +21,8 @@ def test_category_site(config):
                     '<a href="/zee_categories/good.html">good</a>',
                     '<a href="/zee_categories/bad.html">bad</a>'
                 ],
-                'good.html': ['Category: good'],
-                'bad.html': ['Category: bad'],
+                'good.html': ['Category: good', 'Boring category page.'],
+                'bad.html': ['Category: bad', 'This category is bad.'],
             },
         }
         check_path_contents(config['deploy_path'], path_contents)
@@ -29,3 +30,9 @@ def test_category_site(config):
         tree(config['site_path'], config['project_path'])
         tree(config['deploy_path'], config['project_path'])
         raise
+
+
+@will_generate('missing_category_site')
+def test_missing_category_site(config):
+    with pytest.raises(NotImplementedError):
+        strange_case(config)

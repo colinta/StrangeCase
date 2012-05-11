@@ -14,6 +14,15 @@ TODO
 
 * **TABLED** table of contents
 
+2012_05_09 - v4.4.0
+===================
+
+* category extension now supports category-specific detail pages.  just add
+  `category: special category` to the special category page, or
+  `categories: [special, categories]` if you want multiple categories to use
+  that page.  if you don't implement a category page, it will raise a
+  `NotImplementedError`.
+
 2012_05_09 - v4.2.0
 ===================
 
