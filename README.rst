@@ -1012,7 +1012,7 @@ no format is specified it is printed as '01 Jan 2000'.
    <p>The date is {{ 'now'|date }}.</p>
    <p>The date is 06 May 2012.</p>
 
-strange_case.extensions.inflect_ext.pluralize
+strange_case.extensions.inflect.pluralize
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Pluralizes a variable::
@@ -1022,7 +1022,7 @@ Pluralizes a variable::
 ::
 
     filters:
-      pluralize: strange_case.extensions.inflect_ext.pluralize
+      pluralize: strange_case.extensions.inflect.pluralize
 
 strange_case.extensions.uuid.uuid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

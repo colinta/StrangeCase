@@ -1,6 +1,7 @@
 """
 Provides a pluralization filter, using the inflect library.
 """
+from __future__ import absolute_import
 try:
     import inflect
 except ImportError:
@@ -8,6 +9,6 @@ except ImportError:
     require_package('inflect')
 
 
-__inflect = inflect.engine()
+__engine = inflect.engine()
 
-pluralize = __inflect.plural
+pluralize = __engine.plural
