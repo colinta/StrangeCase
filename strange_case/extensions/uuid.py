@@ -1,3 +1,8 @@
+"""
+Usage::
+
+    <id>{{ 'http://myhost.com/articles'|uuid('url') }}</id>
+"""
 from __future__ import absolute_import
 from uuid import uuid5
 from uuid import NAMESPACE_DNS
