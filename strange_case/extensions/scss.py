@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import jinja2
 import jinja2.ext
 try:

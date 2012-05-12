@@ -303,7 +303,7 @@ Here are some quick little neat things.
          - strange_case.extensions.image
          - strange_case.extensions.category
          - strange_case.extensions.paginated
-         - strange_case.extensions.scss_ext
+         - strange_case.extensions.scss
 
 2. Iterate over a folder of pages, or a folder of assets, using
    ``{% for page in site.folder.subfolder %}``.  There is no "easy" way to

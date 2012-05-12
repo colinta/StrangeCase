@@ -14,6 +14,15 @@ TODO
 
 * **TABLED** table of contents
 
+2012_05_09 - v4.5.2
+===================
+
+* no more `_ext.py` files, thanks to `absolute_import`
+* imports from config.py are now easy, so it is encouraged to use `config.yaml`
+  for config, and config.py to create helpers (which are then imported into
+  `config.yaml`)
+* I can't emphasize how happy I am to have test coverage :-)
+
 2012_05_09 - v4.4.0
 ===================
 
