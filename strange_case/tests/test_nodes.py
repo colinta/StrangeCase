@@ -277,6 +277,7 @@ def test_node_pointer():
     b = TestPageNode('b', {'a ->': 'site.a'})
     p.extend([a, b])
     assert b.a == a
+    assert b['a'] == a
 
 
 def test_getitem_and_getattr():
@@ -302,6 +303,7 @@ def test_getitem_and_getattr():
     assert n['bob'] == bob
     assert n.bob == bob
     assert n.friend == joe
+    assert n['friend'] == joe
 
 
 def test_url():
@@ -367,3 +369,90 @@ def test_url_override():
 
     assert bob.url == '/foo/parent/bob'
     assert jane.url == '/foo/parent/jane'
+
+
+def test_is_correct_type():
+    config = {
+        'name': 'folder',
+        'target_name': 'folder',
+        'type': 'folder',
+    }
+    folder = FolderNode(config, 'folder', 'folder')
+
+    config = {
+        'name': 'page',
+        'target_name': 'page.html',
+        'url': 'page',
+    }
+    page = JinjaNode(config, get_test_file('a_folder/page.j2'), '')
+
+    config = {
+        'name': 'asset',
+        'target_name': 'asset.xml',
+        'url': 'asset'
+    }
+    asset = AssetNode(config, get_test_file('a_folder/a_file.txt'), '')
+
+    assert folder.is_folder == True
+    assert folder.is_page == False
+    assert folder.is_asset == False
+
+    assert page.is_folder == False
+    assert page.is_page == True
+    assert page.is_asset == False
+
+    assert asset.is_folder == False
+    assert asset.is_page == False
+    assert asset.is_asset == True
+
+
+def test_is_correct_type_override():
+    config = {
+        'name': 'page',
+        'target_name': 'page.html',
+        'url': 'page',
+        'is_page': False,
+    }
+    page = JinjaNode(config, get_test_file('a_folder/page.j2'), '')
+
+    config = {
+        'name': 'asset',
+        'target_name': 'asset.xml',
+        'url': 'asset',
+        'is_asset': False,
+    }
+    asset = AssetNode(config, get_test_file('a_folder/a_file.txt'), '')
+
+    assert page.is_folder == False
+    assert page.is_page == False
+    assert page.is_asset == True
+
+    assert asset.is_folder == False
+    assert asset.is_page == True
+    assert asset.is_asset == False
+
+
+def test_is_correct_type_reversed_override():
+    config = {
+        'name': 'page',
+        'target_name': 'page.html',
+        'url': 'page',
+        'is_asset': True,
+    }
+    page = JinjaNode(config, get_test_file('a_folder/page.j2'), '')
+
+    config = {
+        'name': 'asset',
+        'target_name': 'asset.xml',
+        'url': 'asset',
+        'is_page': True,
+    }
+    asset = AssetNode(config, get_test_file('a_folder/a_file.txt'), '')
+
+    assert page.is_folder == False
+    assert page.is_page == False
+    assert page.is_asset == True
+
+    assert asset.is_folder == False
+    assert asset.is_page == True
+    assert asset.is_asset == False

@@ -34,6 +34,8 @@ class FileNode(Node):
     @property
     @check_config_first
     def is_page(self):
+        if self.config.get('is_asset') is not None:
+            return not self.is_asset
         return False
 
     @property

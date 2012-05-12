@@ -9,11 +9,11 @@ def read(fname):
 
 setup(
         name="StrangeCase",
-        version="v4.5.0",
+        version="v4.5.1",
         author="Colin Thomas-Arnold",
         author_email="colinta.com",
         url="https://github.com/colinta/StrangeCase",
-        install_requires=['Jinja2', 'PyYAML', 'watchdog', 'python-dateutil'],  # 'PIL', 'markdown2', 'clevercss', 'pyScss', 'pytest'
+        install_requires=['Jinja2', 'PyYAML', 'watchdog'],  # 'PIL', 'markdown2', 'clevercss', 'pyScss', 'pytest', 'python-dateutil'
 
         entry_points={
             'console_scripts': [

@@ -521,7 +521,7 @@ nodes (or it can insert nodes elsewhere in the tree, or do nothing I suppose).
 
 If you are writing your own processor, and need to access a node's config, you
 might want to use the item-index operators, ``[]``.  If the configuration is not
-set, you'll get ``None`` instead of an ``AttributeError``.
+set, you'll get ``None`` instead of an ``AttributeError``. ::
 
     node.thingy     # => AttributeError
     node['thingy']  # => None
@@ -565,6 +565,61 @@ Generates::
     <h1>Colin</h1>
     <h2>test</h2>
     <h2>test</h2>
+
+Node properties
+~~~~~~~~~~~~~~~
+
+Nodes have a number of useful properties, roughly grouped into:
+
+* config/metadata like name, title, created_at.  This is the big one.
+* website-specific - ``url``, ``index``, ``is_{page,asset,folder}``
+* traversal - parents, children, siblings, iterable
+
+**Config**
+
+Hopefully by now the importance of the config object has been bored into your
+head.  StrangeCase is all about the config object.  That, and the node tree.
+And that's it.  Nothing else.  Oh, and templating.  Templating, config, and the
+node tree.  That's all it needs.  That's it, that's... and this lamp.  That's
+all.
+
+In your templates, the configuration is simply "there".  The properties of the
+current node and all the configuration it has inherited is given to jinja2 as
+the context.  There is, however, *one* exception to this, which are "pointer"
+configurations::
+
+    ---
+    images ->: site.static.images
+    ---
+    {{ images|length }}     # wrong
+    {{ my.images|length }}  # right
+
+I have not bothered to fix this, since I *prefer* the second syntax.  I use the
+``my`` prefix anytime I'm referring to the YAML front matter - kind of keeps
+things sane for me.  If people clamor for the pointer thing to get fixed it
+wouldn't be too difficult.
+
+**Website**
+
+The most used is, of course, ``node.url``.  URLs are created by appending the
+current node's URL to the parent URL.  The URL of the site node is assigned
+by the ``set_url`` configurator, and defaults to ``/``.  If you want your static
+site to be in a subfolder, assign something else to the ``root_url`` config.
+
+There are other configs used internally, like ``is_page`` and ``index``.  These
+are worth looking at.  ``is_page`` returns True when the node was processed
+using Jinja - it does not mean that the page is an HTML page, so ``robots.txt``
+and ``sitemap.xml`` will be included in there, too.  BUT hey!  You can fix that!
+Add::
+
+    ---
+    is_page: false
+    ---
+
+And that node will be excluded, it will considered to be an asset instead.  An
+asset is any file that is not a page.  If you want to set ``is_asset: true``
+above, that is supported, and an infinite loop is avoided, but the "official"
+stance is that ``is_asset := ! is_page``.
 
 Accessing any node by name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -957,6 +1012,17 @@ no format is specified it is printed as '01 Jan 2000'.
    <p>The date is {{ 'now'|date }}.</p>
    <p>The date is 06 May 2012.</p>
 
+strange_case.extensions.inflect_ext.pluralize
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Pluralizes a variable::
+
+    <p>Category - {{ title|pluralize }}
+
+::
+
+    filters:
+      pluralize: strange_case.extensions.inflect_ext.pluralize
 
 strange_case.extensions.uuid.uuid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
