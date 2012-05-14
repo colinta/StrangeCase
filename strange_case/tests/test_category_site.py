@@ -33,7 +33,7 @@ def test_missing_category_site(config):
         strange_case(config)
 
 
-@will_generate('missing_category_site')
+@will_generate('category_site')
 def test_build_category_site_twice(config):
     strange_case(config)
     strange_case(config)

@@ -7,6 +7,7 @@ class Registry(object):
     for example.
     """
     processors = {}
+    listeners = {}
     file_types = []
     misc = {}
     configurators = []
@@ -20,6 +21,21 @@ class Registry(object):
         Adds (or overrides) a processor to handle `node_type`
         """
         cls.processors[node_type] = processor
+
+    @classmethod
+    def listen(cls, event, callable):
+        """
+        Adds a listener to `event`
+        """
+        cls.listeners[event] = cls.listeners.get(event, []) + [callable]
+
+    @classmethod
+    def trigger(cls, event, *args, **kwargs):
+        """
+        Adds a listener to `event`
+        """
+        for callable in cls.listeners.get(event, []):
+            callable(*args, **kwargs)
 
     @classmethod
     def associate(cls, node_type, globs):

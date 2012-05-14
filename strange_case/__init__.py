@@ -135,6 +135,10 @@ def strange_case(config):
             except AttributeError:
                 pass
 
+    # generic Registry hooks can listen for 'on_start'
+    # category plugin uses this to reset when --watch is used
+    Registry.trigger('on_start', config)
+
     # each node class should add files to these properties, so that watchdog and
     # stale-file-removal work.
     Node.files_written = []

@@ -142,5 +142,10 @@ def detail_processor(config, source_path, target_path):
     return ()
 
 
+def reset_category_detail(config):
+    CategoryDetail.source_paths = {}
+
+
+Registry.listen('on_start', reset_category_detail)
 Registry.register('category_index', processor)
 Registry.register('category_detail', detail_processor)
