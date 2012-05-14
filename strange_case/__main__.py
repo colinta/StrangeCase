@@ -23,6 +23,7 @@ project-level overrides.
 import imp
 import os
 import sys
+import traceback
 import yaml
 
 from strange_case import strange_case
@@ -150,6 +151,8 @@ def run():
                 try:
                     strange_case(CONFIG)
                 except Exception as e:
+                    exc_type, exc_value, exc_traceback = sys.exc_info()
+                    traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stderr)
                     sys.stderr.write("Error (%s): %s\n" % (type(e).__name__, e.message))
                 else:
                     sys.stderr.write("StrangeCase generated at %i\n" % int(time.time()))
