@@ -3,7 +3,7 @@ import yaml
 
 
 def folder_config_file(source_file, config):
-    if config['type'] == 'folder':
+    if config['type'] == 'folder' or config['type'] == 'root':
         # the config is read *before* its processor is invoked (so no matter what processor you
         # use, it is guaranteed that its config is complete)
         config_path = os.path.join(source_file, config['config_file'])
