@@ -408,3 +408,16 @@ def test_set_url_cant_override(config):
     config = is_index(source_file, config)
     config = set_url(source_file, config)
     assert config['url'] == 'bad_page1.html'
+
+
+@will_test(override)
+def test_override_preserves_local_config(config):
+    source_file = get_test_file('a_folder/bad_page1.j2')
+    config.update({
+        'title': 'old title',
+        'override': {
+            'title': 'Overridden'
+        }
+    })
+    config = override(source_file, config)
+    assert config['title'] == 'old title'

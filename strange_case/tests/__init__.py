@@ -64,7 +64,7 @@ def will_generate(project_name):
         def wrapper():
             project_path = get_test_file(project_name)
             deploy_path = join(project_path, 'public')
-            config_path = join(project_path, 'config.yaml')
+            config_file_path = join(project_path, 'config.yaml')
 
             if os.path.exists(deploy_path):
                 shutil.rmtree(deploy_path)
@@ -74,9 +74,10 @@ def will_generate(project_name):
             config['site_path'] = join(project_path, 'site')
             config['deploy_path'] = join(project_path, 'public')
 
-            with open(config_path, 'r') as config_file:
-                yaml_config = yaml.load(config_file)
-                config.update(yaml_config)
+            if os.path.exists(config_file_path):
+                with open(config_file_path, 'r') as config_file:
+                    yaml_config = yaml.load(config_file)
+                    config.update(yaml_config)
 
             try:
                 os.chdir(project_path)

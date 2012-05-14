@@ -14,6 +14,12 @@ TODO
 
 * **TABLED** table of contents
 
+2012_05_09 - v4.5.3
+===================
+
+* `override` configurator added so that I can set a folder of image titles to
+  `""`.
+
 2012_05_09 - v4.5.2
 ===================
 

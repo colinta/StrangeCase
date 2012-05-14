@@ -28,6 +28,7 @@ def title_from_name(source_file, config):
     config['title'] = title
     return config
 
+
 title_from_name.dont_inherit = [
     'title'
 ]

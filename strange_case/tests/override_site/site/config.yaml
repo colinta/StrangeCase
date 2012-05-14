@@ -1,0 +1,6 @@
+title: 'Root title'
+override:
+  title: 'Overridden'
+files:
+  overridden_from_files.j2: { title: 'Overridden from files' }
+  overridden_from_front_matter.j2: { title: 'Overridden from files' }

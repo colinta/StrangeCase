@@ -23,6 +23,7 @@ CONFIG = ConfigDict({
     # these are ensured to be loaded first
     '__configurators_pre__': [
         'strange_case.configurators.meta_before',
+        'strange_case.configurators.override',
         'strange_case.configurators.file_types',
         'strange_case.configurators.merge_files_config',
         'strange_case.configurators.folder_config_file',

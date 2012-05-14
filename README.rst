@@ -378,7 +378,14 @@ Here are some quick little neat things.
    Interestingly, this was a complete accident.  But I've added a test for it,
    so it's here to stay! :-)
 
-7. ??? I'll add to this list as needed.
+7. Sometimes you will want to override values, but ``dont_inherit`` gets in the
+   way.  In those instances, you can add values to ``override``, usually in a
+   folder ``config.yaml``.  One common case is to set a folder of images'
+   ``title`` to ``""``.  The default configurators would set the title based
+   on the name of the file (``title_from_name`` configurator), but it will *not*
+   if the title is set to anything, even ``""``.
+
+8. ??? I'll add to this list as needed.
 
 --------------------
 STRANGECASE OVERVIEW
