@@ -14,7 +14,7 @@ def file_types(source_file, config):
             config['type'] = config['default_folder_type']
         return config
     else:
-        types = config.get('file_types', [])
+        types = list(config.get('file_types', []))
         # built-in file_types
         for entry in Registry.file_types:
             types.append(entry)
