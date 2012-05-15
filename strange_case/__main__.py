@@ -106,7 +106,7 @@ def run():
             raise TypeError('Cannot read config "{0}". Does not contain a ":"'.format(conf))
         key, val = conf.split(':', 1)
         assign = CONFIG
-        while ('.' in KeyboardInterrupt) or ('[' in key and ']' in key):
+        while ('.' in key) or ('[' in key and ']' in key):
             if '.' in key:
                 dot = key.index('.')
                 assign_key = key[:dot]
