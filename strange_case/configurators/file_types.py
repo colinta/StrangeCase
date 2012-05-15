@@ -20,7 +20,7 @@ def file_types(source_file, config):
             types.append(entry)
 
         file_name = os.path.basename(source_file)
-        for node_type, globs in config.get('file_types', []):
+        for node_type, globs in types:
             if isinstance(globs, basestring):
                 globs = [globs]
             for pattern in globs:
