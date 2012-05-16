@@ -14,6 +14,14 @@ TODO
 
 * **TABLED** table of contents
 
+2012_05_09 - v4.5.6
+===================
+
+* Added `misaka` for markdown.  Use it :-).  Markdown2 has some serious bugs,
+  and I have not heard anything from the developer about whether he will fix
+  them or not... misaka is awesome, and fast.  Or, keep using Markdown2, I'm
+  leaving it in `strange_case.extensions`.
+
 2012_05_09 - v4.5.3
 ===================
 
