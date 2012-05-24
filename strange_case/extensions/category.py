@@ -95,7 +95,7 @@ class CategoryFolderProcesser(Processor):
         self.replace_with(categories.values())
 
 
-def processor(config, source_path, target_path):
+def index_processor(config, source_path, target_path):
     config = configurate(source_path, config)
     categories_name = config['name']
 
@@ -147,5 +147,5 @@ def reset_category_detail(config):
 
 
 Registry.listen('on_start', reset_category_detail)
-Registry.register('category_index', processor)
+Registry.register('category_index', index_processor)
 Registry.register('category_detail', detail_processor)
