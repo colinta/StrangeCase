@@ -9,8 +9,6 @@ If you return multiple nodes, they will all be added as children to the parent n
 If instead you need to create some kind of tree structure, build the tree first and
 then return the top-level node (still in a tuple).  `build_node` might be your
 friend, it handles the configurating.
-
-All files will be parsed for front matter unless `dont_process` is `true`.
 """
 
 import os

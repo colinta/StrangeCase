@@ -296,9 +296,9 @@ Here are some quick little neat things.
          - strange_case.extensions.markdown.MarkdownExtension
        filters:
          date: strange_case.extensions.date.date
-         markdown: strange_case.extensions.markdown.markdown
+         markdown: strange_case.extensions.misaka.markdown
          json: json.dumps
-         sha: strange_case.extensions.sha.sha
+         sha: strange_case.extensions.hashlib.sha
        processors:
          - strange_case.extensions.image
          - strange_case.extensions.category

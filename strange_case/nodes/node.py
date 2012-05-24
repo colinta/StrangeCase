@@ -146,11 +146,11 @@ class Node(object):
         ret = []
         while current.parent:
             try:
-                ret.insert(0, current.parent.index)
+                if current.parent.index != self:
+                    ret.insert(0, current.parent.index)
             except AttributeError:
                 ret.insert(0, current.parent)
             current = current.parent
-
         return ret
 
     @property
