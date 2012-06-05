@@ -2,7 +2,6 @@ from fnmatch import fnmatch
 import sys
 
 from strange_case.registry import Registry
-from strange_case.extensions import *
 from strange_case.support import *
 from strange_case.support.fancy_import import fancy_import
 from strange_case.nodes import *
