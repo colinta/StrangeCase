@@ -30,7 +30,7 @@ my own reference, other formatters::
     %j:  Day of the year as a decimal number [001,366]          "102"
     %k:  ???                                                    "22"
     %l:  ???                                                    "10"
-    %m:  Month as a decimal number [01,12].                     "05"
+    %m:  Month as a decimal number [01,12].                     "04"
     %M:  Minute as a decimal number [00,59].                    "40"
     %n:  ???                                                    "\n"
     %p:  Locale's equivalent of either AM or PM.                "PM"
@@ -39,7 +39,7 @@ my own reference, other formatters::
     %s:  unix timestamp                                         "1334205650"
     %S:  Second as a decimal number [00,61].                    "50"
     %T:  22:40:50
-    %x:  Locale's appropriate date representation.              "05/11/12"
+    %x:  Locale's appropriate date representation.              "04/11/12"
     %X:  Locale's appropriate time representation.              "22:40:50"
     %y:  Year without century as a decimal number [00,99].      "12"
     %Y:  Year with century as a decimal number.                 "2012"
