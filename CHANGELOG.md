@@ -14,6 +14,13 @@ TODO
 
 * **TABLED** table of contents
 
+2012_06_05 - v4.5.9
+===================
+
+* removed support for scss_ext and clevercss_ext, since no one was using them
+  anyway, the backwards support was unneeded.  importing from
+  `strange_case.extensions.sha` will issue a warning
+
 2012_05_09 - v4.5.6
 ===================
 
