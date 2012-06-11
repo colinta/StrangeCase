@@ -250,7 +250,7 @@ class Node(object):
         return True
 
     def __getitem__(self, key):
-        if isinstance(key, int):
+        if isinstance(key, int) or isinstance(key, slice):
             return [child for child in self.children if child.iterable][key]
         else:
             try:
