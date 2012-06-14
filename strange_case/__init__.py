@@ -16,25 +16,19 @@ except ImportError:
     pass
 
 
-def output_error(msg):
-    if msg[-1] != "\n":
-        msg += "\n"
-    sys.stderr.write(msg)
+def require_package(pkg, reason=None):
+    sys.stderr("\033[1m" + pkg + "\033[0m is required.\n  > pip install " + pkg + "\n")
+
+    if reason:
+        sys.stderr(reason + "\n")
     sys.exit(1)
 
 
-def output_warning(msg):
-    if msg[-1] != "\n":
-        msg += "\n"
-    sys.stderr.write(msg)
+def recommend_package(pkg, reason=None):
+    sys.stderr("\033[1m" + pkg + "\033[0m is recommend.\n  > pip install " + pkg + "\n")
 
-
-def require_package(pkg):
-    output_error("\033[1m" + pkg + "\033[0m is required.\n  > pip install " + pkg)
-
-
-def recommend_package(pkg):
-    output_warning("\033[1m" + pkg + "\033[0m is recommend.\n  > pip install " + pkg)
+    if reason:
+        sys.stderr(reason + "\n")
 
 
 def find_files(folder):

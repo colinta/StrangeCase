@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import re
 import jinja2
 import jinja2.ext
 try:
@@ -14,7 +15,28 @@ try:
     from pygments.lexers import get_lexer_by_name
 except ImportError:
     from strange_case import recommend_package
-    recommend_package('pygments')
+    recommend_package('pygments', 'Pygments is used for syntax highlighting code blocks')
+
+slug_remove = re.compile('\W+')
+try:
+    import unidecode
+except ImportError:
+    from strange_case import recommend_package
+    recommend_package('unidecode', 'Unidecoe is used to convert headers with non-ASCII characters into ids for <h1> tags')
+
+
+def sluggify(s):
+    if unidecode:
+        s = unidecode.unidecode(s)
+    s = s.lower()
+    return slug_remove.sub('-', s).strip('-')
+
+
+class HeaderRenderer(m.HtmlRenderer):
+    def header(self, header, n):
+        header = header.strip()
+        slug = sluggify(header)
+        return "\n<h{n} id=\"{slug}\">{header}</h{n}>\n".format(**locals())
 
 
 class PygmentsRenderer(m.HtmlRenderer):
@@ -25,7 +47,10 @@ class PygmentsRenderer(m.HtmlRenderer):
         return p.highlight(text, get_lexer_by_name(lang), HtmlFormatter(cssclass='codehilite'))
 
 
-renderer = PygmentsRenderer(m.HTML_SMARTYPANTS | m.HTML_TOC)
+class MyRenderer(HeaderRenderer, PygmentsRenderer):
+    pass
+
+renderer = MyRenderer(m.HTML_SMARTYPANTS)
 markdowner = m.Markdown(renderer, m.EXT_FENCED_CODE | m.EXT_NO_INTRA_EMPHASIS |
                                   m.EXT_STRIKETHROUGH | m.EXT_SUPERSCRIPT |
                                   m.EXT_TABLES)

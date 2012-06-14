@@ -10,7 +10,7 @@ try:
     import pygments
 except ImportError:
     from strange_case import recommend_package
-    recommend_package('pygments')
+    recommend_package('pygments', 'Pygments is used for syntax highlighting code blocks')
 
 
 markdowner = markdown2.Markdown(extras=["fenced-code-blocks", "header-ids",
