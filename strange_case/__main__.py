@@ -34,7 +34,7 @@ def run():
     logging.basicConfig()
 
     import argparse
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('-w', '--watch', dest='watch', action='store_const',
                        const=True, default=False,
                        help='watch the site_path for changes')
