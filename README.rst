@@ -10,10 +10,10 @@ But this one is:
 1. Written in python, unlike ``jekyll``
 2. **NOT** complicated, unlike ``hyde``.  And I mean *really* **NOT** complicated.
 
-I just read about `webby`_, and realized that it is the Ruby equivalent to
+I just read about `nanoc`_, and realized that it is the Ruby equivalent to
 StrangeCase.  I commend them!  I had considered porting StrangeCase to Ruby
 (and maybe I will some day, just for kicks), but for now, I would say to
-Rubyists: use `webby`_.
+Rubyists: use `nanoc`_.
 
 
 ------------
@@ -1227,5 +1227,5 @@ See LICENSE_ for more details (it's a simplified BSD license).
 .. _Jinja2:       http://jinja.pocoo.org/
 .. _LICENSE:      https://github.com/colinta/StrangeCase/blob/master/LICENSE
 .. _PIL:          http://www.pythonware.com/products/pil/
-.. _webby:        http://webby.rubyforge.org/
+.. _nanoc:        http://nanoc.stoneship.org/
 .. _dateutil:     http://labix.org/python-dateutil
