@@ -74,7 +74,7 @@ def to_datetime(value):
         return datetime.datetime.utcfromtimestamp(value)
     if isinstance(value, basestring):
         try:
-            import dateutil
+            import dateutil.parser
         except ImportError:
             from strange_case import require_package
             require_package('python-dateutil')
