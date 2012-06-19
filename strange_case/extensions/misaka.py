@@ -18,6 +18,7 @@ except ImportError:
     recommend_package('pygments', 'Pygments is used for syntax highlighting code blocks')
 
 slug_remove = re.compile('\W+')
+unidecode = None
 try:
     import unidecode
 except ImportError:
