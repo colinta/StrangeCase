@@ -17,18 +17,18 @@ except ImportError:
 
 
 def require_package(pkg, reason=None):
-    sys.stderr("\033[1m" + pkg + "\033[0m is required.\n  > pip install " + pkg + "\n")
+    sys.stderr.write("\033[1m" + pkg + "\033[0m is required.\n  > pip install " + pkg + "\n")
 
     if reason:
-        sys.stderr(reason + "\n")
+        sys.stderr.write(reason + "\n")
     sys.exit(1)
 
 
 def recommend_package(pkg, reason=None):
-    sys.stderr("\033[1m" + pkg + "\033[0m is recommend.\n  > pip install " + pkg + "\n")
+    sys.stderr.write("\033[1m" + pkg + "\033[0m is recommend.\n  > pip install " + pkg + "\n")
 
     if reason:
-        sys.stderr(reason + "\n")
+        sys.stderr.write(reason + "\n")
 
 
 def find_files(folder):
