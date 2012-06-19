@@ -1,2 +1,2 @@
 extensions:
-  - strange_case.extensions.markdown.MarkdownExtension
+  - strange_case.extensions.misaka.MarkdownExtension

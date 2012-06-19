@@ -2,7 +2,7 @@ a_date: !!timestamp '2012-05-12 09:59:11.399040'
 filters:
   date: strange_case.extensions.date.date
   timestamp: strange_case.extensions.date.timestamp
-  markdown: strange_case.extensions.markdown.markdown
+  markdown: strange_case.extensions.misaka.markdown
   sha: strange_case.extensions.hashlib.sha
   pluralize: strange_case.extensions.inflect.pluralize
   json: json.dumps

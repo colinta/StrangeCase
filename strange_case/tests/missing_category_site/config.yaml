@@ -1,4 +1,4 @@
 extensions:
-  - strange_case.extensions.markdown.MarkdownExtension
+  - strange_case.extensions.misaka.MarkdownExtension
 processors:
   - strange_case.extensions.category
