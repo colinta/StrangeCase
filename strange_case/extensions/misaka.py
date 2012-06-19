@@ -23,7 +23,7 @@ try:
     import unidecode
 except ImportError:
     from strange_case import recommend_package
-    recommend_package('unidecode', 'Unidecoe is used to convert headers with non-ASCII characters into ids for <h1> tags')
+    recommend_package('unidecode', 'Unidecode is used to convert headers with non-ASCII characters into ids for <h1> tags')
 
 
 def sluggify(s):
