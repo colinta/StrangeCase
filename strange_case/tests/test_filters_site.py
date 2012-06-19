@@ -13,6 +13,9 @@ def test_filters_site(config):
 12 May 2012
 Sat May 12 09:59:11 2012
 
+12 May 2012
+Sat May 12 09:59:11 2012
+
 <p>Some <em>markdown</em> text</p>
 
 d8f4590320e1343a915b6394170650a8f35d6926
