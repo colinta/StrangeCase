@@ -293,7 +293,7 @@ Here are some quick little neat things.
    start a new site::
 
        extensions:
-         - strange_case.extensions.markdown.MarkdownExtension
+         - strange_case.extensions.misaka.MarkdownExtension
        filters:
          date: strange_case.extensions.date.date
          markdown: strange_case.extensions.misaka.markdown
@@ -967,7 +967,7 @@ Example of all this nonsense using ``config.py``::
 Equivalent in the root ``config.yaml``::
 
     extensions:
-      - strange_case.extensions.markdown.MarkdownExtension
+      - strange_case.extensions.misaka.MarkdownExtension
     filters:
       markdown: strange_case.extensions.markdown
     processors:
