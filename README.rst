@@ -1198,7 +1198,7 @@ These two get associated with ``.scss`` and ``.clevercss`` files and compile the
 ::
 
     processors:
-        - strange_case.extensions.scss_processor
+        - strange_case.extensions.scss
         - strange_case.extensions.clevercss_processor
 
 -------
