@@ -21,7 +21,7 @@ def setdefault_name(source_file, config):
         name += '_' + ext[1:]  # pluck off the "." in front
 
     # replace non-word, hyphens, and spaces characters with _
-    name = re.sub(r'[\W -]', '_', name, re.UNICODE)
+    name = re.sub(r'\W', '_', name, re.UNICODE)
     config['name'] = name.encode('ascii')
     return config
 
