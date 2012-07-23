@@ -69,7 +69,11 @@ page number as the key.  So if you have this config:
 The third page will use that title instead of the default ("Page 3")
 
 You can use different names than "page" and "Page" using the `paginated`
-option in config.  Here are the options it supports:
+option in config. You can also (and should) reverse the page ordering.  The
+default is *sensible* (ascending) but if you are writing a blog, you probably
+want the newer posts **FIRST**.
+
+Here are the options it supports:
 
     ----
     type: paginated
@@ -77,6 +81,7 @@ option in config.  Here are the options it supports:
         limit: 5  # default: 10
         name: 'pagina'  # default: page
         title: 'Página'  # default: Page
+        reverse: true  # default: false
     pages:
         3: { title: 'The Third Page' }
     ---
@@ -189,16 +194,22 @@ def paginate(all_items, limit):
 def paginated_processor(config, source_path, target_path):
     config['dont_inherit'].append('pages')
     paginated_processor = Processor(config)
-    page_limit = int(config.get('paginated', {}).get('limit', 10))
-    page_name = config.get('paginated', {}).get('name', 'page')
-    page_title = config.get('paginated', {}).get('title', 'Page')
-    page_order = config.get('paginated', {}).get('order', 'asc')
+    paginated_config = config.get('paginated', {})
+    page_limit = int(paginated_config.get('limit', 10))
+    page_name = paginated_config.get('name', 'page')
+    page_title = paginated_config.get('title', 'Page')
+    page_reverse = paginated_config.get('reverse', False)
+    page_order = paginated_config.get('order')
+    if page_order:
+        import sys
+        sys.stderr.write("Warning: paginated.order is deprecated.  Use paginated.reverse instead")
+        page_reverse = True if page_order.upper() == 'DESC' else False
 
     @bind(paginated_processor)
     def populate(self, site):
         ret = []
         nodes = [node for node in self.siblings if node.is_page]
-        if page_order.upper() == 'DESC':
+        if page_reverse:
             nodes.reverse()
         pages = paginate(nodes, page_limit)
 
