@@ -783,12 +783,14 @@ Mostly random thoughts here.  Most of what you might want to know about StrangeC
 
 * StrangeCase points Jinja to your project folder, so you can use any
   directories you want in there to store layouts, macros, and partials.
+
   * layouts that are in ``layouts/`` are extended using ``{% extends 'layouts/file.j2' %}``
   * includes in ``anywhere/`` are included using ``{% include 'anywhere/file.j2' %}``
   * I suppose the convention is to have layouts/ and includes/ folders.
 
 * In the project root, ``config.py`` is where you can place runtime things,
   like...
+
   * if you need to calculate a value (e.g. ``datetime.time``)
   * fetch some data from a database (*ewww!*)
   * import jinja extensions (or use 'extensions' in config.yaml)
