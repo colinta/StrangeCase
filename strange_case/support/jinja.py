@@ -68,20 +68,20 @@ class YamlFrontMatterLoader(FileSystemLoader):
         and then tries to match the same delimiter.
         """
         contents, filename, uptodate = super(YamlFrontMatterLoader, self).get_source(environment, template)
-        front_matter_match = re.match(r"\A([-]{3,}|[`]{3,})$", contents, re.MULTILINE)
+        front_matter_match = re.match(r"\A([-]{3,}|[`]{3,})(\r\n|\r|\n)", contents)
         number_yaml_lines = 0
         if front_matter_match:
+            newline = front_matter_match.group(2)  # group(2) contains the newline/CRLF
             number_yaml_lines += 1
-            offset = len(front_matter_match.group(0)) + 1  # +1 for newline
+            offset = len(front_matter_match.group(0))
             delim = re.compile("^" + front_matter_match.group(1) + "$")
             lines = contents.splitlines()
-            for line in lines[1:]:  # skip the first line
-                offset += len(line) + 1
+            for line in lines[1:]:  # skip the first line, the opening front matter
+                offset += len(line) + len(newline)
                 number_yaml_lines += 1
                 if delim.match(line):
                     break
-            contents = ("\n" * number_yaml_lines) + contents[offset:]
-            # contents = contents[offset:]
+            contents = (newline * number_yaml_lines) + contents[offset:]
 
         return StrangeCaseStr(contents, number_yaml_lines), filename, uptodate
 
