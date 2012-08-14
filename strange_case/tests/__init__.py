@@ -79,6 +79,7 @@ def will_generate(project_name):
                     yaml_config = yaml.load(config_file)
                     config.update(yaml_config)
 
+            old_path = os.getcwd()
             try:
                 os.chdir(project_path)
                 ret = fn(config)
@@ -86,6 +87,8 @@ def will_generate(project_name):
                 tree(config['site_path'], config['project_path'])
                 tree(config['deploy_path'], config['project_path'])
                 raise
+            finally:
+                os.chdir(old_path)
             shutil.rmtree(deploy_path)
             return ret
         return wrapper
