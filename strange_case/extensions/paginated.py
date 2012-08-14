@@ -202,8 +202,8 @@ def paginated_processor(config, source_path, target_path):
     page_order = paginated_config.get('order')
     if page_order:
         import sys
-        sys.stderr.write("Warning: paginated.order is deprecated.  Use paginated.reverse instead")
         page_reverse = True if page_order.upper() == 'DESC' else False
+        sys.stderr.write("Warning: `paginated.order` is deprecated.  Use `paginated.reverse = {0!r}` instead\n".format(page_reverse))
 
     @bind(paginated_processor)
     def populate(self, site):
