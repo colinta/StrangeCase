@@ -1,3 +1,4 @@
+import os
 from strange_case.nodes import PageNode
 from strange_case.registry import Registry
 from strange_case.support.jinja import fix_path
