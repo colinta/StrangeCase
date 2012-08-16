@@ -131,12 +131,13 @@ class YamlFrontMatterLoader(FileSystemLoader):
             t.number_yaml_lines = source.number_yaml_lines
         return t
 
+
 def fix_path(path):
     """
     Provides a ``fix_paths`` function that returns a slash-separated relative path,
     even on Windows.
 
-    Jinja chokes on backslash-separated paths, and slash-separated paths work well 
+    Jinja chokes on backslash-separated paths, and slash-separated paths work well
     enough in Windows anyway.  See also Jinja2-99_, Jinja2-98_.
 
     .. _Jinja2-98: https://github.com/mitsuhiko/jinja2/issues/98
@@ -145,5 +146,4 @@ def fix_path(path):
     Note: This function will also chomp any in-filename backslashes.
     Hopefully you don't have any of those in the relative path to your template.
     """
-    return os.path.relpath(path).replace(os.path.sep, '/')
-
+    return path.replace(os.path.sep, '/')
