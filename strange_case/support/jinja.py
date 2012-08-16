@@ -9,14 +9,21 @@ Jinja support adds the following abilities:
    confuses things.  This module fixes that, too, using a ``StrangeCaseStr``
    which keeps track of how many lines to ignore.  The blank lines are included
    during compilation, and removed after the file is generated.
+3. Provides a ``fix_paths`` function that returns a slash-separated relative path,
+   even on Windows.
+
+   Note: This function will also chomp any in-filename backslashes.
+   Hopefully you don't have any of those in the relative path to your template.
 """
 import re
+import os
 from jinja2 import FileSystemLoader, Environment, Template
 from jinja2.utils import internalcode
 
 
 class StrangeCaseEnvironment(Environment):
     def __init__(self, project_path, *args, **kwargs):
+        project_path = fix_path(project_path)
         kwargs['loader'] = YamlFrontMatterLoader([project_path, '/'])  # root is included so that absolute paths are picked up by Jinja2
         self.template_class = StrangeCaseTemplate
         super(StrangeCaseEnvironment, self).__init__(*args, **kwargs)
@@ -123,3 +130,20 @@ class YamlFrontMatterLoader(FileSystemLoader):
         if isinstance(source, StrangeCaseStr):
             t.number_yaml_lines = source.number_yaml_lines
         return t
+
+def fix_path(path):
+    """
+    Provides a ``fix_paths`` function that returns a slash-separated relative path,
+    even on Windows.
+
+    Jinja chokes on backslash-separated paths, and slash-separated paths work well 
+    enough in Windows anyway.  See also Jinja2-99_, Jinja2-98_.
+
+    .. _Jinja2-98: https://github.com/mitsuhiko/jinja2/issues/98
+    .. _Jinja2-99: https://github.com/mitsuhiko/jinja2/pull/99
+
+    Note: This function will also chomp any in-filename backslashes.
+    Hopefully you don't have any of those in the relative path to your template.
+    """
+    return os.path.relpath(path).replace(os.path.sep, '/')
+
