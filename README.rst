@@ -326,7 +326,7 @@ Here are some quick little neat things.
    (``site.static.images.posts.pics_of.kittens``), use this trick to shorten it
    down in your template.  In this case you *must* prefix the pointer with
    ``my.``, because jinja will not know how to lookup "page ->" when you say
-   only "page", and I have not devised a workaround yet.
+   only "page", and I have not devised a workaround yet.::
 
        ---
        pics ->: site.static.images.posts.pics_of.kittens
