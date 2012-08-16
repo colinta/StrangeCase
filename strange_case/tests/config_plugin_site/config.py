@@ -1,7 +1,7 @@
 
 
 def uglify(value):
-    return "{value} is so UGLY!".format(value=value)
+    return "is so UGLY!".format(value=value)
 
 
 def put_a_bird_on_it(value):

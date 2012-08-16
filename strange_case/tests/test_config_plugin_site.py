@@ -11,7 +11,7 @@ def test_config_plugin_site(config):
 <body>
 <h1 id="welcome-to-my-blog">Welcome to my blog!</h1>
 
-<p>It is pretty great is so UGLY!.</p>
+<p>It is so UGLY!.</p>
 </body>""",
             'blogs': {
                 'index.html': """<doctype html>
