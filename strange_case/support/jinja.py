@@ -24,7 +24,7 @@ from jinja2.utils import internalcode
 class StrangeCaseEnvironment(Environment):
     def __init__(self, project_path, *args, **kwargs):
         project_path = fix_path(project_path)
-        kwargs['loader'] = YamlFrontMatterLoader([project_path, '/'])  # root is included so that absolute paths are picked up by Jinja2
+        kwargs['loader'] = YamlFrontMatterLoader([project_path, os.getcwd() ,'/'])
         self.template_class = StrangeCaseTemplate
         super(StrangeCaseEnvironment, self).__init__(*args, **kwargs)
 

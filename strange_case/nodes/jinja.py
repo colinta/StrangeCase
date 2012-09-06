@@ -16,7 +16,6 @@ class JinjaNode(PageNode):
         self.files_written.append(target_path)
 
     def render(self, site=None):
-        #print "self.source_path is '{}', fixed to '{}'".format(self.source_path, fix_path(self.source_path))
         try:
             template = Registry.get('jinja_environment').get_template(fix_path(self.source_path))
         except UnicodeDecodeError as e:
