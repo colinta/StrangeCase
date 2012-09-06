@@ -116,12 +116,12 @@ def test_strip_extensions_strip(config):
     config.update({
         'strip_extensions': ['.txt']
     })
-    source_file = get_test_file('a_folder/a_file.txt')
+    source_file = get_test_file('a_folder/a_file-txt.txt')
     config = setdefault_target_name(source_file, config)
     config = is_index(source_file, config)
     config = set_url(source_file, config)
     config = strip_extensions(source_file, config)
-    assert config['url'] == 'a_file'
+    assert config['url'] == 'a_file-txt'
 
 
 @will_test(setdefault_target_name, strip_extensions)

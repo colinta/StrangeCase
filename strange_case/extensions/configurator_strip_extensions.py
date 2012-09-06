@@ -3,9 +3,9 @@ from strange_case.registry import Registry
 
 
 def strip_extensions(source_file, config):
-    for extension in config.get('strip_extensions', ['.html', '.xml']):
+    for extension in config['strip_extensions']:
         if config['url'].endswith(extension):
-            config['url'] = config['url'].rstrip(extension)
+            config['url'] = config['url'][:-len(extension)]
             break
     return config
 
@@ -18,3 +18,7 @@ def on_start(config):
 
 
 strip_extensions.on_start = on_start
+
+strip_extensions.defaults = {
+    'strip_extensions': ['.html', '.xml']
+}
