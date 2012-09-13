@@ -43,12 +43,14 @@ my own reference, other formatters::
     %X:  Locale's appropriate time representation.              "09:01:02"
     %y:  Year without century as a decimal number [00,99].      "11"
     %Y:  Year with century as a decimal number.                 "2011"
+    %z:  UTC Offset                                             "-0600"
     %Z:  Time zone name (no characters if no time zone exists). ""
     %%:  A literal '%' character.                               "%"
 
     %Y-%m-%d or %F:  SQL date
     %H:%M:%S or %T:  SQL time
     %B %d, %Y:       April 11, 2012
+    %a, %e %b %Y %X %z:  RSS pubDate format
 
 ``timestamp`` on the other hand defaults to a UTC timestamp in ISO 8601 format::
 
