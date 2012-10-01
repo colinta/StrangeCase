@@ -160,6 +160,8 @@ def run():
 
         exclude_paths = [
             os.path.abspath('.git'),
+            os.path.abspath('.hg'),
+            os.path.abspath('.svn'),
             os.path.abspath(CONFIG['deploy_path']),
         ]
         if args.exclude_paths:
