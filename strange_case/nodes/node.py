@@ -68,13 +68,13 @@ class Node(object):
         return ret
 
     def iter_pages(self, recursive=False):
-        return iter([child for child in self.children if child.iterable and child.is_page])
+        return iter([child for child in self.pages(recursive) if child.iterable])
 
     def iter_folders(self, recursive=False):
-        return iter([child for child in self.children if child.iterable and child.is_folder])
+        return iter([child for child in self.folders(recursive) if child.iterable])
 
     def iter_assets(self, recursive=False):
-        return iter([child for child in self.children if child.iterable and child.is_asset])
+        return iter([child for child in self.assets(recursive) if child.iterable])
 
     def pages(self, recursive=False):
         return self.all(recursive=recursive, pages=True)
