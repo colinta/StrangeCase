@@ -39,7 +39,7 @@ class PlywoodNode(PageNode):
                         number_yaml_lines += 1
                         if delim.match(line):
                             break
-                contents = (newline * number_yaml_lines) + contents[offset:]
+                    contents = (newline * number_yaml_lines) + contents[offset:]
 
         except UnicodeDecodeError as e:
             e.args += "Could not process '%s' because of unicode error." % self.source_path
