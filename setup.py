@@ -10,7 +10,7 @@ def read(fname):
 setup(
         name="StrangeCase",
         version="v4.5.22",
-        author="Colin Thomas-Arnold",
+        author="Colin T.A. Gray",
         author_email="colinta@gmail",
         url="https://github.com/colinta/StrangeCase",
         install_requires=['Jinja2', 'PyYAML', 'watchdog'],  # 'PIL', 'markdown2', 'clevercss', 'pyScss', 'pytest', 'python-dateutil', 'unidecode'
