@@ -93,4 +93,5 @@ def processor(config, source_path, target_path):
     return (image_node, ) + tuple(thumbs)
 
 Registry.register('image', processor)
-Registry.associate('image', ['*.png', '*.jpg', '*.jpeg', '*.gif'])
+Registry.associate('image', ['*.png', '*.jpg', '*.jpeg', '*.gif',
+                             '*.PNG', '*.JPG', '*.JPEG', '*.GIF'])
