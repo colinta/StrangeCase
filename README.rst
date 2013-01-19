@@ -865,6 +865,7 @@ complicated, but more extensible.
     configurators: [                          # list of configurators.  The built-ins do very important things, so overriding this does *bad things*
       meta_before,              # assigns defaults from the configurators ``.defaults`` property
       file_types,               # checks 'file_types' for a pattern that matches the file name
+      page_types,               # if you want to use your own template engine, you'll need to add it to this list
       merge_files_config,       # merges files[filename] with filename
       folder_config_file,       # processes folder/config.yaml.  If the folder config contains `ignore: true`, the folder is skipped
       front_matter_config,      # processes YAML front matter.  Again, the file can be ignored using `ignore: true`

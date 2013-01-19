@@ -12,7 +12,9 @@ friend, it handles the configurating.
 """
 
 import os
-from strange_case.nodes import FolderNode, RootFolderNode, AssetNode, JinjaNode
+from strange_case.nodes import FolderNode, RootFolderNode, AssetNode
+# import nodes for supported engines
+from strange_case.nodes import JinjaNode, PlywoodNode
 from strange_case.registry import Registry
 from strange_case.configurators import configurate
 
@@ -66,6 +68,8 @@ Registry.register('asset', asset_processor)
 
 
 def page_processor(config, source_path, target_path):
-    node = JinjaNode(config, source_path, target_path)
+    page_type = config['page_type']
+    node_class = Registry.get_engine(page_type)
+    node = node_class(config, source_path, target_path)
     return (node, )
 Registry.register('page', page_processor)

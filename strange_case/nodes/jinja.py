@@ -2,6 +2,8 @@ from strange_case.nodes import PageNode
 from strange_case.registry import Registry
 from strange_case.support.jinja import fix_path
 
+
+@Registry.register_engine('jinja')
 class JinjaNode(PageNode):
     """
     A JinjaNode object is rendered before copied to its destination

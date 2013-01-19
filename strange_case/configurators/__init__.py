@@ -70,6 +70,7 @@ def meta_after(source_file, config):
 
 from override import override
 from file_types import file_types
+from page_types import page_types
 from folder_config_file import folder_config_file
 from front_matter_config import front_matter_config
 from ignore import ignore

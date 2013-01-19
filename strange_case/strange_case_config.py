@@ -25,6 +25,7 @@ CONFIG = ConfigDict({
         'strange_case.configurators.meta_before',
         'strange_case.configurators.override',
         'strange_case.configurators.file_types',
+        'strange_case.configurators.page_types',
         'strange_case.configurators.merge_files_config',
         'strange_case.configurators.folder_config_file',
         'strange_case.configurators.front_matter_config',

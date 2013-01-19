@@ -58,6 +58,7 @@ def strange_case(config):
         os.mkdir(config['deploy_path'])
 
     from strange_case.support.jinja import StrangeCaseEnvironment
+    from plywood import PlywoodEnv
 
     ##|
     ##|  EXTENSIONS
@@ -80,6 +81,12 @@ def strange_case(config):
         Registry.set('jinja_environment', jinja_environment)
     else:
         jinja_environment = Registry.get('jinja_environment')
+
+    if not Registry.get('plywood_environment'):
+        plywood_environment = PlywoodEnv()
+        Registry.set('plywood_environment', plywood_environment)
+    else:
+        plywood_environment = Registry.get('plywood_environment')
 
     ##|
     ##|  FILTERS

@@ -1,13 +1,14 @@
 from __future__ import absolute_import
 import re
-import jinja2
-import jinja2.ext
 try:
     import misaka as m
     # from misaka import Markdown, HtmlRenderer, EXT_FENCED_CODE, EXT_NO_INTRA_EMPHASIS, HTML_SMARTYPANTS
 except ImportError:
     from strange_case import require_package
     require_package('misaka')
+import jinja2
+import jinja2.ext
+from plywood.env import PlywoodEnv
 
 try:
     import pygments as p
@@ -60,6 +61,12 @@ markdowner = m.Markdown(renderer, m.EXT_FENCED_CODE | m.EXT_NO_INTRA_EMPHASIS |
 # markdown filter
 def markdown(markdown):
     return markdowner.render(markdown).strip()
+
+
+# plywood extension
+@PlywoodEnv.register_fn('markdown', accepts_block=True)
+def plywood_markdown(block):
+    return markdown(block())
 
 
 # markdown block

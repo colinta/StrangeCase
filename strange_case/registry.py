@@ -9,6 +9,7 @@ class Registry(object):
     processors = {}
     listeners = {}
     file_types = []
+    page_types = {}
     misc = {}
     configurators = []
 
@@ -43,6 +44,20 @@ class Registry(object):
         Assigns a default type to files that match `globs`
         """
         cls.file_types.append((node_type, globs))
+
+    @classmethod
+    def register_engine(cls, engine_name):
+        """
+        Class decorator that associates a node class with a page_type
+        """
+        def decorator(node_type):
+            cls.page_types[engine_name] = node_type
+            return node_type
+        return decorator
+
+    @classmethod
+    def get_engine(cls, engine_name):
+        return cls.page_types[engine_name]
 
     @classmethod
     def nodes(cls, node_type, *args, **kwargs):
