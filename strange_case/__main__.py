@@ -131,7 +131,7 @@ def run():
         assert CONFIG['site_path'], "site_path is required"
         assert CONFIG['deploy_path'], "deploy_path is required"
     except AssertionError as e:
-        sys.stderr.write("\033[1;31mError:\033[0m \033[1m" + e.message + "\033[0m\n")
+        sys.stderr.write("\033[1;31mError:\033[0m \033[1m" + str(e) + "\033[0m\n")
         return
 
     if args.watch:
@@ -153,7 +153,7 @@ def run():
                 except Exception as e:
                     exc_type, exc_value, exc_traceback = sys.exc_info()
                     traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stderr)
-                    sys.stderr.write("Error (%s): %s\n" % (type(e).__name__, e.message))
+                    sys.stderr.write("Error (%s): %s\n" % (type(e).__name__, str(e)))
                 else:
                     sys.stderr.write("StrangeCase generated at %i\n" % int(time.time()))
                 self.last_run = time.time()

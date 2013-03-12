@@ -8,13 +8,6 @@ from strange_case.nodes import *
 from strange_case.processors import *
 from strange_case.nodes import Node
 
-notifier = None
-try:
-    from gntp import notifier
-    import socket
-except ImportError:
-    pass
-
 
 def require_package(pkg, reason=None):
     sys.stderr.write("\033[1m" + pkg + "\033[0m is required.\n  > pip install " + pkg + "\n")
@@ -188,26 +181,6 @@ def strange_case(config):
             p_rel = os.path.relpath(p)
             sys.stderr.write("\033[31mrmdir\033[0m \033[1m" + p_rel + "\033[0m\n")
             os.removedirs(p)
-
-    if notifier:
-        try:
-            growl = notifier.GrowlNotifier(
-                applicationName="StrangeCase",
-                notifications=["New Messages"],
-                defaultNotifications=["New Messages"],
-            )
-            growl.register()
-
-            # Send one message
-            growl.notify(
-                noteType="New Messages",
-                title="StrangeCase site generated",
-                description="site is available at:\n"
-                    "{config[deploy_path]}"\
-                    .format(config=config),
-            )
-        except socket.error:
-            pass
 
 
 def get_configurators(config):
