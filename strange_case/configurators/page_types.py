@@ -24,7 +24,7 @@ def page_types(source_file, config):
 page_types.defaults = {
     'page_types': [
         ('jinja', ('*.j2', '*.jinja2', '*.jinja', '*.txt', '*.html', '*.xml')),
-        ('plywood', ('*.ply', '*.plywood')),
+        ('plywood', ('*.ply', '*.plywood', '*.xply')),
     ],
     'default_page_type': 'jinja',
 }

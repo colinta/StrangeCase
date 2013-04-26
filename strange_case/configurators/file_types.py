@@ -34,7 +34,7 @@ def file_types(source_file, config):
 
 file_types.defaults = {
     'file_types': [
-        ('page', ('*.j2', '*.jinja2', '*.jinja', '*.txt', '*.html', '*.xml', '*.ply', '*.plywood')),
+        ('page', ('*.j2', '*.jinja2', '*.jinja', '*.txt', '*.html', '*.xml', '*.ply', '*.plywood', '*.xply')),
     ],
     'default_type': 'asset',
     'default_root_type': 'root',
