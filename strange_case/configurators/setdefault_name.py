@@ -29,6 +29,7 @@ def setdefault_name(source_file, config):
 setdefault_name.defaults = {
     'rename_extensions': {
         '.ply': u'.html',
+        '.xply': u'.xml',
         '.plywood': u'.html',
         '.j2': u'.html',
         '.jinja2': u'.html',
