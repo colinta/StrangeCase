@@ -14,7 +14,7 @@ setup(
         author_email="colinta@gmail",
         url="https://github.com/colinta/StrangeCase",
         install_requires=['Jinja2', 'PyYAML', 'watchdog', 'plywood'],
-        # optional: 'PIL', 'markdown2', 'clevercss', 'pyScss', 'pytest', 'python-dateutil', 'unidecode'
+        # optional: 'PIL', 'misaka', 'clevercss', 'pyScss', 'pytest', 'python-dateutil', 'unidecode'
 
         entry_points={
             'console_scripts': [
