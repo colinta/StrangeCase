@@ -65,7 +65,9 @@ def markdown(markdown):
 
 # plywood extension
 @PlywoodEnv.register_fn('markdown', accepts_block=True)
-def plywood_markdown(block):
+def plywood_markdown(block, content=None):
+    if content:
+        return markdown(content)
     return markdown(block())
 
 
