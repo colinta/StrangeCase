@@ -51,7 +51,7 @@ def strange_case(config):
         os.mkdir(config['deploy_path'])
 
     from strange_case.support.jinja import StrangeCaseEnvironment
-    from plywood import PlywoodEnv
+    from plywood import PlywoodEnv, PlywoodFunction
 
     ##|
     ##|  EXTENSIONS
@@ -95,6 +95,8 @@ def strange_case(config):
                     sys.stderr.write('Error in filters: Could not find "%s"\n' % method)
                     raise
             jinja_environment.filters[filter_name] = method
+            if filter_name not in plywood_environment.scope:
+                plywood_environment.scope[filter_name] = PlywoodFunction(method)
         del config['filters']
 
     ##|
