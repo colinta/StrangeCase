@@ -25,7 +25,7 @@ setup(
         description="A straightforward python static site generator.",
         long_description=read("README.rst"),
 
-        packages=find_packages(),
+        packages=find_packages(exclude=['strange_case.tests']),
         keywords="strange_case static site generator",
         platforms="any",
         license="BSD",
