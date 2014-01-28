@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from strange_case import strange_case
 from strange_case.tests import will_generate, check_path_contents
 
