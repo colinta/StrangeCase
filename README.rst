@@ -1,3 +1,5 @@
+.. image:: https://travis-ci.org/colinta/StrangeCase.png?branch=master :target: https://travis-ci.org/colinta/StrangeCase
+
 ======================
 The Strange Case of...
 ======================
