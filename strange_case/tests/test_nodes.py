@@ -1,6 +1,7 @@
 from strange_case.tests import get_test_file
 from strange_case.nodes import *
 from strange_case.registry import Registry
+import os
 
 
 class TestConfigNode(Node):
@@ -456,3 +457,9 @@ def test_is_correct_type_reversed_override():
     assert asset.is_folder == False
     assert asset.is_page == True
     assert asset.is_asset == False
+
+def test_paths_use_forward_slash():
+    config = { }
+    path = 'a_folder/page.j2'
+    page = JinjaNode(config, get_test_file(path), '')
+    assert page.source_path == os.path.abspath(path).replace('\\', '/')

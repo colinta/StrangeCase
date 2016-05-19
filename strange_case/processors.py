@@ -22,6 +22,12 @@ from strange_case.configurators import configurate
 def build_node(config, source_path, target_path, file_name):
     source_file = os.path.abspath(os.path.join(source_path, file_name))
 
+    # Jinja chokes on backslash-separated paths,
+    # and slash-separatd paths work well enough in Windows anyway.
+    # See https://github.com/mitsuhiko/jinja2/pull/99
+    # and https://github.com/mitsuhiko/jinja2/issues/98
+    source_file = source_file.replace(os.path.sep, '/')
+
     config = configurate(source_file, config)
     if not config:
         return
