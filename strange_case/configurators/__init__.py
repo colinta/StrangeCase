@@ -25,7 +25,7 @@ def configurate(source_file, config):
         config = configurator(source_file, config)
         if not config:
             if verbose:
-                sys.stderr.write('Ignoring "{0}" due to configurator {1}\n'.format(source_file, configurator.__name__))
+                sys.stderr.write('Ignoring "{0}" due to configurator {1!r}\n'.format(source_file, configurator.__name__))
             return
     return config
 
