@@ -1,9 +1,3 @@
 public/
-*.pxm
 *.pyc
 *.egg-info
-
-# Vim files
-.*~
-*.swp
-*~
