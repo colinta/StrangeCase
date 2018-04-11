@@ -27,7 +27,7 @@ class MarkdownExtension(jinja2.ext.Extension):
     tags = ('markdown',)
 
     def parse(self, parser):
-        lineno = parser.stream.next().lineno
+        lineno = next(parser.stream).lineno
         body = parser.parse_statements(
             ['name:endmarkdown'],
             drop_needle=True

@@ -20,12 +20,8 @@ _namespaces = {
 
 
 def uuid(value, namespace='url'):
-    if isinstance(value, unicode):
-        value = value.encode('utf-8')
-    return unicode(uuid5(_namespaces[namespace], value))
+    return str(uuid5(_namespaces[namespace], value))
 
 
 def urn(value, namespace='url'):
-    if isinstance(value, unicode):
-        value = value.encode('utf-8')
-    return unicode(uuid5(_namespaces[namespace], value).urn)
+    return str(uuid5(_namespaces[namespace], value).urn)

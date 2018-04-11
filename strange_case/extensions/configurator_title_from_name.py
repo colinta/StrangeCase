@@ -4,7 +4,8 @@ from strange_case.configurators import provides
 
 
 def titlecase(s):
-    s = s.replace('_', ' ').lower()
+    s = s.replace('_', ' ')
+    s = s.lower()
     s = re.sub(r"[A-Za-z]+('[A-Za-z]+)?",
                   lambda mo: mo.group(0)[0].upper() +
                              mo.group(0)[1:].lower(),

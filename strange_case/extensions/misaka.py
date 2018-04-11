@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import re
 try:
-    import misaka as m
+    import misaka
     # from misaka import Markdown, HtmlRenderer, EXT_FENCED_CODE, EXT_NO_INTRA_EMPHASIS, HTML_SMARTYPANTS
 except ImportError:
     from strange_case import require_package
@@ -34,14 +34,14 @@ def sluggify(s):
     return slug_remove.sub('-', s).strip('-')
 
 
-class HeaderRenderer(m.HtmlRenderer):
+class HeaderRenderer(misaka.HtmlRenderer):
     def header(self, header, n):
         header = header.strip()
         slug = sluggify(header)
         return "\n<h{n} id=\"{slug}\">{header}</h{n}>\n".format(**locals())
 
 
-class PygmentsRenderer(m.HtmlRenderer):
+class PygmentsRenderer(misaka.HtmlRenderer):
     def block_code(self, text, lang):
         # pygments code highlighting
         if lang is None:
@@ -52,15 +52,15 @@ class PygmentsRenderer(m.HtmlRenderer):
 class MyRenderer(HeaderRenderer, PygmentsRenderer):
     pass
 
-renderer = MyRenderer(m.HTML_SMARTYPANTS)
-markdowner = m.Markdown(renderer, m.EXT_FENCED_CODE | m.EXT_NO_INTRA_EMPHASIS |
-                                  m.EXT_STRIKETHROUGH | m.EXT_SUPERSCRIPT |
-                                  m.EXT_TABLES)
+renderer = MyRenderer()
+markdowner = misaka.Markdown(renderer, extensions=(misaka.EXT_FENCED_CODE, misaka.EXT_NO_INTRA_EMPHASIS,
+                                  misaka.EXT_STRIKETHROUGH, misaka.EXT_SUPERSCRIPT,
+                                  misaka.EXT_TABLES))
 
 
 # markdown filter
 def markdown(markdown):
-    return markdowner.render(markdown).strip()
+    return misaka.smartypants(markdowner(markdown).strip())
 
 
 # plywood extension
@@ -76,7 +76,7 @@ class MarkdownExtension(jinja2.ext.Extension):
     tags = ('markdown',)
 
     def parse(self, parser):
-        lineno = parser.stream.next().lineno
+        lineno = next(parser.stream).lineno
         body = parser.parse_statements(
             ['name:endmarkdown'],
             drop_needle=True

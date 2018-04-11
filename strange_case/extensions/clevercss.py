@@ -21,7 +21,7 @@ class CleverCssExtension(jinja2.ext.Extension):
         super(CleverCssExtension, self).__init__(environment)
 
     def parse(self, parser):
-        lineno = parser.stream.next().lineno
+        lineno = next(parser.stream).lineno
         body = parser.parse_statements(
             ['name:endclevercss'],
             drop_needle=True

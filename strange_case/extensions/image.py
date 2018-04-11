@@ -5,7 +5,7 @@ try:
     from PIL import Image
 except ImportError:
     from strange_case import require_package
-    require_package('PIL')
+    require_package('Pillow')
 
 from strange_case.nodes import AssetNode
 from strange_case.registry import Registry
@@ -23,14 +23,14 @@ class ImageNode(AssetNode):
                 image = Image.open(source_path)
                 size = self.config['size']
 
-                if isinstance(size, basestring):
+                if isinstance(size, str):
                     size = self.config['size'].split('x')
                     if len(size) == 1:
                         size = [size[0], size[0]]
                 elif isinstance(size, int):
                     size = [size, size]
 
-                # ensure working with ints - strings do nothing in PIL (no
+                # ensure working with ints - strings do nothing in Pillow (no
                 # error, nothing!)
                 size[0] = int(size[0])
                 size[1] = int(size[1])

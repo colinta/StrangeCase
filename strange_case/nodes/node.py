@@ -1,4 +1,4 @@
-import urllib
+import urllib.parse
 
 from strange_case.config_dict import config_copy
 from strange_case.registry import Registry
@@ -116,6 +116,7 @@ class Node(object):
             children = child_or_children
         else:
             children = [child_or_children]
+
         for child in children:
             if child.parent:
                 child.parent.remove(child)
@@ -202,7 +203,7 @@ class Node(object):
         else:
             prefix = '/'
 
-        url = self.config.get('url', urllib.quote(self.target_name))
+        url = self.config.get('url', urllib.parse.quote(self.target_name))
 
         return prefix + url
 
@@ -246,7 +247,7 @@ class Node(object):
     ##|
     ##|  OBJECT-MODEL STUFF
     ##|
-    def __nonzero__(self):
+    def __bool__(self):
         return True
 
     def __getitem__(self, key):
@@ -308,4 +309,4 @@ class Node(object):
         return self.url
 
     def __repr__(self, indent=''):
-        return "%s<url: %s type:%s>" % (indent, self.url, str(type(self)))
+        return "%s<url: %s type:%s>" % (indent, self.config.get('url', 'None'), str(type(self)))

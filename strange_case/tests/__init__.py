@@ -5,6 +5,7 @@ from os.path import join
 import re
 import shutil
 from functools import wraps
+import pytest
 from strange_case.strange_case_config import CONFIG
 
 
@@ -37,7 +38,7 @@ def get_test_file(source):
 def will_test(*configurators):
     def decorator(fn):
         @wraps(fn)
-        def wrapper():
+        def wrapper(**ignore):
             config = {
                 'project_path': os.path.dirname(__file__),
                 'site_path': get_test_file('a_site'),
@@ -58,10 +59,43 @@ def will_test(*configurators):
     return decorator
 
 
+@pytest.fixture
+def basic_config():
+    project_name = 'basic_site'
+    project_path = get_test_file(project_name)
+    deploy_path = join(project_path, 'public')
+    config_file_path = join(project_path, 'config.yaml')
+
+    if os.path.exists(deploy_path):
+        shutil.rmtree(deploy_path)
+    config = CONFIG.copy(all=True)
+
+    config['project_path'] = project_path
+    config['site_path'] = join(project_path, 'site')
+    config['deploy_path'] = join(project_path, 'public')
+
+    if os.path.exists(config_file_path):
+        with open(config_file_path, 'r') as config_file:
+            yaml_config = yaml.load(config_file)
+            config.update(yaml_config)
+
+    old_path = os.getcwd()
+    try:
+        os.chdir(project_path)
+        yield config
+    except Exception:
+        tree(config['site_path'], config['project_path'])
+        tree(config['deploy_path'], config['project_path'])
+        raise
+    finally:
+        os.chdir(old_path)
+    shutil.rmtree(deploy_path)
+
+
 def will_generate(project_name):
     def decorator(fn):
         @wraps(fn)
-        def wrapper():
+        def wrapper(**ignore):
             project_path = get_test_file(project_name)
             deploy_path = join(project_path, 'public')
             config_file_path = join(project_path, 'config.yaml')
@@ -103,7 +137,7 @@ def check_path_contents(path, path_contents):
     """
     check_existing_files(path, path_contents)
 
-    for filename, contents in path_contents.iteritems():
+    for filename, contents in path_contents.items():
         assert os.path.exists(join(path, filename))
         if isinstance(contents, dict):
             check_path_contents(join(path, filename), contents)
@@ -141,10 +175,10 @@ def check_file_contents(file_name, search):
         assert True
     elif isinstance(search, RegexType):
         file_name = os.path.basename(file_name)
-        assert search.search(content), '{content} does not match {search.pattern}'.format(**locals())
+        assert search.search(content), '{content!r} does not match {search.pattern!r}'.format(**locals())
     else:
         file_name = os.path.basename(file_name)
-        assert search in content, '{content} does not contain {search}'.format(**locals())
+        assert search in content, '{content!r} does not contain {search!r}'.format(**locals())
 
 
 LEFT_T = '|-- '  # u'\u251c\u2500\u2500'

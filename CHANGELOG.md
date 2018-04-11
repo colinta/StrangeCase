@@ -103,11 +103,11 @@ TODO
       strange_case.extensions.clevercss_processor => strange_case.extensions.clevercss_ext
       strange_case.extensions.scss_processor => strange_case.extensions.scss_ext
 
-* Thanks to this refactor, CleverCSS, PIL, markdown2, and PySCSS are now
+* Thanks to this refactor, CleverCSS, Pillow, markdown2, and PySCSS are now
   optional, not installed as part of `pip install StrangeCase`
 
 * Added `require_package` helper to output error message when a package is not
-  installed.  Usage: `require_package("PIL")`.
+  installed.  Usage: `require_package("Pillow")`.
 
 2012_03_13 - v3.0.3
 ===================

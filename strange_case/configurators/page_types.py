@@ -10,7 +10,7 @@ def page_types(source_file, config):
 
     file_name = os.path.basename(source_file)
     for node_type, globs in types:
-        if isinstance(globs, basestring):
+        if isinstance(globs, str):
             globs = [globs]
         for pattern in globs:
             if fnmatch(file_name, pattern):

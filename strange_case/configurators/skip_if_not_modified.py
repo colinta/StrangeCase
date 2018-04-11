@@ -25,7 +25,8 @@ class SkipIfNotModified(object):
         # read timestamps file
         self.timestamps_file = os.path.join(config['project_path'], timestamps)
         if os.path.exists(self.timestamps_file):
-            config['file_mtimes'] = pickle.load(open(self.timestamps_file))
+            with open(self.timestamps_file, 'rb') as fp:
+                config['file_mtimes'] = pickle.load(fp)
 
     def on_finish(self, config):
         timestamps = config.get('.timestamps', '.timestamps')

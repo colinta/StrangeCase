@@ -74,7 +74,7 @@ def to_datetime(value):
         return value
     if isinstance(value, int) or isinstance(value, float):
         return datetime.datetime.utcfromtimestamp(value)
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         try:
             import dateutil.parser
         except ImportError:

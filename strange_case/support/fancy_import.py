@@ -8,5 +8,8 @@ def fancy_import(import_name):
     """
 
     import_path, import_me = import_name.rsplit('.', 1)
-    imported = __import__(import_path, globals(), locals(), [import_me], -1)
-    return getattr(imported, import_me)
+    imported = __import__(import_path, globals(), locals(), [import_me], 0)
+    try:
+        return getattr(imported, import_me)
+    except AttributeError as error:
+        raise error

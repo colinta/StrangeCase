@@ -89,10 +89,11 @@ class CategoryFolderProcesser(Processor):
             categories[category].count += 1
             categories[category].pages.append(page)
 
+        categories_values = list(categories.values())
         # assign categories list to the category index page
         if CategoryDetail.index_node:
-            CategoryDetail.index_node.config.setdefault('categories', categories.values())
-        self.replace_with(categories.values())
+            CategoryDetail.index_node.config.setdefault('categories', categories_values)
+        self.replace_with(categories_values)
 
 
 def index_processor(config, source_path, target_path):

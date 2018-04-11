@@ -1,11 +1,11 @@
-import urllib
+import urllib.parse
 
 
 def set_url(source_file, config):
     if config['is_index']:
         config['url'] = ''
     else:
-        config['url'] = urllib.quote(config['target_name'])
+        config['url'] = urllib.parse.quote(config['target_name'])
     return config
 
 

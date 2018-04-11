@@ -12,7 +12,7 @@ class JinjaNode(PageNode):
         content = self.render(site)
 
         with open(target_path, 'w') as dest:
-            dest.write(content.encode('utf-8'))
+            dest.write(content)
 
         self.files_tracked.append(source_path)
         self.files_written.append(target_path)

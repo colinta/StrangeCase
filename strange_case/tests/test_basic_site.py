@@ -1,12 +1,11 @@
 import os
 from os.path import join
 from strange_case import strange_case
-from strange_case.tests import will_generate, check_path_contents
+from strange_case.tests import will_generate, check_path_contents, basic_config
 
 
-@will_generate('basic_site')
-def test_basic_site(config):
-    strange_case(config)
+def test_basic_site(basic_config):
+    strange_case(basic_config)
 
     path_contents = {
         '001_2012_01_16_file.html': '1. 2012-01-16',
@@ -38,19 +37,18 @@ def test_basic_site(config):
 </body>""",
         },
     }
-    check_path_contents(config['deploy_path'], path_contents)
+    check_path_contents(basic_config['deploy_path'], path_contents)
 
 
-@will_generate('basic_site')
-def test_basic_site_remove_existing(config):
+def test_basic_site_remove_existing(basic_config):
     # create extra files
     # this file does not exist in path_contents, and so
     # should be removed
-    os.mkdir(config['deploy_path'])
-    with open(join(config['deploy_path'], 'rm_this'), 'w') as f:
+    os.mkdir(basic_config['deploy_path'])
+    with open(join(basic_config['deploy_path'], 'rm_this'), 'w') as f:
         f.write('blablabla')
 
-    strange_case(config)
+    strange_case(basic_config)
 
     path_contents = {
         '001_2012_01_16_file.html': True,
@@ -61,4 +59,4 @@ def test_basic_site_remove_existing(config):
             '2012_01_02_post2.html': True,
         },
     }
-    check_path_contents(config['deploy_path'], path_contents)
+    check_path_contents(basic_config['deploy_path'], path_contents)

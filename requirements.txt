@@ -2,7 +2,7 @@ Brownie==0.5.1
 CleverCSS==0.1
 Jinja2==2.6
 MarkupSafe==0.15
-PIL==1.1.7
+Pillow==3.3.3
 PyYAML==3.10
 StrangeCase==v3.0.2
 argh==0.15.0

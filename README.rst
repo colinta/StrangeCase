@@ -542,7 +542,7 @@ tree of nodes, with the root node at the top, and it is always named ``"site"``.
 The ``generate`` method is called on the root node, and recursively on all the
 children.  This is where folders are created, pages are generated, and assets
 are copied over.  If you are using the image processor, you might also have
-thumbnails created using `PIL`_.
+thumbnails created using `Pillow`_.
 
 ---------
 TEMPLATES
@@ -694,7 +694,7 @@ jekyll (``site.categories.blablabla``) very easy, and intuitive, I think, since
 you only have to know the folder name of your images/blogs/projects/*whatever*.
 
 You might want to check out the image processor, explained below.  It uses
-`PIL`_ to make thumbnail images.
+`Pillow`_ to make thumbnail images.
 
 You can check what kind of node you're working with using the ``type`` property
 ("page", "folder", "asset") or the ``is_page``, ``is_folder``, ``is_asset``
@@ -1074,7 +1074,7 @@ namespace identifier. The available namespaces are:
 IMAGE PROCESSOR
 ---------------
 
-The image processor uses PIL to create thumbnails.  The usual way to do this is
+The image processor uses Pillow to create thumbnails.  The usual way to do this is
 to specify the thumbnail size in a parent folder config, and then set `type:
 image` on all the image files.  This is done in the image folder's config.yaml
 file::

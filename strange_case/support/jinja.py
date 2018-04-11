@@ -29,9 +29,9 @@ class StrangeCaseEnvironment(Environment):
         super(StrangeCaseEnvironment, self).__init__(*args, **kwargs)
 
 
-class StrangeCaseStr(unicode):
+class StrangeCaseStr(str):
     def __new__(self, content, number_yaml_lines):
-        s = unicode.__new__(self, content)
+        s = str.__new__(self, content)
         s.__init__(number_yaml_lines)
         s.number_yaml_lines = number_yaml_lines
         return s

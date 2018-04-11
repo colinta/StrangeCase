@@ -60,7 +60,7 @@ def strange_case(config):
     extensions = []
     if 'extensions' in config:
         for extension in config['extensions']:
-            if isinstance(extension, basestring):
+            if isinstance(extension, str):
                 try:
                     extension = fancy_import(extension)
                 except ImportError:
@@ -87,8 +87,8 @@ def strange_case(config):
     ##|  the Environment object's `filter` property.
     ##|
     if 'filters' in config:
-        for filter_name, method in config['filters'].iteritems():
-            if isinstance(method, basestring):
+        for filter_name, method in config['filters'].items():
+            if isinstance(method, str):
                 try:
                     method = fancy_import(method)
                 except ImportError:
@@ -189,14 +189,14 @@ def get_configurators(config):
     configurators = []
     # load built-in pre configurators
     for configurator in config['__configurators_pre__']:
-        if isinstance(configurator, basestring):
+        if isinstance(configurator, str):
             configurator = fancy_import(configurator)
         configurators.append(configurator)
 
     # load user configurators
     if 'configurators' in config:
         for configurator in config['configurators']:
-            if isinstance(configurator, basestring):
+            if isinstance(configurator, str):
                 configurator = fancy_import(configurator)
             configurators.append(configurator)
 
@@ -210,13 +210,13 @@ However, you will probably want to make sure to include the defaults:
 - created_at_from_name
 - title_from_name''')
         for configurator in config['configurators +']:
-            if isinstance(configurator, basestring):
+            if isinstance(configurator, str):
                 configurator = fancy_import(configurator)
             configurators.append(configurator)
 
     # load built-in post configurators
     for configurator in config['__configurators_post__']:
-        if isinstance(configurator, basestring):
+        if isinstance(configurator, str):
             configurator = fancy_import(configurator)
         configurators.append(configurator)
 

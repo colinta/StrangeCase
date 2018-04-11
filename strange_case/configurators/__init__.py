@@ -43,7 +43,7 @@ class MetaBefore(object):
         configurators = Registry.configurators
         for configurator in configurators:
             if hasattr(configurator, 'defaults'):
-                for key, value in configurator.defaults.iteritems():
+                for key, value in configurator.defaults.items():
                     if key not in config:
                         config[key] = value
 
@@ -68,16 +68,16 @@ def meta_after(source_file, config):
     return config
 
 
-from override import override
-from file_types import file_types
-from page_types import page_types
-from folder_config_file import folder_config_file
-from front_matter_config import front_matter_config
-from ignore import ignore
-from is_index import is_index
-from merge_files_config import merge_files_config
-from setdefault_name import setdefault_name
-from setdefault_target_name import setdefault_target_name
-from set_url import set_url
-from setdefault_iterable import setdefault_iterable
-from skip_if_not_modified import skip_if_not_modified
+from .override import override
+from .file_types import file_types
+from .page_types import page_types
+from .folder_config_file import folder_config_file
+from .front_matter_config import front_matter_config
+from .ignore import ignore
+from .is_index import is_index
+from .merge_files_config import merge_files_config
+from .setdefault_name import setdefault_name
+from .setdefault_target_name import setdefault_target_name
+from .set_url import set_url
+from .setdefault_iterable import setdefault_iterable
+from .skip_if_not_modified import skip_if_not_modified

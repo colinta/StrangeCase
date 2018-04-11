@@ -3,7 +3,7 @@ from strange_case.nodes import *
 from strange_case.registry import Registry
 
 
-class TestConfigNode(Node):
+class MockingConfigNode(Node):
     def __init__(self, name='test', addl_config={}):
         config = {
             'test_it': 'test_it',
@@ -12,7 +12,7 @@ class TestConfigNode(Node):
             'iterable': True,
         }
         config.update(addl_config)
-        super(TestConfigNode, self).__init__(config=config,
+        super(MockingConfigNode, self).__init__(config=config,
                                   target_folder='target')
 
     @property
@@ -26,7 +26,7 @@ class TestConfigNode(Node):
         return 'RIGHT'
 
 
-class TestRootNode(RootFolderNode):
+class MockingRootNode(RootFolderNode):
     def __init__(self, name='test', addl_config={}):
         config = {
             'target_name': name,
@@ -36,12 +36,12 @@ class TestRootNode(RootFolderNode):
         }
         config.update(addl_config)
         Registry.set('root', self)
-        super(TestRootNode, self).__init__(config=config,
+        super(MockingRootNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/'),
                                   target_folder='target')
 
 
-class TestFolderNode(FolderNode):
+class MockingFolderNode(FolderNode):
     def __init__(self, name='test', addl_config={}):
         config = {
             'target_name': name,
@@ -50,12 +50,12 @@ class TestFolderNode(FolderNode):
             'iterable': True,
         }
         config.update(addl_config)
-        super(TestFolderNode, self).__init__(config=config,
+        super(MockingFolderNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/'),
                                   target_folder='target')
 
 
-class TestPageNode(PageNode):
+class MockingPageNode(PageNode):
     def __init__(self, name, addl_config={}):
         config = {
             'target_name': name,
@@ -64,12 +64,12 @@ class TestPageNode(PageNode):
             'iterable': True,
         }
         config.update(addl_config)
-        super(TestPageNode, self).__init__(config=config,
+        super(MockingPageNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/a_file.txt'),
                                   target_folder='target')
 
 
-class TestIndexNode(PageNode):
+class MockingIndexNode(PageNode):
     def __init__(self, name, addl_config={}):
         config = {
             'target_name': name,
@@ -79,26 +79,26 @@ class TestIndexNode(PageNode):
             'is_index': True,
         }
         config.update(addl_config)
-        super(TestIndexNode, self).__init__(config=config,
+        super(MockingIndexNode, self).__init__(config=config,
                                   source_path=get_test_file('a_folder/a_file.txt'),
                                   target_folder='target')
 
 
 def test_check_config_first():
-    n = TestConfigNode()
+    n = MockingConfigNode()
     assert n.test_it == 'test_it'
     assert n.test_another == 'RIGHT'
 
 
 def test_node_defaults():
-    n = TestRootNode()
+    n = MockingRootNode()
     assert n.parent == None
     assert n.children == []
 
 
 def test_parent_child_relationship():
-    p = TestRootNode()
-    c = TestPageNode('c')
+    p = MockingRootNode()
+    c = MockingPageNode('c')
     p.append(c)
     assert len(p.children) == 1
     assert c.parent == p
@@ -106,31 +106,31 @@ def test_parent_child_relationship():
     assert len(p.children) == 0
     assert c.parent == None
 
-    p = TestRootNode()
-    c1 = TestPageNode('c1')
-    c2 = TestPageNode('c2')
+    p = MockingRootNode()
+    c1 = MockingPageNode('c1')
+    c2 = MockingPageNode('c2')
     p.extend([c1, c2])
     assert len(p.children) == 2
     assert c1.parent == p
     assert c2.parent == p
-    c3 = TestPageNode('c3')
+    c3 = MockingPageNode('c3')
     p.insert(0, c3)
     assert p.children == [c3, c1, c2]
     assert c3.parent == p
-    c4 = TestPageNode('c4')
-    c5 = TestPageNode('c5')
+    c4 = MockingPageNode('c4')
+    c5 = MockingPageNode('c5')
     p.insert(1, [c4, c5])
     assert p.children == [c3, c4, c5, c1, c2]
     assert c4.parent == p
 
 
 def test_contains_and_len_and_iter():
-    p = TestRootNode('p')
+    p = MockingRootNode('p')
 
-    index = TestIndexNode('index')  # not iterable
-    c1 = TestPageNode('c1')
-    c2 = TestPageNode('c2')
-    c3 = TestPageNode('c3')
+    index = MockingIndexNode('index')  # not iterable
+    c1 = MockingPageNode('c1')
+    c2 = MockingPageNode('c2')
+    c3 = MockingPageNode('c3')
     p.extend([index, c1, c2, c3])
 
     assert list(n for n in p) == [c1, c2, c3]
@@ -151,16 +151,16 @@ def test_siblings():
         - c4
         - c5 (is_index: true, not iterable)
     """
-    p1 = TestRootNode('p1')
-    p2 = TestRootNode('p2')
+    p1 = MockingRootNode('p1')
+    p2 = MockingRootNode('p2')
 
-    c1 = TestPageNode('c1')
-    c2 = TestPageNode('c2')
-    c3 = TestPageNode('c3')
+    c1 = MockingPageNode('c1')
+    c2 = MockingPageNode('c2')
+    c3 = MockingPageNode('c3')
     p1.extend([c1, c2, c3, p2])
 
-    c4 = TestPageNode('c4')
-    c5 = TestIndexNode('c5')
+    c4 = MockingPageNode('c4')
+    c5 = MockingIndexNode('c5')
     p2.extend([c4, c5])
 
     assert len(p1.children) == 4
@@ -173,7 +173,6 @@ def test_siblings():
     assert c4.parent == p2
     assert c5.parent == p2
 
-    print c1.siblings
     assert c1.siblings == [c1, c2, c3, p2]
     assert c1.next == c2
     assert c2.next == c3
@@ -184,7 +183,6 @@ def test_siblings():
     assert c3.prev == c2
     assert p2.prev == c3
 
-    print c4.siblings
     assert c4.siblings == [c4]
 
 
@@ -197,16 +195,15 @@ def test_ancestors():
         - p3
           - c
     """
-    p1 = TestRootNode('p1')
-    p2 = TestFolderNode('p2')
-    p3 = TestFolderNode('p3')
-    i1 = TestIndexNode('i1')
-    i2 = TestIndexNode('i2')
-    c = TestPageNode('c')
+    p1 = MockingRootNode('p1')
+    p2 = MockingFolderNode('p2')
+    p3 = MockingFolderNode('p3')
+    i1 = MockingIndexNode('i1')
+    i2 = MockingIndexNode('i2')
+    c = MockingPageNode('c')
     p1.extend([i1, p2])
     p2.extend([i2, p3])
     p3.append(c)
-    print c.ancestors
     assert c.ancestors == [i1, i2, p3]
 
 
@@ -219,14 +216,13 @@ def test_ancestors_no_index():
         - p3
           - c
     """
-    p1 = TestRootNode('p1')
-    p2 = TestFolderNode('p2')
-    p3 = TestFolderNode('p3')
-    c = TestPageNode('c')
+    p1 = MockingRootNode('p1')
+    p2 = MockingFolderNode('p2')
+    p3 = MockingFolderNode('p3')
+    c = MockingPageNode('c')
     p1.extend([p2])
     p2.extend([p3])
     p3.append(c)
-    print c.ancestors
     assert c.ancestors == [p1, p2, p3]
 
 
@@ -239,15 +235,14 @@ def test_ancestors_some_index():
         - p3
           - c
     """
-    p1 = TestRootNode('p1')
-    i1 = TestIndexNode('i1')
-    p2 = TestFolderNode('p2')
-    p3 = TestFolderNode('p3')
-    c = TestPageNode('c')
+    p1 = MockingRootNode('p1')
+    i1 = MockingIndexNode('i1')
+    p2 = MockingFolderNode('p2')
+    p3 = MockingFolderNode('p3')
+    c = MockingPageNode('c')
     p1.extend([i1, p2])
     p2.extend([p3])
     p3.append(c)
-    print c.ancestors
     assert c.ancestors == [i1, p2, p3]
 
 
@@ -272,9 +267,9 @@ def test_config_copy():
 
 
 def test_node_pointer():
-    p = TestRootNode(name='site')
-    a = TestPageNode('a')
-    b = TestPageNode('b', {'a ->': 'site.a'})
+    p = MockingRootNode(name='site')
+    a = MockingPageNode('a')
+    b = MockingPageNode('b', {'a ->': 'site.a'})
     p.extend([a, b])
     assert b.a == a
     assert b['a'] == a
@@ -285,7 +280,7 @@ def test_getitem_and_getattr():
         'key': 'value',
         'friend ->': 'site.bob.joe'
     }
-    n = TestRootNode('node', config)
+    n = MockingRootNode('node', config)
     config = {
         'name': 'bob',
     }
@@ -309,12 +304,14 @@ def test_getitem_and_getattr():
 def test_url():
     config = {
         'root_url': '/',
+        'iterable': True,
     }
     root = RootFolderNode(config, '', '')
 
     config = {
         'name': 'parent',
         'target_name': 'parent',
+        'iterable': True,
     }
     parent = FolderNode(config, 'parent', 'parent')
     root.append(parent)
@@ -322,12 +319,14 @@ def test_url():
     config = {
         'name': 'bob',
         'target_name': 'bob.html',
+        'iterable': True,
     }
     bob = JinjaNode(config, get_test_file('a_folder/page.j2'), '')
 
     config = {
         'name': 'jane',
         'target_name': 'jane.html',
+        'iterable': True,
     }
     jane = JinjaNode(config, get_test_file('a_folder/page.j2'), '')
 
@@ -340,6 +339,7 @@ def test_url():
 def test_url_override():
     config = {
         'root_url': '/foo/',
+        'iterable': True,
     }
     root = RootFolderNode(config, '', '')
 
@@ -347,6 +347,7 @@ def test_url_override():
         'name': 'parent',
         'target_name': 'parent',
         'type': 'folder',
+        'iterable': True,
     }
     parent = FolderNode(config, 'parent', 'parent')
     root.append(parent)
@@ -355,13 +356,15 @@ def test_url_override():
         'name': 'bob',
         'target_name': 'bob.html',
         'url': 'bob',
+        'iterable': True,
     }
     bob = JinjaNode(config, get_test_file('a_folder/page.j2'), '')
 
     config = {
         'name': 'jane',
         'target_name': 'jane.xml',
-        'url': 'jane'
+        'url': 'jane',
+        'iterable': True,
     }
     jane = AssetNode(config, get_test_file('a_folder/a_file.txt'), '')
 
