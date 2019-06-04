@@ -93,7 +93,7 @@ def run():
 
     if os.path.isfile(config_path):
         with open(config_path, 'r') as config_file:
-            yaml_config = yaml.load(config_file)
+            yaml_config = yaml.load(config_file, Loader=yaml.FullLoader)
         if yaml_config:
             CONFIG.update(yaml_config)
 
