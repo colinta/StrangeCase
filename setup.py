@@ -9,7 +9,7 @@ def read(fname):
 
 setup(
         name="StrangeCase",
-        version="4.6.5",
+        version="4.6.6",
         author="Colin T.A. Gray",
         author_email="colinta@gmail",
         url="https://github.com/colinta/StrangeCase",

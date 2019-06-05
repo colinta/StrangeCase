@@ -60,7 +60,7 @@ def front_matter_config(source_file, config):
                         break
                     front_matter += line + "\n"
 
-                yaml_config = yaml.load(front_matter, Loader=yaml.FullLoader)
+                yaml_config = yaml.load(front_matter)
                 if yaml_config:
                     config.update(yaml_config)
                     return config

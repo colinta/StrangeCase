@@ -9,7 +9,7 @@ def folder_config_file(source_file, config):
         config_path = os.path.join(source_file, config['config_file'])
         if os.path.isfile(config_path):
             with open(config_path, 'r') as config_file:
-                yaml_config = yaml.load(config_file, Loader=yaml.FullLoader)
+                yaml_config = yaml.load(config_file)
 
             if yaml_config:
                 config.update(yaml_config)
