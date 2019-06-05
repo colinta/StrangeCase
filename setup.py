@@ -11,7 +11,7 @@ setup(
         name="StrangeCase",
         version="4.6.6",
         author="Colin T.A. Gray",
-        author_email="colinta@gmail",
+        author_email="colinta@gmail.com",
         url="https://github.com/colinta/StrangeCase",
         install_requires=['Jinja2', 'PyYAML', 'watchdog'],
         # optional: 'Pillow', 'misaka', 'clevercss', 'pyScss', 'pytest', 'python-dateutil', 'unidecode', 'plywood'
