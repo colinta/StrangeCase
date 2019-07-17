@@ -1232,3 +1232,4 @@ See LICENSE_ for more details (it's a simplified BSD license).
 .. _PIL:          http://www.pythonware.com/products/pil/
 .. _nanoc:        http://nanoc.stoneship.org/
 .. _dateutil:     http://labix.org/python-dateutil
+.. _pillow:       https://pillow.readthedocs.io/en/stable/
