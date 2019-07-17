@@ -20,14 +20,16 @@ Will assign "My new title" to config['meta']['title'].  All argument overrides
 happen just after config.yaml and config.py are processed, so these act as
 project-level overrides.
 """
-import imp
 import os
 import sys
 import traceback
 import yaml
+from importlib.machinery import SourceFileLoader
 
 from strange_case import strange_case
 
+def load_source(name, path):
+    return SourceFileLoader(name, path).load_module()
 
 def run():
     import logging
@@ -85,7 +87,7 @@ def run():
 
     # now we can look for the app config
     if os.path.isfile(os.path.join(project_path, 'config.py')):
-        config_module = imp.load_source('config', os.path.join(project_path, 'config.py'))
+        config_module = load_source('config', os.path.join(project_path, 'config.py'))
         if hasattr(config_module, 'CONFIG'):
             CONFIG.update(config_module.CONFIG)
 
@@ -93,7 +95,7 @@ def run():
 
     if os.path.isfile(config_path):
         with open(config_path, 'r') as config_file:
-            yaml_config = yaml.load(config_file)
+            yaml_config = yaml.load(config_file, Loader=yaml.FullLoader)
         if yaml_config:
             CONFIG.update(yaml_config)
 

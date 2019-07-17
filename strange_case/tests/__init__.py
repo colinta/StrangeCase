@@ -76,7 +76,7 @@ def basic_config():
 
     if os.path.exists(config_file_path):
         with open(config_file_path, 'r') as config_file:
-            yaml_config = yaml.load(config_file)
+            yaml_config = yaml.load(config_file, Loader=yaml.FullLoader)
             config.update(yaml_config)
 
     old_path = os.getcwd()
@@ -110,7 +110,7 @@ def will_generate(project_name):
 
             if os.path.exists(config_file_path):
                 with open(config_file_path, 'r') as config_file:
-                    yaml_config = yaml.load(config_file)
+                    yaml_config = yaml.load(config_file, Loader=yaml.FullLoader)
                     config.update(yaml_config)
 
             old_path = os.getcwd()

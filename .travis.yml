@@ -5,9 +5,6 @@ python:
 # command to install dependencies
 install:
   - "pip install . --use-mirrors"
-  - "pip install misaka"
-  - "pip install python-dateutil"
-  - "pip install inflect"
   - "pip install -r requirements.txt --use-mirrors"
 # command to run tests
 script: py.test
