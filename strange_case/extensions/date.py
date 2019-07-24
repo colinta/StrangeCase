@@ -91,7 +91,7 @@ def date(value, format='%d %b %Y'):
     if not value:
         return ''
 
-    if value is "now":
+    if value == "now":
         value = datetime.datetime.now()
     else:
         value = to_datetime(value)
@@ -103,7 +103,7 @@ def timestamp(value, format=None):
     if not value:
         return ''
 
-    if value is 'now':
+    if value == 'now':
         value = datetime.datetime.utcnow()
     else:
         value = to_datetime(value)

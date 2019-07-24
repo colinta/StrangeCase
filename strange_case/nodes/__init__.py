@@ -6,4 +6,7 @@ from strange_case.nodes.file import FileNode
 from strange_case.nodes.asset import AssetNode
 from strange_case.nodes.page import PageNode
 from strange_case.nodes.jinja import JinjaNode
-from strange_case.nodes.plywood import PlywoodNode
+try:
+    from strange_case.nodes.plywood import PlywoodNode
+except ImportError:
+    pass

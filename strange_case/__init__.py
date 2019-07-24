@@ -51,7 +51,13 @@ def strange_case(config):
         os.mkdir(config['deploy_path'])
 
     from strange_case.support.jinja import StrangeCaseEnvironment
-    from plywood import PlywoodEnv, PlywoodFunction
+    try:
+        from plywood import PlywoodEnv, PlywoodFunction
+    except ImportError:
+        class PlywoodEnv:
+            pass
+        def PlywoodFunction(_):
+            pass
 
     ##|
     ##|  EXTENSIONS

@@ -14,7 +14,11 @@ friend, it handles the configurating.
 import os
 from strange_case.nodes import FolderNode, RootFolderNode, AssetNode
 # import nodes for supported engines
-from strange_case.nodes import JinjaNode, PlywoodNode
+from strange_case.nodes import JinjaNode
+try:
+    from strange_case.nodes import PlywoodNode
+except ImportError:
+    pass
 from strange_case.registry import Registry
 from strange_case.configurators import configurate
 
