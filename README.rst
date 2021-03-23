@@ -28,17 +28,6 @@ INSTALLATION
                      # for changes to source files
 
 
------
-HELP!
------
-
-Already!?  Geez::
-
-    #strangecase @ irc.freenode.net
-
-    (i'm colinta)
-
-
 -----------
 QUICK START
 -----------
