@@ -54,7 +54,7 @@ def strange_case(config):
     try:
         from plywood import PlywoodEnv, PlywoodFunction
     except ImportError:
-        class PlywoodEnv:
+        class PlywoodEnv(object):
             pass
         def PlywoodFunction(_):
             pass

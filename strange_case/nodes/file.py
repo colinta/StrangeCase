@@ -1,4 +1,5 @@
 import os
+import sys
 from strange_case.nodes import Node, check_config_first
 
 
@@ -17,6 +18,8 @@ class FileNode(Node):
 
     def generate(self, site):
         target_path = os.path.join(self.target_folder, self.target_name)
+        if self['__verbose']:
+            sys.stderr.write("Generating %s\n" % self.source_path)
         self.generate_file(site, self.source_path, target_path)
         super(FileNode, self).generate(site)
 
