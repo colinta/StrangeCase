@@ -2,7 +2,7 @@ Brownie==0.5.1
 CleverCSS==0.1
 Jinja2==2.11.3
 MarkupSafe==0.23
-Pillow==6.2.2
+Pillow==8.2.0
 PyYAML==5.4
 argh==0.15.0
 misaka==2.1.1
